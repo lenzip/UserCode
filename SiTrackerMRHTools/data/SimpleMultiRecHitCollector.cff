@@ -1,0 +1,20 @@
+# Chi2MeasurementEstimatorESProducer
+es_module RelaxedChi2Simple = Chi2MeasurementEstimator from  "TrackingTools/KalmanUpdators/data/Chi2MeasurementEstimatorESProducer.cfi"
+replace RelaxedChi2Simple.ComponentName = "RelaxedChi2Simple"
+replace RelaxedChi2Simple.MaxChi2 = 100.
+#replace RelaxedChi2.nSigma = 3.
+
+# PropagatorWithMaterialESProducer
+include "TrackingTools/MaterialEffects/data/MaterialPropagator.cfi"
+
+# PropagatorWithMaterialESProducer
+include "TrackingTools/MaterialEffects/data/OppositeMaterialPropagator.cfi"
+
+# MeasurementTracker
+include "RecoTracker/MeasurementDet/data/MeasurementTrackerESProducer.cfi"
+
+# MultiRecHitUpdator
+include "RecoTracker/SiTrackerMRHTools/data/SiTrackerMultiRecHitUpdator.cff"
+
+#MultiRecHitCollector
+include "RecoTracker/SiTrackerMRHTools/data/SimpleMultiRecHitCollector.cfi"

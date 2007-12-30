@@ -1,0 +1,9 @@
+es_module groupedMultiRecHitCollector = MultiRecHitCollectorESProducer{
+	string ComponentName = "groupedMultiRecHitCollector"	
+	string Mode = "Grouped"
+	string MultiRecHitUpdator     = "SiTrackerMultiRecHitUpdator"
+	string propagatorAlong        = "PropagatorWithMaterial"
+	string propagatorOpposite     = "PropagatorWithMaterialOpposite"
+	string estimator              = "RelaxedChi2"
+	string MeasurementTrackerName = ""
+}

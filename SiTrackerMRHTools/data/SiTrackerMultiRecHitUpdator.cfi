@@ -1,0 +1,6 @@
+es_module siTrackerMultiRecHitUpdator = SiTrackerMultiRecHitUpdatorESProducer {
+	string ComponentName = "SiTrackerMultiRecHitUpdator"
+	string TTRHBuilder   = "WithTrackAngle"
+	string HitPropagator = "trackingRecHitPropagator"   
+	vdouble AnnealingProgram = {80, 9, 4, 1, 1, 1}
+} 
