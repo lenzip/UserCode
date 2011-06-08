@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export BUILD_HOME=/data/lenzip/Generators/integration/testBuild
+export BUILD_HOME=$PWD
 export TMPDIR=$BUILD_HOME/tmp
 
 cd $BUILD_HOME/build
