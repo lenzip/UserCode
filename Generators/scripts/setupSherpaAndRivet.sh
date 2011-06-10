@@ -45,7 +45,7 @@ scram tool info rivet
 
 cd src
 
-cvs co -r V00-03-19 GeneratorInterface/SherpaInterface
+cvs co -r mn_201106092024 GeneratorInterface/SherpaInterface
 cvs co -r V00-00-08 GeneratorInterface/RivetInterface
 cp ../../testBuild/GeneratorsStuff/scripts/MC_LES_HOUCHES_SYSTEMATICS.cc GeneratorInterface/RivetInterface/src
 cp ../../testBuild/GeneratorsStuff/scripts/rivet_analyze_cfg.py GeneratorInterface/RivetInterface/test
