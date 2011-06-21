@@ -23,6 +23,7 @@ parser.add_option("--notwikiline", action="store_true", help="do not print the f
 parser.add_option("--twikifile", action="store", help="twiki file name", default='twiki.txt')
 parser.add_option("--force", action="store_true", help="overwrite twiki file", default=False)
 parser.add_option("--requestnumber", action="store", help="starting request number", default=1)
+parser.add_option("--domatchingefficiency", action="store_true", help="compute the matching efficiency?", default=False)
 
 
 
@@ -79,6 +80,7 @@ for line in file:
       if ('# with command line options:' in line):
         linesplit = line.split()
         pythonconfig=linesplit[5]
+        print pythonconfig;
       if ('articleID' in line):
         #print 'found MCDB: '+line 
         linesplit = line.split("(")
@@ -93,6 +95,7 @@ for line in file:
   xsection=0
   foundXS = False
   ngeneventspythia=0
+  matching_eff=0
   try:
     logGEN = open(stripline+"/log_GEN.txt", "r")
     ilines = logGEN.readlines()
@@ -108,10 +111,16 @@ for line in file:
         ngeneventspythia=float(xsection_line[6])
         xsection*=1e9
         foundXS = True
+      if "Fraction of events that fail fragmentation cuts = " in line:
+        if options.domatchingefficiency:
+          matching_line = line.split("=")
+          failfraction=matching_line[1].lstrip(' ').rstrip('\n').rstrip('*').rstrip(' ')
+          matching_eff=1-float(failfraction)
     if foundXS is False :
       print 'Xsection not found for '+stripdirname
   except Exception, e:
     print "Error: %s" % str(e)
+    continue
 
   time=0 
   foundTiming=False
@@ -148,7 +157,8 @@ for line in file:
   try:
     rootrecofilename = ''
     for file3 in os.listdir(stripline):
-      if fnmatch.fnmatch(file3, '*GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root'):
+      #if fnmatch.fnmatch(file3, '*GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root'):
+      if fnmatch.fnmatch(file3, '*GEN_SIM.root'):
         rootrecofilename = file3
         foundRootReco=True
         break
@@ -166,7 +176,7 @@ for line in file:
     time /= entries
 
     for file4 in os.listdir(stripline):
-      if fnmatch.fnmatch(file4, '*GEN.root'):
+      if fnmatch.fnmatch(file4, '*GEN_VALIDATION.root'):
         rootgenfilename = file4
         foundRootGen=True
         break
@@ -189,13 +199,15 @@ for line in file:
   print 'size per event: '+str(size)
   print 'filterefficiency: %.7f +- %.7f' % (filtereff, sqrt(filtereff*(1-filtereff)/ngeneventspythia))
   print 'articleID: '+articleid
+  if options.domatchingefficiency:
+    print 'matching efficiency: '+ str(matching_eff)
 
   if (articleid != ''):
     articleid += " | "
 
   if (not options.notwikiline):
     #twiki+='| '+str(requestnumber)+' [[http://vdutta.web.cern.ch/vdutta/Fall10ProductionRAWglobal.html#request_'+str(requestnumber)+'][RAW]] [[http://vdutta.web.cern.ch/vdutta/Fall10ProductionRECOglobal.html#request_'+str(requestnumber)+'][RECO]] [[http://vdutta.web.cern.ch/vdutta/Fall10ProductionAODglobal.html#request_'+str(requestnumber)+'][AOD]] | EWK/P.Lenzi | '+fullstripline_split[1]+' | no | | no | '+str(xsection)+(' | %.1f | '% filtereff)+articleid+'[['+pythonconfig+'][GEN]] | '+str(time)+' | '+str(size)+' | '+fullstripline_split[2]+' | N/A | | *not yet* |\n' 
-    twiki+='| '+str(requestnumber)+' | EWK/P.Lenzi | '+fullstripline_split[1]+' | no | | no | '+str(xsection)+(' | %.1f | '% filtereff)+articleid+'[['+pythonconfig+'][GEN]] | '+str(time)+' | '+str(size)+' | '+fullstripline_split[2]+' | N/A | | *not yet* |\n' 
+    twiki+='| '+str(requestnumber)+' | EWK/P.Lenzi | '+fullstripline_split[1]+' | no | | no | '+str(xsection)+(' | %.3f | '% matching_eff)+(' | %.1f | '% filtereff)+articleid+'[['+pythonconfig+'][GEN]] | '+('%.0f'% time)+' | '+('%.0f'% size)+' | '+fullstripline_split[2]+' | N/A | | *not yet* |\n' 
   requestnumber+=1
 
   print '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
