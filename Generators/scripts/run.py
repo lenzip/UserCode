@@ -23,12 +23,13 @@ class CommandBuilder:
       print "Error: %s" % str(e)  
       
 class LocalCommandBuilder(CommandBuilder):
-  def __init__(self, name, directory, type, nevents, extension = ''):
+  def __init__(self, name, directory, type, nevents, extension = '', cmsgen = ''):
     CommandBuilder.__init__(self, name);
     self._type=type
     self._nevents=nevents
     self._directory=directory 
     self._extension=extension
+    self._cmsgen=cmsgen
   def build(self):
     if not (self._type is 'GEN' or self._type is 'REC'):
       print 'type in LocalCommandBuilder can be either GEN or REC, not '+str(self._type)
@@ -38,6 +39,9 @@ class LocalCommandBuilder(CommandBuilder):
       infile=''
       infile += '#!/bin/bash\n'
       infile += 'export SCRAM_ARCH=slc5_amd64_gcc434\n'
+      if self._cmsgen != '':
+        infile += 'echo '+self._cmsgen+' > cmsgen.cfg\n'
+        infile += 'cmsGen.py --generator sherpa --number-of-events 1 --cfg cmsgen.cfg\n'
       if self._type is 'GEN':
         infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,VALIDATION:genvalid  --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
         infile += 'cat '+self._name+'_py_GEN_VALIDATION.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
@@ -59,12 +63,13 @@ class LocalCommandBuilder(CommandBuilder):
 
 
 class LXBATCHCommandBuilder(CommandBuilder):
-  def __init__(self, name, directory, type, nevents, extension = ''):
+  def __init__(self, name, directory, type, nevents, extension = '', cmsgen = ''):
     CommandBuilder.__init__(self, name);
     self._type=type
     self._nevents=nevents
     self._directory=directory
     self._extension=extension
+    self._cmsgen=cmsgen
   def build(self):
     if not (self._type is 'GEN' or self._type is 'REC'):
       print 'type in LocalCommandBuilder can be either GEN or REC, not '+str(self._type)
@@ -83,8 +88,12 @@ class LXBATCHCommandBuilder(CommandBuilder):
       infile += 'cd '+cmsswbase+'\n'
       infile += 'eval `scram runtime -sh`\n'
       infile += 'cd -\n'
+      if self._cmsgen != '':
+        infile += 'echo '+self._cmsgen+' > cmsgen.cfg\n'
+        infile += 'cmsGen.py --generator sherpa --number-of-events 1 --cfg cmsgen.cfg\n'
       if self._type is 'GEN':
         #infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN --customise Configuration/GenProduction/validation_customize.py --conditions START38_V8::All --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
+        infile += ''
         infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,VALIDATION:genvalid_dy  --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
         #infile += 'cat '+self._name+'_py_GEN.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
         #infile += 'mv tmp.py '+self._name+'_py_GEN.py\n'
@@ -184,13 +193,22 @@ for line in file:
   stripline = line.rstrip('\n')
   print stripline
   
+  newstripline = stripline
   #check if the directory name starts with a number --> it is an MCDB article
-  namecomponents = stripline.split('_')
+  namecomponents = stripline.split(':')
+  cmsgen = ""
   if len(namecomponents) == 0:
     print 'something wrong while parsing '+stripline+'. Doing nothing'
     continue
+  if len(namecomponents) > 1 and "sherpa" in namecomponents[1]:
+    print "this needs cmsGen"
+    cmsgen = namecomponents[1]
+    print "sherpack path "+cmsgen
+    stripline = namecomponents[0]
+    newstripline = stripline
+
+    
  
-  newstripline = stripline
 
   dummy=None
 
@@ -200,7 +218,8 @@ for line in file:
     print 'This is an MCDB article'
   except:
     print 'this is not an MCDB article'
- 
+
+
   print newstripline
   extension = '' if dummy is None else '--filein=mcdb:'+namecomponents[0]  
 
@@ -213,7 +232,7 @@ for line in file:
     os.mkdir(stripline)
   
   if not options.reconly:
-    commandBuilder = LocalCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension) 
+    commandBuilder = LocalCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension, cmsgen) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension, cmsgen) 
     command = commandBuilder.build()
     if command is None:
       print 'problem building GEN command for '+stripline
@@ -222,7 +241,7 @@ for line in file:
         queue.put(command)
 
   if not options.genonly:
-    commandBuilder = LocalCommandBuilder(newstripline, stripline, 'REC', options.events_for_rec, extension) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'REC', options.events_for_rec, extension)
+    commandBuilder = LocalCommandBuilder(newstripline, stripline, 'REC', options.events_for_rec, extension, cmsgen) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'REC', options.events_for_rec, extension,cmsgen)
     command = commandBuilder.build() 
     if command is None:
       print 'problem building REC command for '+stripline
