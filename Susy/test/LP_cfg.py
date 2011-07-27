@@ -42,8 +42,7 @@ print process.source.fileNames
 
 outFileNameExt = ext
 
-process.load('CMGTools.Susy.susyCommon_cff')
-#process.LPPath = cms.Path(process.analysisSequence * process.LPSkimSequence)
+process.load('Lenzip.Susy.LP_cff')
 process.LPPath = cms.Path(process.LPSkimSequence)
 # pprint.pprint(process.out.outputCommands)
 #process.dump = cms.EDAnalyzer("EventContentAnalyzer")
