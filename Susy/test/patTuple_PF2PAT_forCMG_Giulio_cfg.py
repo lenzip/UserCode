@@ -98,7 +98,7 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 # ---------------- Sequence AK5 ----------------------
 
 
-process.eIdSequence = cms.Sequence()
+#process.eIdSequence = cms.Sequence()
 
 # PF2PAT+PAT sequence 1:
 # no lepton cleaning, AK5PFJets
@@ -154,6 +154,18 @@ getattr(process,"pfIsolatedElectrons"+postfixAK5LC).combinedIsolationCut = 0.2
 
 print 'cloning AK5 sequence to prepare AK5LC sequence...Done'
 
+# ---------------- Sequence AK5LeadingLepton, lepton x-cleaning ---------------
+
+# PF2PAT+PAT sequence 3:
+# lepton cleaning, AK5PFJets. This sequence is a clone of the AK5 sequence defined previously.
+# it removes the leading lepton (e or mu) 
+postfixLeadingLepton = 'LeadingLepton'
+cloneProcessingSnippet(process, getattr(process, 'patPF2PATSequence'+postfixAK5), postfixLeadingLepton)
+postfixAK5LeadingLepton = postfixAK5+postfixLeadingLepton
+from Lenzip.Susy.tools.GiulioCleaningTools import cleanLeadingParicles
+cleanLeadingParicles( process, postfixAK5LeadingLepton ) 
+
+
 # ---------------- Common stuff ---------------
 
 process.load('CMGTools.Common.gen_cff')
@@ -186,7 +198,7 @@ process.p += getattr(process,"patPF2PATSequence"+postfixAK5)
 
 if runAK5LC:
     process.p += getattr(process,"patPF2PATSequence"+postfixAK5LC) 
-
+    process.p += getattr(process,"patPF2PATSequence"+postfixAK5LeadingLepton)
 # CMG ---
 
 if runCMG:

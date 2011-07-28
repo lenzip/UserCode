@@ -1,0 +1,13 @@
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="CommonTools/Utils"/>
+<use   name="DataFormats/Common"/>
+<use   name="CommonTools/CandAlgos"/>
+<use   name="CommonTools/CandUtils"/>
+<use   name="CommonTools/ParticleFlow"/>
+<use   name="DataFormats/ParticleFlowCandidate"/>
+<library   name="LenzipSusy_plugins" file="*.cc">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+

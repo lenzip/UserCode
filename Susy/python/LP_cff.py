@@ -28,35 +28,36 @@ from CMGTools.Common.skims.cmgPFJetSel_cfi import *
 LPPFJetSel      = cmgPFJetSel.clone( src = 'cmgPFJetSel', cut = LPJetCut ) 
 LPPFTightJetSel = cmgPFJetSel.clone( src = 'cmgPFJetSel', cut = LPTightJetCut )
 
-
-
 #HT
 from CMGTools.Common.met_cff import cmgMHTPFJet30
-LPMHTPFJet30 = cmgMHTPFJet30.clone()
-LPMHTPFJet30.cfg.ptThreshold = 30.0
-LPMHTPFJet30.cfg.inputCollection = 'LPPFJetSel'
+#this is the HT, computed with 30 GeV jets
+LPHTPFJet30 = cmgMHTPFJet30.clone()
+LPHTPFJet30.cfg.ptThreshold = 30.0
+LPHTPFJet30.cfg.inputCollection = 'LPPFJetSel'
 #HT including selected muons
 from CMGTools.Common.Tools.cmgBaseMETModifier_cfi import cmgBaseMETModifier
 LPLeptonicMHTPFJet30 = cmgBaseMETModifier.clone() 
 LPLeptonicMHTPFJet30.cfg.inputCollection = 'LPMuon'
-LPLeptonicMHTPFJet30.cfg.metCollection   = 'LPMHTPFJet30' 
+LPLeptonicMHTPFJet30.cfg.metCollection   = 'LPHTPFJet30' 
 LPLeptonicMHTPFJet30.cfg.operator = '+'
 
 from CMGTools.Common.skims.cmgBaseMETSel_cfi import cmgBaseMETSel
 
-LPMHTPFJet30LooseSel = cmgBaseMETSel.clone( src = 'LPMHTPFJet30',
+LPHTPFJet30LooseSel = cmgBaseMETSel.clone( src = 'LPHTPFJet30',
                                             cut = LPHTLooseCut ) 
 
-LPMHTPFJet30LooseCount = cmgCandCount.clone( src = 'LPMHTPFJet30LooseSel',
+LPHTPFJet30LooseCount = cmgCandCount.clone( src = 'LPHTPFJet30LooseSel',
                                              minNumber = 1 )
 
-LPMHTPFJet30TightSel = cmgBaseMETSel.clone( src = 'LPMHTPFJet30',
+LPHTPFJet30TightSel = cmgBaseMETSel.clone( src = 'LPTPFJet30',
                                             cut = LPHTTightCut )
 
-LPMHTPFJet30TightCount = cmgCandCount.clone( src = 'LPMHTPFJet30TightSel',
+LPHTPFJet30TightCount = cmgCandCount.clone( src = 'LPHTPFJet30TightSel',
                                              minNumber = 1 )
 
 #W
+#MHT is defined ad the muon plus the MET, and is called LPWMuNu.
+#I'm using also an additional definition of MHT, which is the muon + the MET computed as the HT.missingEt() + muon 
 from CMGTools.Common.factories.cmgWMuNu_cfi import cmgWMuNu
 LPWMuNu = cmgWMuNu.clone()
 LPWMuNu.cfg.leg1Collection = 'LPMuon'
@@ -79,9 +80,9 @@ LPObjectSequence = cms.Sequence(
     LPMuonSequence +
     LPPFJetSel +
     LPPFTightJetSel +
-    LPMHTPFJet30 +
-    LPMHTPFJet30LooseSel +
-    LPMHTPFJet30TightSel +
+    LPHTPFJet30 +
+    LPHTPFJet30LooseSel +
+    LPHTPFJet30TightSel +
     LPLeptonicMHTPFJet30 +
     LPWMuNu +
     LPMuMHT 
@@ -108,7 +109,7 @@ LPSequence = cms.Sequence(
 LPSkimSequence   = cms.Sequence(
     LPObjectSequence + 
     LPMuonSkimSequence +
-    LPMHTPFJet30LooseCount
+    LPHTPFJet30LooseCount
     #LPPFJetCount +
     #LPMHTPFJet20Count
     )
