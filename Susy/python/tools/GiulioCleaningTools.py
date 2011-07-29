@@ -18,21 +18,30 @@ def cleanLeadingParicles( process, postfix):
       src = cms.InputTag('twoLeadingLeptons'),
       maxNumber = cms.uint32(1))
 
-    process.leadingLeptonSelectionSequence = cms.Sequence(process.leadingMuon )
+    #we need to run first the AllMuon and AllElectron producers
+    allmu = getattr(process, 'pfAllMuons'+postfix)
+    alle  = getattr(process, 'pfAllElectrons'+postfix)
+    alle.src = 'pfNoPileUp'+postfix
+    process.allleptons = cms.Sequence(allmu + alle)
+    process.leadingLeptonSelectionSequence = cms.Sequence(process.allleptons + 
+                                                          process.leadingMuon + 
+                                                          process.leadingElectron + 
+                                                          process.twoLeadingLeptons + 
+                                                          process.leadingLepton)
+
     #process.leadingLeptonSelectionSequence = cms.Sequence(process.leadingMuon + process.leadingElectron + process.twoLeadingLeptons + process.leadingLepton)
 
     process.pfNoMuonAK5LeadingLepton.verbose = cms.untracked.bool(True)
     process.pfNoElectronAK5LeadingLepton.verbose = cms.untracked.bool(True)
     #removal of the leading lepton
     getattr(process,"pfNoMuon"+postfix).enable = True
-    getattr(process,"pfNoMuon"+postfix).topCollection = src = cms.InputTag('leadingMuon')
-    getattr(process,"pfNoElectron"+postfix).enable = False 
-    #getattr(process,"pfNoElectron"+postfix).topCollection = src = cms.InputTag('leadingElectron')
+    getattr(process,"pfNoMuon"+postfix).topCollection = src = cms.InputTag('leadingLepton')
+    getattr(process,"pfNoElectron"+postfix).enable = True 
+    getattr(process,"pfNoElectron"+postfix).topCollection = src = cms.InputTag('leadingLepton')
+    # line below because we don't want to remove the muons (pfNoElectron sequence had as input pfNoMuon by default) 
     getattr(process,"pfNoElectron"+postfix).bottomCollection = src = cms.InputTag('pfNoPileUp'+postfix)
     
-    #getattr(process, 'patPF2PATSequence'+postfix).insert(0,(process.leadingMuonSelectionSequence))
-    seq = getattr(process, 'pfMuonSequence'+postfix)
-    seq += process.leadingMuon
-    setattr (process, 'pfMuonSequence'+postfix, seq )
-    #getattr(process, 'pfNoPileUpSequence'+postfix) += process.leadingLeptonSelectionSequence
+    pfnopu = getattr(process, 'pfNoPileUpSequence'+postfix) 
+    pfnopu += process.leadingLeptonSelectionSequence
+    setattr ( process, 'pfNoPileUpSequence'+postfix, pfnopu)
   
