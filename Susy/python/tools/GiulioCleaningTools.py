@@ -29,10 +29,9 @@ def cleanLeadingParicles( process, postfix):
                                                           process.twoLeadingLeptons + 
                                                           process.leadingLepton)
 
-    #process.leadingLeptonSelectionSequence = cms.Sequence(process.leadingMuon + process.leadingElectron + process.twoLeadingLeptons + process.leadingLepton)
 
-    process.pfNoMuonAK5LeadingLepton.verbose = cms.untracked.bool(True)
-    process.pfNoElectronAK5LeadingLepton.verbose = cms.untracked.bool(True)
+    #process.pfNoMuonAK5LeadingLepton.verbose = cms.untracked.bool(True)
+    #process.pfNoElectronAK5LeadingLepton.verbose = cms.untracked.bool(True)
     #removal of the leading lepton
     getattr(process,"pfNoMuon"+postfix).enable = True
     getattr(process,"pfNoMuon"+postfix).topCollection = src = cms.InputTag('leadingLepton')
