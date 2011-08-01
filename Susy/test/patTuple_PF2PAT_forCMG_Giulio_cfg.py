@@ -12,7 +12,9 @@ runOnMC = True
 # AK5 sequence with no cleaning is the default
 # the other sequences can be turned off with the following flags.
 #JOSE: no need to run these guys for what you are up to
-runAK5LC = True
+runAK5 = False
+runAK5LC = False
+runAK5LeadingLepton = True
 
 #COLIN: will need to include the event filters in tagging mode
 
@@ -193,11 +195,13 @@ if runOnMC:
     process.p += process.genSequence 
 
 # PF2PAT+PAT ---
-
-process.p += getattr(process,"patPF2PATSequence"+postfixAK5)
+if runAK5:
+    process.p += getattr(process,"patPF2PATSequence"+postfixAK5)
 
 if runAK5LC:
     process.p += getattr(process,"patPF2PATSequence"+postfixAK5LC) 
+
+if runAK5LeadingLepton:
     process.p += getattr(process,"patPF2PATSequence"+postfixAK5LeadingLepton)
 # CMG ---
 
@@ -213,16 +217,23 @@ if runCMG:
     cloneProcessingSnippet(process, getattr(process, 'analysisSequence'), 'AK5LCCMG')
     replacePostfix(getattr(process,"analysisSequenceAK5LCCMG"),'AK5','AK5LC') 
     
-    cloneProcessingSnippet(process, getattr(process, 'analysisSequence'), 'AK7CMG')
-    replacePostfix(getattr(process,"analysisSequenceAK7CMG"),'AK5','AK7') 
+    #cloneProcessingSnippet(process, getattr(process, 'analysisSequence'), 'AK7CMG')
+    #replacePostfix(getattr(process,"analysisSequenceAK7CMG"),'AK5','AK7') 
+
+    cloneProcessingSnippet(process, getattr(process, 'analysisSequence'), 'AK5LeadingLeptonCMG')
+    replacePostfix(getattr(process,"analysisSequenceAK5LeadingLeptonCMG"),'AK5','AK5LeadingLepton')
     
     from CMGTools.Common.Tools.tuneCMGSequences import * 
     tuneCMGSequences(process, postpostfix='CMG')
 
-    process.p += process.analysisSequence
+    if runAK5: 
+        process.p += process.analysisSequence
 
     if runAK5LC:
         process.p += process.analysisSequenceAK5LCCMG
+      
+    if runAK5LeadingLepton:
+        process.p += process.analysisSequenceAK5LeadingLeptonCMG
         
 
 ### OUTPUT DEFINITION #############################################
