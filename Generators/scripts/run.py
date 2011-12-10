@@ -23,19 +23,21 @@ class CommandBuilder:
       print "Error: %s" % str(e)  
       
 class LocalCommandBuilder(CommandBuilder):
-  def __init__(self, name, directory, type, nevents, extension = '', cmsgen = ''):
+  def __init__(self, name, directory, type, nevents, extension = '', cmsgen = '', aqcut = -1):
     CommandBuilder.__init__(self, name);
     self._type=type
     self._nevents=nevents
     self._directory=directory 
     self._extension=extension
     self._cmsgen=cmsgen
+    self._aqcut=aqcut
   def build(self):
     if not (self._type is 'GEN' or self._type is 'REC'):
       print 'type in LocalCommandBuilder can be either GEN or REC, not '+str(self._type)
       return
     try:
-      script = open(self._directory+'/job'+self._name+self._type+'.sh', 'w') 
+      outfilesroot=self._name+self._type+str(self._aqcut)
+      script = open(self._directory+'/job'+outfilesroot+'.sh', 'w') 
       infile=''
       infile += '#!/bin/bash\n'
       infile += 'export SCRAM_ARCH=slc5_amd64_gcc434\n'
@@ -43,33 +45,42 @@ class LocalCommandBuilder(CommandBuilder):
         infile += 'echo '+self._cmsgen+' > cmsgen.cfg\n'
         infile += 'cmsGen.py --generator sherpa --number-of-events 1 --cfg cmsgen.cfg\n'
       if self._type is 'GEN':
-        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,VALIDATION:genvalid  --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
-        infile += 'cat '+self._name+'_py_GEN_VALIDATION.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
-        infile += 'mv tmp.py '+self._name+'_py_GEN.py\n'
-        infile += 'cmsRun '+self._name+'_py_GEN.py &>log_GEN.txt\n'
-        infile += 'cmsDriver.py step3 -s HARVESTING:genHarvesting --harvesting AtJobEnd --conditions auto:mc  --mc --filein file:'+self._name+'_py_GEN_VALIDATION.root\n' 
+        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+ \
+                  '.py -s GEN  --conditions auto:mc --datatier GEN-SIM --eventcontent RAWSIM --no_exec -n '+ \
+                  str(self._nevents)+' '+self._extension+ \
+                  ' --python_filename '+ outfilesroot+'.py '+ \
+                  ' --fileout '+outfilesroot+'.root\n'
+        if self._aqcut != -1:
+          infile += 'echo "process.generator.jetMatching.MEMAIN_qcut='+str(self._aqcut)+'" >> '+ outfilesroot+'.py'+ '\n'
+          infile += 'echo "process.generator.jetMatching.outTree_flag=1" >> ' + outfilesroot +'.py' + '\n'
+        infile += 'cmsRun '+outfilesroot+'.py &> '+outfilesroot+'.log\n'
+        infile += 'mv events.tree '+outfilesroot+'.tree\n'
       elif self._type is 'REC':
-        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,SIM --customise Configuration/GenProduction/timing_customize.py --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
-        #infile += 'cmsRun '+self._name+'_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.py &>log_REC.txt\n'
-        infile += 'cat '+self._name+'_py_GEN_SIM.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
-        infile += 'mv tmp.py '+self._name+'_py_GEN_SIM.py\n' 
-        infile += 'cmsRun '+self._name+'_py_GEN_SIM.py &>log_REC.txt\n'
+        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+ \
+                  '.py -s GEN,SIM --customise Configuration/GenProduction/timing_customize.py --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n ' \
+                  +str(self._nevents)+' '+self._extension+ \
+                  ' --python_filename '+ outfilesroot+'.py '+ \
+                  ' --fileout '+outfilesroot+'.root\n'
+        infile += 'cat '+outfilesroot+'.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
+        infile += 'mv tmp.py '+outfilesroot+'.py\n'
+        infile += 'cmsRun '+outfilesroot+'.py &> '+outfilesroot+'.log\n'
       script.write(infile)
-      os.chmod(self._directory+'/job'+self._name+self._type+'.sh', 0755)
+      os.chmod(self._directory+'/job'+outfilesroot+'.sh', 0755)
       script.close()
-      return str('cd '+self._directory+'; ./job'+self._name+self._type+'.sh')  
+      return str('cd '+self._directory+'; ./job'+outfilesroot+'.sh')  
     except Exception, e:
       print "Error: %s" % str(e) 
 
 
 class LXBATCHCommandBuilder(CommandBuilder):
-  def __init__(self, name, directory, type, nevents, extension = '', cmsgen = ''):
+  def __init__(self, name, directory, type, nevents, extension = '', cmsgen = '', aqcut = -1):
     CommandBuilder.__init__(self, name);
     self._type=type
     self._nevents=nevents
     self._directory=directory
     self._extension=extension
     self._cmsgen=cmsgen
+    self._aqcut=aqcut
   def build(self):
     if not (self._type is 'GEN' or self._type is 'REC'):
       print 'type in LocalCommandBuilder can be either GEN or REC, not '+str(self._type)
@@ -79,7 +90,8 @@ class LXBATCHCommandBuilder(CommandBuilder):
       if cmsswbase is None:
         print "you have to run cmsenv in your area first!"
         return
-      script = open(self._directory+'/job'+self._name+self._type+'.sh', 'w')
+      outfilesroot=self._name+self._type+str(self._aqcut)
+      script = open(self._directory+'/job'+outfilesroot+'.sh', 'w')
       infile=''
       infile += '#!/bin/bash\n'
       infile += 'export SCRAM_ARCH=slc5_amd64_gcc434\n'
@@ -92,34 +104,37 @@ class LXBATCHCommandBuilder(CommandBuilder):
         infile += 'echo '+self._cmsgen+' > cmsgen.cfg\n'
         infile += 'cmsGen.py --generator sherpa --number-of-events 1 --cfg cmsgen.cfg\n'
       if self._type is 'GEN':
-        #infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN --customise Configuration/GenProduction/validation_customize.py --conditions START38_V8::All --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
         infile += ''
-        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,VALIDATION:genvalid_dy  --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
-        #infile += 'cat '+self._name+'_py_GEN.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
-        #infile += 'mv tmp.py '+self._name+'_py_GEN.py\n'
-        infile += 'cmsRun '+self._name+'_py_GEN_VALIDATION.py &>log_GEN.txt\n'
-        infile += 'cmsDriver.py step3 -s HARVESTING:genHarvesting --harvesting AtJobEnd --conditions auto:mc  --mc --filein file:'+self._name+'_py_GEN_VALIDATION.root\n'
+        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+ \
+                  '.py -s GEN  --conditions auto:mc --datatier GEN-SIM --eventcontent RAWSIM --no_exec -n '+ \
+                  str(self._nevents)+' '+self._extension+ \
+                  ' --python_filename '+ outfilesroot+'.py '+ \
+                  ' --fileout '+outfilesroot+'.root\n'
+        if self._aqcut != -1:
+          infile += 'echo "process.generator.jetMatching.MEMAIN_qcut='+str(self._aqcut)+'" >> '+ outfilesroot+'.py'+ '\n'
+          infile += 'echo "process.generator.jetMatching.outTree_flag=1" >> ' + outfilesroot+'.py' + '\n'
+        infile += 'cmsRun '+outfilesroot+'.py &> '+outfilesroot+'.log\n'
+        infile += 'mv events.tree '+outfilesroot+'.tree\n' 
       elif self._type is 'REC':
-        #infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,SIM,DIGI,L1,DIGI2RAW,HLT --customise Configuration/GenProduction/timing_customize.py --conditions START38_V8::All --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
-        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+'.py -s GEN,SIM --customise Configuration/GenProduction/timing_customize.py --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n '+str(self._nevents)+' '+self._extension+'\n'
-        #infile += 'cmsRun '+self._name+'_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.py &>log_REC.txt\n'
-        infile += 'cat '+self._name+'_py_GEN_SIM.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
-        infile += 'mv tmp.py '+self._name+'_py_GEN_SIM.py\n'  
-        infile += 'cmsRun '+self._name+'_py_GEN_SIM.py &>log_REC.txt\n'
-      
+        infile += 'cmsDriver.py Configuration/GenProduction/python/'+self._name+ \
+                  '.py -s GEN,SIM --customise Configuration/GenProduction/timing_customize.py --conditions auto:mc --datatier GEN-SIM-RAW --eventcontent RAWSIM --no_exec -n ' \
+                  +str(self._nevents)+' '+self._extension+ \
+                  ' --python_filename '+ outfilesroot+'.py '+ \
+                  ' --fileout '+outfilesroot+'.root\n' 
+        infile += 'cat '+outfilesroot+'.py | sed -e "s#input = cms\.untracked#output = cms\.untracked#g" > tmp.py\n'
+        infile += 'mv tmp.py '+outfilesroot+'.py\n'  
+        infile += 'cmsRun '+outfilesroot+'.py &> '+outfilesroot+'.log\n'
       infile += 'ls\n'
-      castordir = '/castor/cern.ch/cms/store/cmst3/user/lenzip/Summer11/'
-      infile += 'rfmkdir '+castordir+self._directory+'\n'
-      infile += 'rfcp *.py '+castordir+self._directory+'\n'
-      #infile += 'scp *.py luana:/data/lenzip/generatorValidation/Production412_patch1/'+self._directory+'\n'
-      infile += 'for i in `ls *.root`; do rfcp $i '+castordir+self._directory+';done\n'
-      #infile += 'scp *.root luana:/data/lenzip/generatorValidation/Production412_patch1/'+self._directory+'\n'
-      infile += 'rfcp *.txt '+castordir+self._directory+'\n'
-      #infile += 'scp *.txt luana:/data/lenzip/generatorValidation/Production412_patch1/'+self._directory+'\n'
+      castordir = '/store/eos/user/lenzip/Summer11/'
+      infile += 'cmsMkdir '+castordir+self._directory+'\n'
+      infile += 'cmsStage -f *.py '+castordir+self._directory+'\n'
+      infile += 'cmsStage -f *.root '+castordir+self._directory+'\n'
+      infile += 'cmsStage -f *.log '+castordir+self._directory+'\n'
+      infile += 'cmsStage -f *.tree '+castordir+self._directory+'\n'
       script.write(infile)
-      os.chmod(self._directory+'/job'+self._name+self._type+'.sh', 0755)
+      os.chmod(self._directory+'/job'+outfilesroot+'.sh', 0755)
       script.close()
-      return str('cd '+self._directory+'; bsub -q 1nd job'+self._name+self._type+'.sh')
+      return str('cd '+self._directory+'; bsub -q 1nd job'+outfilesroot+'.sh')
     except Exception, e:
       print "Error: %s" % str(e) 
 
@@ -161,6 +176,7 @@ parser.add_option('-f', "--force", action="store_true", help="overwrite old resu
 parser.add_option('-c', "--cores", action="store", help="number of cores to use (default=%s)" %numcores, default=numcores)
 parser.add_option('-b', "--batch", action="store_true", help="run on LXBATCH", default=False)
 parser.add_option("-n", '--negate', action="store_true", help="do nothing, just prepare the jobs", default=False)
+parser.add_option("-s", '--scanqcut', action="store", help="min,max valued of the qcut", default=None)
 
 
 (options, args) = parser.parse_args()
@@ -179,6 +195,23 @@ except Exception, e:
   print "Error: %s" % str(e)
   sys.exit(1)
 
+if options.scanqcut != None:
+  print "you requested a qcut scan, disabling SIM step"
+  options.genonly = True
+  options.reconly = False
+  #we can do single core only in this case, for local runs, beccause the the name of events.tree file cannot be changed
+  #so we have to run on job at a time and rename aftrwards
+  options.cores = 1
+  qcuts = options.scanqcut.split(',')
+  if len(qcuts) != 2:
+    print "error parsing input qcuts"
+    sys.exit(1)
+  minqcut = float(qcuts[0])
+  maxqcut = float(qcuts[1])
+  if minqcut > maxqcut:
+    print "error minqcut has to be smaller than maxqcut"
+    sys.exit(1)
+
 
 queue = Queue.Queue()
 
@@ -195,7 +228,7 @@ for line in file:
   
   newstripline = stripline
   #check if the directory name starts with a number --> it is an MCDB article
-  namecomponents = stripline.split(':')
+  namecomponents = stripline.split('_')
   cmsgen = ""
   if len(namecomponents) == 0:
     print 'something wrong while parsing '+stripline+'. Doing nothing'
@@ -220,7 +253,6 @@ for line in file:
     print 'this is not an MCDB article'
 
 
-  print newstripline
   extension = '' if dummy is None else '--filein=mcdb:'+namecomponents[0]  
 
   if os.path.exists(stripline) and options.force is False:
@@ -230,15 +262,27 @@ for line in file:
   
   if not os.path.exists(stripline):
     os.mkdir(stripline)
-  
+ 
+  print newstripline
+
   if not options.reconly:
-    commandBuilder = LocalCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension, cmsgen) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension, cmsgen) 
-    command = commandBuilder.build()
-    if command is None:
-      print 'problem building GEN command for '+stripline
-    else: 
-      if not options.negate:
-        queue.put(command)
+    qcuts = []
+    if (options.scanqcut != None):
+      qcut = minqcut
+      while (qcut < maxqcut):
+        qcut += 1.0
+        print qcut
+        qcuts.append(qcut)
+    else:    
+      qcuts = [-1]
+    for aqcut in qcuts:  
+      commandBuilder = LocalCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension, cmsgen, aqcut) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'GEN', options.events_for_gen, extension, cmsgen, aqcut) 
+      command = commandBuilder.build()
+      if command is None:
+        print 'problem building GEN command for '+stripline
+      else: 
+        if not options.negate:
+          queue.put(command)
 
   if not options.genonly:
     commandBuilder = LocalCommandBuilder(newstripline, stripline, 'REC', options.events_for_rec, extension, cmsgen) if not options.batch else LXBATCHCommandBuilder(newstripline, stripline, 'REC', options.events_for_rec, extension,cmsgen)
