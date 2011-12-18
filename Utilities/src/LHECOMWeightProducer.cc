@@ -4,11 +4,13 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 
 //
 // class declaration
@@ -20,19 +22,20 @@ class LHECOMWeightProducer : public edm::EDProducer {
 
    private:
       virtual void beginJob() ;
+      virtual void beginRun(edm::Run &run, const edm::EventSetup &es) ;
       virtual void produce(edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
 
       edm::InputTag lheTag_;
-      std::string pdfSetName_;
-      std::string pdfShortName_;
+      int _pdfset;
+      int _pdfmember;
       double _origECMS;
       double _newECMS;
 };
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 namespace LHAPDF {
-      void initPDFSet(int nset, const std::string& filename, int member=0);
+      void initPDFSet(int nset, int setid, int member=0);
       int numberPDF(int nset);
       void usePDFMember(int nset, int member);
       double xfx(int nset, double x, double Q, int fl);
@@ -46,26 +49,30 @@ namespace LHAPDF {
 /////////////////////////////////////////////////////////////////////////////////////
 LHECOMWeightProducer::LHECOMWeightProducer(const edm::ParameterSet& pset) :
  lheTag_(pset.getParameter<edm::InputTag> ("lheSrc")),
- pdfSetName_(pset.getParameter<std::string> ("PdfSetNames")),
  _origECMS(pset.getParameter< double > ("OriginalECMS")),
  _newECMS(pset.getParameter< double > ("NewECMS"))
 {
-  size_t dot = pdfSetName_.find_first_of('.');
-  size_t underscore = pdfSetName_.find_first_of('_');
-  if (underscore<dot) {
-        pdfShortName_ = pdfSetName_.substr(0,underscore);
-  } else {
-        pdfShortName_ = pdfSetName_.substr(0,dot);
-  }
-  produces<double>(pdfShortName_.data());
+  produces<double>();
 } 
 
 /////////////////////////////////////////////////////////////////////////////////////
 LHECOMWeightProducer::~LHECOMWeightProducer(){}
 
 /////////////////////////////////////////////////////////////////////////////////////
+void LHECOMWeightProducer::beginRun(edm::Run &run, const edm::EventSetup &es){
+  using namespace edm;
+  Handle<LHERunInfoProduct> lheRun;
+  run.getByLabel(lheTag_, lheRun);
+  //assumes the same pdf is used for both beams
+  _pdfset    = lheRun->heprup().PDFSUP.first;
+  _pdfmember = lheRun->heprup().PDFGUP.first;
+  LHAPDF::initPDFSet(1,_pdfset, _pdfmember);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
 void LHECOMWeightProducer::beginJob() {
-  LHAPDF::initPDFSet(1,pdfSetName_);
+  //LHAPDF::initPDFSet(1,pdfSetName_);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -114,9 +121,9 @@ void LHECOMWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup&) {
 
       // Put PDF weights in the event
       if (verbose)
-        cout << " Set : " << pdfSetName_ << endl;
+        cout << " Set : " << _pdfset << "  member : " << _pdfmember << endl;
      
-      LHAPDF::usePDFMember(1,0);
+      LHAPDF::usePDFMember(1,_pdfmember);
       double oldpdf1 = LHAPDF::xfx(1, x1, Q, id1)/x1;
       double oldpdf2 = LHAPDF::xfx(1, x2, Q, id2)/x2;
       double newpdf1 = LHAPDF::xfx(1, x1prime, Q, id1)/x1prime;
@@ -130,7 +137,7 @@ void LHECOMWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup&) {
         cout << "     weight:" << (newpdf1/oldpdf1)*(newpdf2/oldpdf2) << endl;
       }
       std::auto_ptr<double> weight (new double((newpdf1/oldpdf1)*(newpdf2/oldpdf2)));
-      iEvent.put(weight,pdfShortName_);
+      iEvent.put(weight);
 }
 
 DEFINE_FWK_MODULE(LHECOMWeightProducer);
