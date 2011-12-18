@@ -11,7 +11,9 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
+#include <sstream>
 //
 // class declaration
 //
@@ -31,6 +33,7 @@ class LHECOMWeightProducer : public edm::EDProducer {
       int _pdfmember;
       double _origECMS;
       double _newECMS;
+      std::string _label;
 };
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -52,7 +55,13 @@ LHECOMWeightProducer::LHECOMWeightProducer(const edm::ParameterSet& pset) :
  _origECMS(pset.getParameter< double > ("OriginalECMS")),
  _newECMS(pset.getParameter< double > ("NewECMS"))
 {
-  produces<double>();
+  if ( _newECMS > _origECMS )
+    throw cms::Exception("LHECOMWeightProducer") << "You cannot reweight COM energy to a higher than original energy ";
+  //produces<double>();
+  std::stringstream labelStr;
+  labelStr << "comFrom" << _origECMS << "To" << _newECMS;
+  _label = labelStr.str();
+  produces<GenEventInfoProduct>(_label);
 } 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -136,8 +145,14 @@ void LHECOMWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup&) {
         cout << "     xfx2': " << newpdf2 << endl;
         cout << "     weight:" << (newpdf1/oldpdf1)*(newpdf2/oldpdf2) << endl;
       }
-      std::auto_ptr<double> weight (new double((newpdf1/oldpdf1)*(newpdf2/oldpdf2)));
-      iEvent.put(weight);
+      //std::auto_ptr<double> weight (new double((newpdf1/oldpdf1)*(newpdf2/oldpdf2)));
+      //iEvent.put(weight);
+      double weight = (newpdf1/oldpdf1)*(newpdf2/oldpdf2);
+      std::vector<double> weights;
+      weights.push_back(weight);
+      std::auto_ptr<GenEventInfoProduct> info(new GenEventInfoProduct());
+      info->setWeights(weights);
+      iEvent.put(info, _label);
 }
 
 DEFINE_FWK_MODULE(LHECOMWeightProducer);
