@@ -52,14 +52,10 @@ namespace LHAPDF {
 /////////////////////////////////////////////////////////////////////////////////////
 LHECOMWeightProducer::LHECOMWeightProducer(const edm::ParameterSet& pset) :
  lheTag_(pset.getParameter<edm::InputTag> ("lheSrc")),
- _origECMS(pset.getParameter< double > ("OriginalECMS")),
  _newECMS(pset.getParameter< double > ("NewECMS"))
 {
-  if ( _newECMS > _origECMS )
-    throw cms::Exception("LHECOMWeightProducer") << "You cannot reweight COM energy to a higher than original energy ";
-  //produces<double>();
   std::stringstream labelStr;
-  labelStr << "comFrom" << _origECMS << "To" << _newECMS;
+  labelStr << "com" << "To" << _newECMS;
   _label = labelStr.str();
   produces<GenEventInfoProduct>(_label);
 } 
@@ -75,6 +71,10 @@ void LHECOMWeightProducer::beginRun(edm::Run &run, const edm::EventSetup &es){
   //assumes the same pdf is used for both beams
   _pdfset    = lheRun->heprup().PDFSUP.first;
   _pdfmember = lheRun->heprup().PDFGUP.first;
+  _origECMS  = lheRun->heprup().EBMUP.first + lheRun->heprup().EBMUP.second;
+  edm::LogInfo("LHECOMWeightProducer") << "PDFSET: " << _pdfset << "; member: " << _pdfmember << "; COM energy: " << _origECMS;
+  if ( _newECMS > _origECMS )
+      throw cms::Exception("LHECOMWeightProducer") << "You cannot reweight COM energy to a higher than original energy ";
   LHAPDF::initPDFSet(1,_pdfset, _pdfmember);
 }
 
@@ -103,25 +103,19 @@ void LHECOMWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup&) {
       int id1        = lheevent->hepeup().IDUP[0];
       double x1      = fabs(lheevent->hepeup().PUP[0][2]/(_origECMS/2));
       double x1prime = fabs(lheevent->hepeup().PUP[0][2]/(_newECMS/2));
-      //double pdf1 = pdfstuff->pdf()->xPDF.first;
 
       int id2        = lheevent->hepeup().IDUP[1];
       double x2      = fabs(lheevent->hepeup().PUP[1][2]/(_origECMS/2));
       double x2prime = fabs(lheevent->hepeup().PUP[1][2]/(_newECMS/2));
-      //double pdf2 = pdfstuff->pdf()->xPDF.second;
 
-      if (verbose){
-        cout << "*******LHECOMWeightProducer*******" << endl;
-        cout << " Q  : " << Q << endl; 
-        cout << " id1: " << id1 << endl;
-        cout << " x1 : " << x1  << endl;
-        cout << " x1': " << x1prime << endl;
-
-        cout << " id2: " << id2 << endl;
-        cout << " x2 : " << x2  << endl;
-        cout << " x2': " << x2prime << endl;
-      } 
-
+      LogTrace("LHECOMWeightProducer") << "*******LHECOMWeightProducer*******\n" << 
+                                          " Q  : " << Q << "\n" <<
+                                          " id1: " << id1 << "\n" <<
+                                          " x1 : " << x1  << "\n" <<
+                                          " x1': " << x1prime << "\n" <<
+                                          " id2: " << id2 << "\n" <<
+                                          " x2 : " << x2  << "\n" <<
+                                          " x2': " << x2prime ;
       //gluon is 0 in the LHAPDF numbering
       if (id1 == 21)
         id1 = 0;
@@ -137,16 +131,12 @@ void LHECOMWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup&) {
       double oldpdf2 = LHAPDF::xfx(1, x2, Q, id2)/x2;
       double newpdf1 = LHAPDF::xfx(1, x1prime, Q, id1)/x1prime;
       double newpdf2 = LHAPDF::xfx(1, x2prime, Q, id2)/x2prime;
-      if (verbose) {
-        cout << "     xfx1 : " << oldpdf1 << endl;
-        cout << "     xfx2 : " << oldpdf2 << endl;
-
-        cout << "     xfx1': " << newpdf1 << endl;
-        cout << "     xfx2': " << newpdf2 << endl;
-        cout << "     weight:" << (newpdf1/oldpdf1)*(newpdf2/oldpdf2) << endl;
-      }
-      //std::auto_ptr<double> weight (new double((newpdf1/oldpdf1)*(newpdf2/oldpdf2)));
-      //iEvent.put(weight);
+      LogTrace("LHECOMWeightProducer") <<
+          "     xfx1 : " << oldpdf1 << "\n" <<
+          "     xfx2 : " << oldpdf2 << "\n" <<
+          "     xfx1': " << newpdf1 << "\n" <<
+          "     xfx2': " << newpdf2 << "\n" <<
+          "     weight:" << (newpdf1/oldpdf1)*(newpdf2/oldpdf2);
       double weight = (newpdf1/oldpdf1)*(newpdf2/oldpdf2);
       std::vector<double> weights;
       weights.push_back(weight);
