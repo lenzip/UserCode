@@ -27,7 +27,14 @@ extern "C" {
   void hzha_event_(void);
   //void timel_(int&);
   void hzha_close_(void);
-  void pyhepc_(int);
+  void pyhepc_(int&);
+}
+
+extern "C" {
+  extern struct {
+    int n, npad, k[5][4000];
+    double p[5][4000], v[5][4000];
+  } pyjets_;
 }
 
 class HZHAHadronizer : public gen::BaseHadronizer {
@@ -104,7 +111,8 @@ bool HZHAHadronizer::generatePartonsAndHadronize()
   //get the next event
   hzha_event_();
   //convert hepevt to hepmc
-  pyhepc_(1);
+  int mode=1; 
+  pyhepc_(mode);
   //store hepmc in the event
   event().reset( conv.read_next_event() );
   return true;

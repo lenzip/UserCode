@@ -6101,6 +6101,8 @@ C
 C QED coupling constant at the Z
 C
       alpha(0)  = pyalem(amz**2)
+      write(*,*) "alpha(0)"
+      write(*,*) alpha(0)
       alpha2    = 0.38937966E12 * alpha(0)**2
 C
 C QCD coupling constant at the Z
