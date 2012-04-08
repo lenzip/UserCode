@@ -7387,9 +7387,11 @@ C     of two RNDM's, since the latter gives different results
 C     on different machines (!)
 C-----------------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      REAL*4 RNDM, dummy2
+      EXTERNAL RNDMCMSSW
+      REAL*8 RNDMCMSSW, dummy2
 C
-      rndm2 = DBLE(rndm(dummy2))
+C      rndm2 = DBLE(rndmCMSSW(dummy2))
+      rndm2 = rndmCMSSW(dummy2)
 C
       RETURN 
       END

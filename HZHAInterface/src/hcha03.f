@@ -1106,12 +1106,12 @@ C----------------------------------------------------------------------
       IMPLICIT    NONE
       REAL*8    RANDOM(*)
       INTEGER   LEN
-      REAL*8    RNDM
+      REAL*8    RNDMCMSSW
       INTEGER   I, DUM
 C
       DUM= 0
       DO I=1,LEN
-        RANDOM(I)= DBLE(RNDM(DUM))
+        RANDOM(I)= RNDMCMSSW(DUM)
       END DO
 C
       RETURN
