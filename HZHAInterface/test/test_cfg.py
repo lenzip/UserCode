@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 
 process = cms.Process("TEST")
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(20))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
 process.source = cms.Source("EmptySource")
 
 process.load("IOMC.RandomEngine.IOMC_cff")
@@ -19,7 +19,10 @@ process.load("RecoJets.Configuration.RecoGenJets_cff")
 process.load("RecoMET.Configuration.RecoGenMET_cff")
 process.load("RecoJets.Configuration.GenJetParticles_cff")
 process.load("RecoMET.Configuration.GenMETParticles_cff")
-process.genJetMET = cms.Sequence(process.genJetParticles*process.recoGenJets+process.genMETParticles*process.recoGenMET)
+process.load("RecoJets.JetProducers.ExclusiveNJadeGenJets_cfi") 
+process.load("RecoJets.JetProducers.ExclusiveYcutJadeGenJets_cfi") 
+#process.genJetMET = cms.Sequence(process.genJetParticles*process.recoGenJets+process.genMETParticles*process.recoGenMET)
+process.genJetMET = cms.Sequence(process.genJetParticles*process.ExclusiveNJadeGenJets+process.ExclusiveYcutJadeGenJets)
 
 #ourtput module
 process.GEN = cms.OutputModule("PoolOutputModule",
