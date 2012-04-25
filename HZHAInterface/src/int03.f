@@ -211,7 +211,7 @@ C Set the b, c and tau pole masses. Please do not change these values,
 C They are meant to be valid for the two loop QCD radiative corrections
 C (computed in hzha).
 C
-      pmas( 5,1) = 4.87                                                 
+      pmas( 5,1) = 4.68                                                 
       pmas( 4,1) = 1.64                                                 
       pmas(15,1) = 1.777                                                
 C

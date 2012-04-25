@@ -1600,7 +1600,25 @@ C         WRITE(6,*) '-------------------'
           branch(2,jhig) = brgg * alphah**2 * xmh**3 * gw2
      .                   * CDABS(branch2)**2
 C But account also for large QCD corrections (Kniehl et al)
-     .                   * ( 1D0 + alphah/pi*(95./4.-7.*fnh/6.) )
+C     .                   * ( 1D0 + alphah/pi*(95./4.-7.*fnh/6.) )
+C But account also for large QCD corrections (Steinhauser, 2007)
+          tau = xmh**2/(2.*amt)**2
+          xLt = LOG(4.*tau)
+          h0NLO = 95./4. - 7.*fnh/6.
+          h1NLO = 5803./540. - 14.*xLt/15. - 29.*fnh/60.
+          h2NLO = 1029839./189000. - 1543.*xLt/1575. - 89533.*fnh/378000.
+          dNLO = h0NLO + tau * h1NLO + tau**2 * h2NLO
+          WRITE(6,*) 'NLO terms : ',h0NLO, tau*h1NLO, tau**2*h2NLO
+          h0NNLO = 156.808 + 5.708*xLt
+          h1NNLO = 109.365 + 4.645*xLt
+          h2NNLO = 74.434 + 3.297*xLt
+          dNNLO = h0NNLO + tau * h1NNLO + tau**2 * h2NNLO
+          WRITE(6,*) 'NNLO terms : ',h0NNLO, tau*h1NNLO, tau**2*h2NNLO
+          dNNNLO = 467.684 + 122.441*xLt + 10.941*xLt**2
+          branch(2,jhig) = branch(2,jhig) 
+     &                   * (1D0 + alphah/pi * dNLO 
+     &                          + (alphah/pi)**2 * dNNLO 
+     &                          + (alphah/pi)**3 * dNNNLO )
         ELSE
           branch(2,jhig) = 0.
         ENDIF
@@ -2082,9 +2100,9 @@ C-----------------------------------------------------------------------
      .        '      alpha_s(mZ)   = ',F8.5,' ... '/)
  1001 FORMAT(/50('-')//
      .       1x,'The following branching ratios have been computed :'/
-     .       1X,'   ',A1,' mass                 : ',F8.3,' GeV/c**2'/
-     .       1X,'    Total decay width     : ',F8.3,' GeV'/
-     .       1X,'    Width to be generated : ',F8.3,' GeV'//)
+     .       1X,'   ',A1,' mass                 : ',F9.3,' GeV/c**2'/
+     .       1X,'    Total decay width     : ',F9.5,' GeV'/
+     .       1X,'    Width to be generated : ',F9.5,' GeV'//)
  2001 FORMAT(/50('-')/
      .       1X,'   ',A1,' (mass : ',F8.3,' GeV/c**2)'/
      .       1x,'    won''t be decayed by HHDECAY !'//)
