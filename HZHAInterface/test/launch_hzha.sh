@@ -10,7 +10,7 @@ for ((job=0;job<100;job++));
   name="HZHA_Full_"${job}
   aodfilename="aod_"${name}".root"
   recofilename="reco_"${name}".root"
-  logfilename="lof_"${name}".txt"
+  logfilename="log_"${name}".txt"
   echo $name
 
   seed1=$(( ($job+1)*14312 ))
@@ -35,13 +35,13 @@ echo "EOF" >> job_${name}.sh
 cat >> job_${name}.sh << EOF
 cmsRun TEST_cfg.py >& log
 
-cmsStage aod.root $eosDir$aodfilename
-cmsStage reco.root $eosDir$recofilename
-cmsStage log $eosDir$
+cmsStage -f aod.root $eosDir$aodfilename
+cmsStage -f reco.root $eosDir$recofilename
+cmsStage -f log $eosDir$logfilename
 
 EOF
 chmod 755 job_${name}.sh
-#bsub -q 1nd80 -J $name -R "mem>2000" $PWD/job_${name}.sh
+bsub -q 1nd -J $name -R "mem>2000" $PWD/job_${name}.sh
 
 
 done
