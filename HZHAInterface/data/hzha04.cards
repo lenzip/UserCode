@@ -1,7 +1,7 @@
 *     First event    Last event    to be generated  (INTEGER)  
 TRIG      1           100000         
-*     First event    Last event to debug            (INTEGER)  
-DEBU        1         1  
+*     First event    Last event to debug            (INTEGER) 
+ DEBU        1         1  
 *  Keep some time at end of job                     (REAL)     
 TIME 30. 
 *
@@ -81,8 +81,8 @@ GENE   1.    1.   1.   240.  4.0    1.   2.
 *                                                        
 * ALL numbers MUST be REAL !                             
 *                                                        
-*         MZ     GZ       GF       MTOP   MH    QCD5  
-GSMO   91.189  2.497  1.16639E-5   174.3  125.  0.208 
+*         MZ      GZ        GF       MTOP   MH    QCD5  
+GSMO   91.1876  2.4952  1.16637E-5   172.5  125.  0.213 
 *                                                        
 ***********************************************************************
 * Anomalous coupling (only if ISM = 1)
