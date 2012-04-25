@@ -6292,9 +6292,9 @@ C
       pmas(25,1) = amh
       pmas(35,1) = gmh
       pmas(36,1) = ama
-      chaf(25) = 'h       '
-      chaf(35) = 'H       '
-      chaf(36) = 'A       '
+      chaf(25,1) = 'h       '
+      chaf(35,1) = 'H       '
+      chaf(36,1) = 'A       '
 C     mdme(337,1) = 0
       mdme(174,1) = 0
       mdme(153,1) = 0
@@ -9041,6 +9041,7 @@ C  Input :    iwz, the position of the virtual boson in /LUJET/
 C
 C  Patrick Janot -- 01 Sep 1995
 C-------------------------------------------------------------------
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       include 'lundcom.inc'
       DIMENSION ijoin(2)
 C

@@ -25,6 +25,7 @@ C
       real*8 M12,m0,msnu
 C
       loutbe = 6
+
 C
 C Welcome !
 C
@@ -338,8 +339,8 @@ C
         jchi = indneu(ineut)
         kchi = PYCOMP(jchi)
 C
-        CHAF(kchi)(1:4)='Chi0'
-        WRITE(CHAF(kchi)(4:4),50) ineut
+        CHAF(kchi,1)(1:4)='Chi0'
+        WRITE(CHAF(kchi,1)(4:4),50) ineut
    50   FORMAT(I1)
         PMAS(kchi,1) = ABS(amneut(ineut))
         IF ( ineut .NE. 1 ) MDCY(kchi,1) = 0
@@ -353,8 +354,8 @@ C
         jchi = indcha(ichar)
         kchi = PYCOMP(jchi)
 C
-        CHAF(kchi)(1:4)='Chi0'
-        WRITE(CHAF(kchi)(4:4),51) ichar
+        CHAF(kchi,1)(1:4)='Chi0'
+        WRITE(CHAF(kchi,1)(4:4),51) ichar
    51   FORMAT(I1)
         PMAS(kchi,1) = ABS(amchar(ichar))
         MDCY(kchi,1) = 0
