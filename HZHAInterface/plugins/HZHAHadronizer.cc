@@ -75,9 +75,9 @@ bool HZHAHadronizer::initializeForInternalPartons()
   
   edm::FileInPath file( _configPath.c_str() );
   const char* filename = file.fullPath().c_str();
-  std::cout << file.fullPath() << std::endl;
+  //std::cout << file.fullPath() << std::endl;
   steering_(filename);
-  std::cout << "ciao" << std::endl;
+  //std::cout << "ciao" << std::endl;
   hzha_init_();
   return true;
 }

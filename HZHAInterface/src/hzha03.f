@@ -1608,12 +1608,10 @@ C But account also for large QCD corrections (Steinhauser, 2007)
           h1NLO = 5803./540. - 14.*xLt/15. - 29.*fnh/60.
           h2NLO = 1029839./189000. - 1543.*xLt/1575. - 89533.*fnh/378000.
           dNLO = h0NLO + tau * h1NLO + tau**2 * h2NLO
-          WRITE(6,*) 'NLO terms : ',h0NLO, tau*h1NLO, tau**2*h2NLO
           h0NNLO = 156.808 + 5.708*xLt
           h1NNLO = 109.365 + 4.645*xLt
           h2NNLO = 74.434 + 3.297*xLt
           dNNLO = h0NNLO + tau * h1NNLO + tau**2 * h2NNLO
-          WRITE(6,*) 'NNLO terms : ',h0NNLO, tau*h1NNLO, tau**2*h2NNLO
           dNNNLO = 467.684 + 122.441*xLt + 10.941*xLt**2
           branch(2,jhig) = branch(2,jhig) 
      &                   * (1D0 + alphah/pi * dNLO 

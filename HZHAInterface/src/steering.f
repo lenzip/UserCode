@@ -31,7 +31,6 @@ C
 C
 C Define the units for input and output
 C
-      write(*,*) filename
       locvar(1) = 10      ! input  unit
       lenvar(1) = 6       ! output unit
       OPEN(locvar(1), FILE=filename)
