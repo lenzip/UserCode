@@ -17,12 +17,16 @@ process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.genParticles_cfi")
 #process.load("RecoJets.Configuration.RecoGenJets_cff")
 #process.load("RecoMET.Configuration.RecoGenMET_cff")
-#process.load("RecoJets.Configuration.GenJetParticles_cff")
+process.load("RecoJets.Configuration.GenJetParticles_cff")
 #process.load("RecoMET.Configuration.GenMETParticles_cff")
-#process.load("RecoJets.JetProducers.ExclusiveNJadeGenJets_cfi") 
-#process.load("RecoJets.JetProducers.ExclusiveYcutJadeGenJets_cfi") 
+#process.load("RecoJets.JetProducers.ak5GenJets_cfi")
+#process.ak5GenJets.exclNJets  = cms.int32(2)
+process.load("RecoJets.JetProducers.ExclusiveNJadeGenJets_cfi") 
+process.load("RecoJets.JetProducers.ExclusiveYcutJadeGenJets_cfi")
+process.ExclusiveYcutJadeGenJets.yCutEE = 0.01
 #process.genJetMET = cms.Sequence(process.genJetParticles*process.recoGenJets+process.genMETParticles*process.recoGenMET)
-#process.genJetMET = cms.Sequence(process.genJetParticles*process.ExclusiveNJadeGenJets+process.ExclusiveYcutJadeGenJets)
+process.genJetMET = cms.Sequence(process.genJetParticles*process.ExclusiveNJadeGenJets+process.ExclusiveYcutJadeGenJets)
+#process.genJetMET = cms.Sequence(process.genJetParticles*process.ExclusiveNJadeGenJets+process.ExclusiveYcutJadeGenJets+process.ak5GenJets)
 
 #ourtput module
 process.GEN = cms.OutputModule("PoolOutputModule",
@@ -31,7 +35,7 @@ process.GEN = cms.OutputModule("PoolOutputModule",
 
 #paths
 process.p = cms.Path(process.generator+
-                    process.genParticles#+
-                    #process.genJetMET
+                    process.genParticles+
+                    process.genJetMET
                      )
 process.outpath = cms.EndPath(process.GEN)
