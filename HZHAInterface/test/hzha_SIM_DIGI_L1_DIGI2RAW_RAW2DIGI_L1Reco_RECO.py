@@ -52,7 +52,7 @@ process.generator = cms.EDFilter("HZHAGeneratorFilter",
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('hzha nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -94,10 +94,10 @@ process.towerMakerWithHO.HF1Threshold = 1E9
 process.towerMakerWithHO.HF2Threshold = 1E9
 
 # LEP3 Beam Spot (in cm) for generation step
-process.VtxSmeared.GaussVtxSmearingParameters.SigmaX = 0.0060
-process.VtxSmeared.GaussVtxSmearingParameters.SigmaY = 0.00004
-process.VtxSmeared.GaussVtxSmearingParameters.SigmaZ = 0.3
- 
+process.VtxSmeared.SigmaX = 0.0060
+process.VtxSmeared.SigmaY = 0.00004
+process.VtxSmeared.SigmaZ = 0.3
+
 # LEP3 Beam Spot (in cm) for reconstruction step
 process.load("RecoVertex.BeamSpotProducer.BeamSpotFakeParameters_cfi")
 process.es_prefer_beamspot = cms.ESPrefer("BeamSpotFakeConditions")
