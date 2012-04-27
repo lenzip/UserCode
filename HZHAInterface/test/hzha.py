@@ -27,9 +27,34 @@ process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.VtxSmeared.SigmaX = 0.0060
+process.VtxSmeared.SigmaY = 0.00004
+process.VtxSmeared.SigmaZ = 0.3
 
+process.load("RecoVertex.BeamSpotProducer.BeamSpotFakeParameters_cfi")
+process.es_prefer_beamspot = cms.ESPrefer("BeamSpotFakeConditions")
+
+process.BeamSpotFakeConditions.X0 = cms.double(0.)
+process.BeamSpotFakeConditions.Y0 = cms.double(0.)
+process.BeamSpotFakeConditions.Z0 = cms.double(0.)
+process.BeamSpotFakeConditions.dxdz = cms.double(0.)
+process.BeamSpotFakeConditions.dydz = cms.double(0.)
+process.BeamSpotFakeConditions.sigmaZ = cms.double(0.3)
+process.BeamSpotFakeConditions.widthX = cms.double(0.00004)
+process.BeamSpotFakeConditions.widthY = cms.double(0.006)
+process.BeamSpotFakeConditions.emittanceX = cms.double(0.)
+process.BeamSpotFakeConditions.emittanceY = cms.double(0.)
+process.BeamSpotFakeConditions.betaStar = cms.double(0.)
+process.BeamSpotFakeConditions.errorX0 = cms.double(0.)
+process.BeamSpotFakeConditions.errorY0 = cms.double(0.)
+process.BeamSpotFakeConditions.errorZ0 = cms.double(0.)
+process.BeamSpotFakeConditions.errordxdz = cms.double(0.)
+process.BeamSpotFakeConditions.errordydz = cms.double(0.)
+process.BeamSpotFakeConditions.errorSigmaZ = cms.double(0.)
+process.BeamSpotFakeConditions.errorWidth = cms.double(0.)
+ 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( ==NEVT== )
+    input = cms.untracked.int32( 1000 )
 )
 
 # Input source
@@ -45,7 +70,7 @@ process.options = cms.untracked.PSet(
 )
 
 #HZHA generator 
-process.RandomNumberGeneratorService.generator.initialSeed = ==SEED==
+process.RandomNumberGeneratorService.generator.initialSeed = 1234567
 process.generator = cms.EDFilter("HZHAGeneratorFilter",
   CardsPath = cms.string("GeneratorInterface/HZHAInterface/data/hzha04.cards")
 )
@@ -85,42 +110,6 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
 # Other statements
 process.GlobalTag.globaltag = 'START52_V5::All'
 
-# Remove HF (by setting large threshold on HF tower energies)
-process.towerMakerPF.HF1Threshold = 1E9
-process.towerMakerPF.HF2Threshold = 1E9
-process.towerMaker.HF1Threshold = 1E9
-process.towerMaker.HF2Threshold = 1E9
-process.towerMakerWithHO.HF1Threshold = 1E9
-process.towerMakerWithHO.HF2Threshold = 1E9
-
-# LEP3 Beam Spot (in cm) for generation step
-process.VtxSmeared.GaussVtxSmearingParameters.SigmaX = 0.0060
-process.VtxSmeared.GaussVtxSmearingParameters.SigmaY = 0.00004
-process.VtxSmeared.GaussVtxSmearingParameters.SigmaZ = 0.3
- 
-# LEP3 Beam Spot (in cm) for reconstruction step
-process.load("RecoVertex.BeamSpotProducer.BeamSpotFakeParameters_cfi")
-process.es_prefer_beamspot = cms.ESPrefer("BeamSpotFakeConditions")
-process.BeamSpotFakeConditions.X0 = cms.double(0.)
-process.BeamSpotFakeConditions.Y0 = cms.double(0.)
-process.BeamSpotFakeConditions.Z0 = cms.double(0.)
-process.BeamSpotFakeConditions.dxdz = cms.double(0.)
-process.BeamSpotFakeConditions.dydz = cms.double(0.)
-process.BeamSpotFakeConditions.sigmaZ = cms.double(0.3)
-process.BeamSpotFakeConditions.widthX = cms.double(0.00004)
-process.BeamSpotFakeConditions.widthY = cms.double(0.006)
-process.BeamSpotFakeConditions.emittanceX = cms.double(0.)
-process.BeamSpotFakeConditions.emittanceY = cms.double(0.)
-process.BeamSpotFakeConditions.betaStar = cms.double(0.)
-process.BeamSpotFakeConditions.errorX0 = cms.double(0.)
-process.BeamSpotFakeConditions.errorY0 = cms.double(0.)
-process.BeamSpotFakeConditions.errorZ0 = cms.double(0.)
-process.BeamSpotFakeConditions.errordxdz = cms.double(0.)
-process.BeamSpotFakeConditions.errordydz = cms.double(0.)
-process.BeamSpotFakeConditions.errorSigmaZ = cms.double(0.)
-process.BeamSpotFakeConditions.errorWidth = cms.double(0.)
- 
-
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.generator+process.genParticles)
 process.simulation_step = cms.Path(process.psim)
@@ -135,15 +124,5 @@ process.RECOSIMoutput_step = cms.EndPath(process.RECOSIMoutput)
 process.AODSIMoutput_step = cms.EndPath(process.AODSIMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.generation_step,
-                                process.simulation_step,
-                                process.digitisation_step,
-                                process.L1simulation_step,
-                                process.digi2raw_step,
-                                process.raw2digi_step,
-                                process.L1Reco_step,
-                                process.reconstruction_step,
-                                process.endjob_step,
-                                process.RECOSIMoutput_step,
-                                process.AODSIMoutput_step)
+process.schedule = cms.Schedule(process.generation_step,process.simulation_step,process.digitisation_step,process.L1simulation_step,process.digi2raw_step,process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.RECOSIMoutput_step,process.AODSIMoutput_step)
 
