@@ -34,24 +34,24 @@ C
 C
 C Initialization
 C
-      CALL znnb_init
+C      CALL znnb_init
 C                                                                       
 C Event generation                                                      
 C                                                                       
-      iev1   = trig(1)                                                  
-      iev2   = trig(2) 
-      write(6,*) iev1,iev2
-      timlft = time(1)                                                  
-      DO 1 ievt = iev1, iev2                                            
-        CALL znnb_event                                                 
+C      iev1   = trig(1)                                                  
+C      iev2   = trig(2) 
+C      write(6,*) iev1,iev2
+C      timlft = time(1)                                                  
+C      DO 1 ievt = iev1, iev2                                            
+C        CALL znnb_event                                                 
 C        CALL timel(tileft)                                              
 C        IF ( tileft .LE. timlft ) GOTO 2                                
-    1 CONTINUE                                                          
+C    1 CONTINUE                                                          
 C                                                                       
 C Close the job                                                         
 C                                                                       
-      CALL zznb_close                                                   
+C      CALL zznb_close                                                   
 C                                                                       
-      STOP                                                              
+      RETURN                                                            
       END                                                               
 
