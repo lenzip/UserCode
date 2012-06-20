@@ -40,6 +40,12 @@ C
       pmas(23,2) = gmz
       parj( 102) = sw2
 C
+C Switch off Z -> nunubar decays
+      mdme(183,1) = 0
+      mdme(185,1) = 0
+      mdme(187,1) = 0
+C
+C
 C...Initialize ZZNB
 C
       Z=amz/1000.
@@ -142,19 +148,6 @@ C  Listing of the event
 C
       IF ( nevent(1) .GE. idb1 .AND.
      .     nevent(1) .LE. idb2 ) CALL pylist(1)
-C
-C  Event counters
-C
-      IF ( ist .EQ. 0 ) nevent(2) = nevent(2) + 1
-      IF ( ist .GT. 0) THEN
-        nevent(3) = nevent(3) + 1
-        nevent(4) = nevent(4) + 1
-        WRITE(6,*) 'Evt ',nevent(1),' ist = ',ist
-        CALL pylist(1)
-      ELSEIF ( ist .LT. 0) THEN
-        nevent(3) = nevent(3) + 1
-        nevent(4-ist) = nevent(4-ist) + 1
-      ENDIF
 C
       RETURN
       END
