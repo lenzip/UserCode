@@ -15,6 +15,8 @@
 #include "GeneratorInterface/Core/interface/HadronizerFilter.h"
 #include "GeneratorInterface/Core/interface/RNDMEngineAccess.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "GeneratorInterface/Pythia6Interface/interface/Pythia6Service.h"
+#include "GeneratorInterface/Core/interface/FortranCallback.h"
 
 HepMC::IO_HEPEVT conv;
 
@@ -26,7 +28,7 @@ extern "C" {
   void znnb_init_(void);
   void znnb_event_(void);
   //void timel_(int&);
-  void znnb_close_(void);
+  //void znnb_close_(void);
   void pyhepc_(int&);
 }
 
@@ -55,12 +57,14 @@ public:
   
 private:
   
+  gen::Pythia6Service* fPy6Service;
   std::string _configPath;
   
 };
 
 ZNNBHadronizer::ZNNBHadronizer(const edm::ParameterSet &params) :
   BaseHadronizer(params),
+  fPy6Service( new gen::Pythia6Service() ),
   _configPath(params.getParameter<std::string>("CardsPath"))
    
 {
@@ -72,7 +76,6 @@ ZNNBHadronizer::~ZNNBHadronizer()
 
 bool ZNNBHadronizer::initializeForInternalPartons()
 {
-  
   edm::FileInPath file( _configPath.c_str() );
   const char* filename = file.fullPath().c_str();
   std::cout << file.fullPath() << std::endl;
@@ -108,6 +111,8 @@ bool ZNNBHadronizer::declareStableParticles(const std::vector<int> &pdgIds)
 
 bool ZNNBHadronizer::generatePartonsAndHadronize()
 {
+  gen::Pythia6Service::InstanceWrapper guard(fPy6Service);
+  gen::FortranCallback::getInstance()->resetIterationsPerEvent();
   //get the next event
   znnb_event_();
   //convert hepevt to hepmc
