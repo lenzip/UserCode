@@ -15,6 +15,9 @@
 #include "GeneratorInterface/Core/interface/HadronizerFilter.h"
 #include "GeneratorInterface/Core/interface/RNDMEngineAccess.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "GeneratorInterface/Pythia6Interface/interface/Pythia6Service.h"
+#include "GeneratorInterface/Core/interface/FortranCallback.h"
+
 
 HepMC::IO_HEPEVT conv;
 
@@ -54,13 +57,15 @@ public:
   const char *classname() const { return "HZHAHadronizer"; }
   
 private:
-  
+ 
+  //gen::Pythia6Service* fPy6Service;
   std::string _configPath;
   
 };
 
 HZHAHadronizer::HZHAHadronizer(const edm::ParameterSet &params) :
   BaseHadronizer(params),
+  //fPy6Service( new gen::Pythia6Service() ),
   _configPath(params.getParameter<std::string>("CardsPath"))
    
 {
@@ -108,6 +113,8 @@ bool HZHAHadronizer::declareStableParticles(const std::vector<int> &pdgIds)
 
 bool HZHAHadronizer::generatePartonsAndHadronize()
 {
+  //gen::Pythia6Service::InstanceWrapper guard(fPy6Service);
+  //gen::FortranCallback::getInstance()->resetIterationsPerEvent();
   //get the next event
   hzha_event_();
   //convert hepevt to hepmc

@@ -4,4 +4,8 @@ extern "C"{
     //std::cout << "Using CMSSW random number generator" << std::endl;
     return gen::getEngineReference().flat();
   }
+  double pyr_(double& dummy){
+    //std::cout << "Using CMSSW random number generator" << std::endl;
+    return gen::getEngineReference().flat();
+  }  
 }  
