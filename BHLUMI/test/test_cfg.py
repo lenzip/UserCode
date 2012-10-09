@@ -2,11 +2,11 @@ import FWCore.ParameterSet.Config as cms
 
 
 process = cms.Process("TEST")
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 process.source = cms.Source("EmptySource")
 
 process.load("IOMC.RandomEngine.IOMC_cff")
-process.RandomNumberGeneratorService.generator.initialSeed = 8899191
+process.RandomNumberGeneratorService.generator.initialSeed = 8899
 #HZHA generator 
 process.generator = cms.EDFilter("BHLUMIGeneratorFilter",
   CardsPath = cms.string("GeneratorInterface/BHLUMI/data/lmdcards.dat")

@@ -363,8 +363,7 @@
       WT1=0D0
       WT2=0D0
       WT3=0D0
-C      CALL VarRan(drvec,2)
-      CALL rndmcmssw(drvec)
+      CALL VarRan(drvec,2)
 !--------------------------------------------------------------------
 ! Generate t-channel transfer (the true one)
       rn1 = drvec(1)

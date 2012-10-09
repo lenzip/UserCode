@@ -1511,6 +1511,8 @@ C     ***************************
 C Switchable random number generator
 C Translation to double precision
 C     ***************************
+      EXTERNAL RNDMCMSSW
+      REAL*8 RNDMCMSSW
       COMMON / RANPAR / KEYRND
       save   / RANPAR /
       DOUBLE PRECISION DRVEC(*)
@@ -1523,6 +1525,11 @@ C     ***************************
          CALL ECURAN(RVEC,LEN)
       ELSEIF(KEYRND.EQ.3) THEN
          CALL CARRAN(RVEC,LEN)
+C.....CMSSW RNG    
+      ELSEIF(KEYRND.EQ.4) THEN  
+        DO 111 I=1,LEN
+          RVEC(I) = rndmcmssw()
+  111   CONTINUE        
       ELSE
          GOTO 902
       ENDIF

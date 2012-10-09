@@ -117,7 +117,11 @@ bool BHLUMIHadronizer::generatePartonsAndHadronize()
   //gen::FortranCallback::getInstance()->resetIterationsPerEvent();
   //get the next event
   int mode = 0;
-  bhlumi_(&mode, _xpar, _npar);
+  //reset the weight to 0 and generate until we get a weight different from 0.
+  // according to BHLUMI authors these events should be skipped
+  wgtall_.wtmod = 0.;
+  while (wgtall_.wtmod <= 0.)
+    bhlumi_(&mode, _xpar, _npar);
   //convert to hepmc
   //std::cout << momset_.p1[0] << ","<< momset_.p1[1] << ","<<momset_.p1[2]<< ","<< momset_.p1[3]<< std::endl;
   event().reset(convert());
