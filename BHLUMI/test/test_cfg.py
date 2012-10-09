@@ -17,6 +17,13 @@ process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.genParticles_cfi")
 process.load("RecoJets.Configuration.GenJetParticles_cff")
 
+process.TFileService = cms.Service("TFileService",
+  fileName = cms.string('bhlumi_plots.root')
+)
+process.ana = cms.EDAnalyzer('LumiAnalyzer',
+  src = cms.InputTag("generator")
+)
+
 #ourtput module
 process.GEN = cms.OutputModule("PoolOutputModule",
 	fileName = cms.untracked.string('bhlumi.root')
@@ -24,6 +31,7 @@ process.GEN = cms.OutputModule("PoolOutputModule",
 
 #paths
 process.p = cms.Path(process.generator+
-                    process.genParticles
+                    process.genParticles+
+                    process.ana
                      )
-process.outpath = cms.EndPath(process.GEN)
+#process.outpath = cms.EndPath(process.GEN)

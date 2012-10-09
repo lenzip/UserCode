@@ -149,10 +149,10 @@ HepMC::GenEvent* BHLUMIHadronizer::convert() const{
   //p is electron q is positron
   //add incoming electron/positron
   HepMC::FourVector pp1(momset_.p1[0], momset_.p1[1], momset_.p1[2], momset_.p1[3]);
-  HepMC::GenParticle* p1 = new HepMC::GenParticle(pp1, 11, 1);
+  HepMC::GenParticle* p1 = new HepMC::GenParticle(pp1, 11, -1);
   v->add_particle_in(p1);
   HepMC::FourVector pq1(momset_.q1[0], momset_.q1[1], momset_.q1[2], momset_.q1[3]);
-  HepMC::GenParticle* q1 = new HepMC::GenParticle(pq1, -11, 1);
+  HepMC::GenParticle* q1 = new HepMC::GenParticle(pq1, -11, -1);
   v->add_particle_in(q1);
   //add outgoing electron/positron 
   HepMC::FourVector pp2(momset_.p2[0], momset_.p2[1], momset_.p2[2], momset_.p2[3]);
