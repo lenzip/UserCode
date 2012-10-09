@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 
 process = cms.Process("TEST")
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000000))
 process.source = cms.Source("EmptySource")
 
 process.load("IOMC.RandomEngine.IOMC_cff")
