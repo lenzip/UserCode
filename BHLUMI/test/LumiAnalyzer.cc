@@ -13,7 +13,7 @@
 //
 // Original Author:  Piergiulio Lenzi,40 1-B01,+41227671638,
 //         Created:  Tue Nov  8 15:57:17 CET 2011
-// $Id: LumiAnalyzer.cc,v 1.1 2012/10/09 18:00:40 lenzip Exp $
+// $Id: LumiAnalyzer.cc,v 1.2 2012/10/09 18:17:25 lenzip Exp $
 //
 //
 
@@ -189,11 +189,11 @@ LumiAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           e_isr+=(*ipart)->momentum().e();
         }
       }
-      abscosth_min->Fill(std::min(cth_p2,cth_q2),wgt);
-      if (nph == 0)
-        abscosth_min_np->Fill(std::min(cth_p2,cth_q2),wgt); 
-      ISR->Fill(e_isr, wgt);
    } 
+   abscosth_min->Fill(std::min(cth_p2,cth_q2),wgt);
+    if (nph == 0)
+      abscosth_min_np->Fill(std::min(cth_p2,cth_q2),wgt); 
+   ISR->Fill(e_isr, wgt);
 
 }
 
