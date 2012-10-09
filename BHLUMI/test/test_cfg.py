@@ -2,9 +2,10 @@ import FWCore.ParameterSet.Config as cms
 
 
 process = cms.Process("TEST")
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(500000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000000))
 process.source = cms.Source("EmptySource")
-
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
 process.load("IOMC.RandomEngine.IOMC_cff")
 process.RandomNumberGeneratorService.generator.initialSeed = 8899
 #HZHA generator 
