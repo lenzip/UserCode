@@ -1,0 +1,463 @@
+Index: AnalysisDataFormats/CMGTools/interface/DiObject.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/DiObject.h,v
+retrieving revision 1.19
+diff -u -r1.19 DiObject.h
+--- AnalysisDataFormats/CMGTools/interface/DiObject.h	17 Jan 2012 12:51:07 -0000	1.19
++++ AnalysisDataFormats/CMGTools/interface/DiObject.h	15 Nov 2012 13:15:09 -0000
+@@ -11,6 +11,7 @@
+ 
+ template <typename T, typename U> class DiObject;
+ template <typename T, typename U> class DiObjectFactory;
++template <typename T, typename U> class DiObjectKinFitFactory;
+ 
+ template< typename T, typename U >
+ class DiObject : public AbstractPhysicsObject{
+@@ -38,7 +39,8 @@
+       pZetaVis_(UnSet(Double_t)),
+       mTLeg1_(UnSet(Double_t)),
+       mTLeg2_(UnSet(Double_t)),
+-      massSVFit_(UnSet(Double_t))
++      massSVFit_(UnSet(Double_t)),
++      fitChi2_(UnSet(Double_t))
+ 	{
+     }
+     
+@@ -57,7 +59,8 @@
+       pZetaVis_(other.pZetaVis_), 
+       mTLeg1_(other.mTLeg1_), 
+       mTLeg2_(other.mTLeg2_),
+-      massSVFit_(other.massSVFit_) {
++      massSVFit_(other.massSVFit_),
++      fitChi2_(other.fitChi2_){
+     }
+ 
+     virtual ~DiObject(){}
+@@ -109,8 +112,14 @@
+     ///mass from SVFit
+     double massSVFit() const { return massSVFit_; }
+ 
++    ///chi2 from fit
++    double fitChi2() const { return fitChi2_; } 
++
+     ///set mass from SVFit 
+     void setMassSVFit(double mass) { massSVFit_ = mass; }
++
++    ///set chi2
++    void setChi2(double chi2) { fitChi2_ = chi2; }
+     
+     virtual void accept(AbstractPhysicsObjectVisitor* v) const{
+       v->visit(this);
+@@ -191,7 +200,11 @@
+     /// SVFit mass
+     double   massSVFit_;
+ 
++    /// fit chi2
++    double   fitChi2_;
++
+     friend class cmg::DiObjectFactory<T,U>;
++    friend class cmg::DiObjectKinFitFactory<T,U>;
+ 
+ };
+ 
+Index: CMGTools/Common/interface/DiObjectFactory.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/interface/DiObjectFactory.h,v
+retrieving revision 1.14
+diff -u -r1.14 DiObjectFactory.h
+--- CMGTools/Common/interface/DiObjectFactory.h	28 Feb 2012 15:45:19 -0000	1.14
++++ CMGTools/Common/interface/DiObjectFactory.h	15 Nov 2012 13:15:09 -0000
+@@ -60,6 +60,7 @@
+     return cmg::DiObject<T,U>(l1,l2);
+ }
+ ///Make when the types are the same - sorts the legs
++/*
+ template< typename T >
+ cmg::DiObject<T,T> make(const T& l1, const T& l2){
+     if(l1 >= l2){
+@@ -68,6 +69,7 @@
+         return cmg::DiObject<T,T>(l2,l1);
+     }
+ }
++*/
+ 
+ }
+ 
+Index: CMGTools/RootTools/python/fwlite/MultiLoop.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/RootTools/python/fwlite/MultiLoop.py,v
+retrieving revision 1.8
+diff -u -r1.8 MultiLoop.py
+--- CMGTools/RootTools/python/fwlite/MultiLoop.py	28 Sep 2012 12:07:46 -0000	1.8
++++ CMGTools/RootTools/python/fwlite/MultiLoop.py	15 Nov 2012 13:15:17 -0000
+@@ -119,6 +119,8 @@
+                                  'src/CMGTools/HToZZTo4Leptons/python/analyzers'] ))
+     sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
+                                  'src/CMGTools/LEP3/python/analyzers'] ))
++    sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
++                                 'src/HiggsAna/PyHLLJJ/python/analyzers'] ))
+     selComps = [comp for comp in cfg.config.components if len(comp.files)>0]
+     selComps = split(selComps)
+     for comp in selComps:
+Index: DataFormats/Candidate/interface/LeafCandidate.h
+===================================================================
+RCS file: /local/reps/CMSSW/CMSSW/DataFormats/Candidate/interface/LeafCandidate.h,v
+retrieving revision 1.24
+diff -u -r1.24 LeafCandidate.h
+--- DataFormats/Candidate/interface/LeafCandidate.h	27 Oct 2011 16:29:58 -0000	1.24
++++ DataFormats/Candidate/interface/LeafCandidate.h	15 Nov 2012 13:15:18 -0000
+@@ -39,7 +39,7 @@
+       cachePolarFixed_( false ), cacheCartesianFixed_( false ) { }
+     // constructor from candidate                                                         
+     explicit LeafCandidate( const Candidate & c) :
+-      qx3_( c.charge()*3 ), pt_( c.p4().pt() ), eta_( c.p4().eta() ), phi_( c.p4().phi() )\
++      qx3_( c.charge()*3 ), pt_( c.pt() ), eta_( c.eta() ), phi_( c.phi() )\
+       , mass_( c.p4().mass() ),
+       vertex_( c.vertex() ), pdgId_( c.pdgId() ), status_( c.status() ),
+       cachePolarFixed_( false ), cacheCartesianFixed_( false ) {}
+Index: Francesco/KinFitter/src/DiJetKinFitter.cc
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc,v
+retrieving revision 1.3
+diff -u -r1.3 DiJetKinFitter.cc
+--- Francesco/KinFitter/src/DiJetKinFitter.cc	21 May 2011 15:35:53 -0000	1.3
++++ Francesco/KinFitter/src/DiJetKinFitter.cc	15 Nov 2012 13:15:18 -0000
+@@ -1,13 +1,13 @@
+ #include "DiJetKinFitter.h"
+ 
+-#include "TFitConstraintM.h"
+-#include "TFitParticleEtEtaPhi.h"
+-#include "TKinFitter.h"
++#include "PhysicsTools/KinFitter/interface/TFitConstraintM.h"
++#include "PhysicsTools/KinFitter/interface/TFitConstraintMGaus.h"
++#include "PhysicsTools/KinFitter/interface/TFitParticleEtEtaPhi.h"
+ 
+ #include <iostream>
++typedef reco::Candidate::LorentzVector LorentzVector;
+ 
+-
+-DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass ) : TKinFitter( name, title ) {
++DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass ) : TKinFitter( name, title ), width_(-1) {
+ 
+   name_ = name;
+   title_ = title;
+@@ -15,27 +15,44 @@
+ 
+ }
+ 
++DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass, double width ) : TKinFitter( name, title ) {
++
++  name_ = name;
++  title_ = title;
++  mass_ = mass;
++  width_ = width;
++}
+ 
+ 
+-std::pair<TLorentzVector,TLorentzVector> DiJetKinFitter::fit(TLorentzVector jet1, TLorentzVector jet2 ) {
++std::pair<LorentzVector,LorentzVector> DiJetKinFitter::fit(LorentzVector jet1, LorentzVector jet2 ) {
+ 
+   this->reset();
+ 
+   TMatrixD m_jet1(3,3);
+   TMatrixD m_jet2(3,3);
+ 
+-  m_jet1(0,0) = this->ErrEt (jet1.Et(), jet1.Eta()); // et
+-  m_jet1(1,1) = this->ErrEta(jet1.Et(), jet1.Eta()); // eta
+-  m_jet1(2,2) = this->ErrPhi(jet1.Et(), jet1.Eta()); // phi
+-  m_jet2(0,0) = this->ErrEt (jet2.Et(), jet2.Eta()); // et
+-  m_jet2(1,1) = this->ErrEta(jet2.Et(), jet2.Eta()); // eta
+-  m_jet2(2,2) = this->ErrPhi(jet2.Et(), jet2.Eta()); // phi
++  TLorentzVector tjet1 = TLorentzVector(jet1.px(),jet1.py(),jet1.pz(),jet1.energy());
++  TLorentzVector tjet2 = TLorentzVector(jet2.px(),jet2.py(),jet2.pz(),jet2.energy());
+ 
+-  TFitParticleEtEtaPhi *fitJet1 = new TFitParticleEtEtaPhi( "Jet1", "Jet1", &jet1, &m_jet1 );
+-  TFitParticleEtEtaPhi *fitJet2 = new TFitParticleEtEtaPhi( "Jet2", "Jet2", &jet2, &m_jet2 );
++  m_jet1(0,0) = this->ErrEt (tjet1.Et(), tjet1.Eta()); // et
++  m_jet1(1,1) = this->ErrEta(tjet1.Et(), tjet1.Eta()); // eta
++  m_jet1(2,2) = this->ErrPhi(tjet1.Et(), tjet1.Eta()); // phi
++  m_jet2(0,0) = this->ErrEt (tjet2.Et(), tjet2.Eta()); // et
++  m_jet2(1,1) = this->ErrEta(tjet2.Et(), tjet2.Eta()); // eta
++  m_jet2(2,2) = this->ErrPhi(tjet2.Et(), tjet2.Eta()); // phi
++
++  TFitParticleEtEtaPhi *fitJet1 = new TFitParticleEtEtaPhi( "Jet1", "Jet1", &tjet1, &m_jet1 );
++  TFitParticleEtEtaPhi *fitJet2 = new TFitParticleEtEtaPhi( "Jet2", "Jet2", &tjet2, &m_jet2 );
+   
+-  TFitConstraintM *mCons_jets = new TFitConstraintM( "ZMassConstraint_jets", "ZMass-Constraint", 0, 0 , mass_);
+-  mCons_jets->addParticles1( fitJet1, fitJet2 );
++  TAbsFitConstraint * mCons_jets = 0;
++  std::vector<TAbsFitParticle*> par1;
++  par1.push_back(fitJet1);
++  par1.push_back(fitJet2);
++  if (width_ > 0.) {
++    mCons_jets = new TFitConstraintMGaus( "ZMassConstraint_jets", "ZMass-Constraint", &par1, 0 , mass_, width_);
++  } else { 
++    mCons_jets = new TFitConstraintM( "ZMassConstraint_jets", "ZMass-Constraint", &par1, 0, mass_);
++  }
+ 
+   
+   this->addMeasParticle( fitJet1 );
+@@ -52,10 +69,12 @@
+   //Perform the fit
+   TKinFitter::fit();
+ 
+-  TLorentzVector jet1_kinfit(*fitJet1->getCurr4Vec());
+-  TLorentzVector jet2_kinfit(*fitJet2->getCurr4Vec());
++  TLorentzVector tjet1_kinfit(*fitJet1->getCurr4Vec());
++  TLorentzVector tjet2_kinfit(*fitJet2->getCurr4Vec());
++  LorentzVector jet1_kinfit(tjet1_kinfit.Px(), tjet1_kinfit.Py(), tjet1_kinfit.Pz(), tjet1_kinfit.E());
++  LorentzVector jet2_kinfit(tjet2_kinfit.Px(), tjet2_kinfit.Py(), tjet2_kinfit.Pz(), tjet2_kinfit.E());
+ 
+-  std::pair<TLorentzVector,TLorentzVector> jetpair;
++  std::pair<LorentzVector,LorentzVector> jetpair;
+   jetpair.first  = jet1_kinfit;
+   jetpair.second = jet2_kinfit;
+ 
+@@ -231,7 +250,13 @@
+ 
+ }
+ 
+-
++double DiJetKinFitter::getChi2( ) {
++  
++  //Get the Chi2
++  double chi2 =  TKinFitter::getS();
++  
++  return chi2;
++}
+ 
+ /*  OLD - CALOJET RESOLUTIONS:
+ double DiJetKinFitter::ErrEt(double Et, double Eta) {
+Index: Francesco/KinFitter/src/DiJetKinFitter.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.h,v
+retrieving revision 1.1
+diff -u -r1.1 DiJetKinFitter.h
+--- Francesco/KinFitter/src/DiJetKinFitter.h	5 Apr 2011 15:42:53 -0000	1.1
++++ Francesco/KinFitter/src/DiJetKinFitter.h	15 Nov 2012 13:15:18 -0000
+@@ -8,7 +8,8 @@
+ #ifndef DiJetKinFitter_h
+ #define DiJetKinFitter_h
+ 
+-#include "TKinFitter.h"
++#include "PhysicsTools/KinFitter/interface/TKinFitter.h"
++#include "DataFormats/Candidate/interface/Candidate.h"
+ #include "TLorentzVector.h"
+ 
+ 
+@@ -16,8 +17,9 @@
+ class DiJetKinFitter : public TKinFitter {
+ 
+  public:
+-  
+-  DiJetKinFitter( const TString&  name, const TString& title, double mass = 91.1876 );
++  typedef reco::Candidate::LorentzVector LorentzVector;
++  DiJetKinFitter( const TString&  name, const TString& title, double mass );
++  DiJetKinFitter( const TString&  name, const TString& title, double mass , double width );
+ 
+   void set_mass( double mass ) { mass_ = mass; };
+ 
+@@ -25,14 +27,19 @@
+   double ErrEta(double Et, double Eta); 
+   double ErrPhi(double Et, double Eta); 
+ 
+-  std::pair<TLorentzVector,TLorentzVector> fit( TLorentzVector jet1, TLorentzVector jet2 );
++  std::pair<LorentzVector,LorentzVector> fit( LorentzVector jet1, LorentzVector jet2 );
++
++  double getChi2();
+ 
+  private:
+ 
+   double mass_;
++  double width_;
+   TString name_;
+   TString title_;
+ 
++  ClassDef(DiJetKinFitter, 1);
++
+ };
+ 
+ 
+Index: Francesco/KinFitter/src/GlobalFitter.cc
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.cc,v
+retrieving revision 1.1
+diff -u -r1.1 GlobalFitter.cc
+--- Francesco/KinFitter/src/GlobalFitter.cc	25 Sep 2011 15:00:53 -0000	1.1
++++ Francesco/KinFitter/src/GlobalFitter.cc	15 Nov 2012 13:15:18 -0000
+@@ -1,10 +1,9 @@
+ #include "GlobalFitter.h"
+ 
+-#include "TFitConstraintM.h"
+-#include "TFitConstraintMGaus.h"
+-#include "TFitConstraintEp.h"
+-#include "TFitParticleEtEtaPhi.h"
+-#include "TKinFitter.h"
++#include "PhysicsTools/KinFitter/interface/TFitConstraintM.h"
++#include "PhysicsTools/KinFitter/interface/TFitParticleEtEtaPhi.h"
++#include "PhysicsTools/KinFitter/interface/TFitConstraintMGaus.h"
++#include "PhysicsTools/KinFitter/interface/TFitConstraintEp.h"
+ 
+ #include <iostream>
+ 
+Index: Francesco/KinFitter/src/GlobalFitter.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.h,v
+retrieving revision 1.1
+diff -u -r1.1 GlobalFitter.h
+--- Francesco/KinFitter/src/GlobalFitter.h	25 Sep 2011 15:00:53 -0000	1.1
++++ Francesco/KinFitter/src/GlobalFitter.h	15 Nov 2012 13:15:18 -0000
+@@ -6,7 +6,7 @@
+ #ifndef GlobalFitter_h
+ #define GlobalFitter_h
+ 
+-#include "TKinFitter.h"
++#include "PhysicsTools/KinFitter/interface/TKinFitter.h"
+ #include "TLorentzVector.h"
+ 
+ 
+Index: HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h,v
+retrieving revision 1.5
+diff -u -r1.5 DiObjectKinFitFactory.h
+--- HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	23 Apr 2012 13:35:22 -0000	1.5
++++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	15 Nov 2012 13:15:18 -0000
+@@ -66,21 +66,31 @@
+ void cmg::DiObjectKinFitFactory<T, U>::set(const cmg::DiObject<T,U>& pair, cmg::DiObject<T,U>* const obj) const{
+ 
+   //kinematic fit
+-  TLorentzVector j1corr, j2corr;
+-  j1corr.SetPtEtaPhiE(pair.leg1().pt(),pair.leg1().eta(),pair.leg1().phi(),pair.leg1().energy());
+-  j2corr.SetPtEtaPhiE(pair.leg2().pt(),pair.leg2().eta(),pair.leg2().phi(),pair.leg2().energy());
+-  int kinfitstatus=myKinFit_.getCorrJets(j1corr,j2corr);
+-  if(kinfitstatus!=0){//kinematic fit failed, set to zero for easy sorting out later ()
++  //TLorentzVector j1corr, j2corr;
++  //j1corr.SetPtEtaPhiE(pair.leg1().pt(),pair.leg1().eta(),pair.leg1().phi(),pair.leg1().energy());
++  //j2corr.SetPtEtaPhiE(pair.leg2().pt(),pair.leg2().eta(),pair.leg2().phi(),pair.leg2().energy());
++  //int kinfitstatus=myKinFit_.getCorrJets(j1corr,j2corr);
++  reco::Candidate::LorentzVector j1corr = pair.leg1().p4(); 
++  reco::Candidate::LorentzVector j2corr = pair.leg2().p4();
++  std::pair<int, double> kinfitstatus=myKinFit_.getCorrJets(j1corr, j2corr);
++  if(kinfitstatus.first!=0){//kinematic fit failed, set to zero for easy sorting out later ()
+     //std::cout<<"Jet KinFit failed (status="<<kinfitstatus<<"), set to zero"<<std::endl;
+-    j1corr.SetXYZM(0,pair.leg1().py()/1000.,0,0); //keep a small component that jets remain unique
+-    j2corr.SetXYZM(0,pair.leg2().py()/1000.,0,0); 
++    //j1corr.SetXYZM(0,pair.leg1().py()/1000.,0,0); //keep a small component that jets remain unique
++    //j2corr.SetXYZM(0,pair.leg2().py()/1000.,0,0); 
++    obj->leg1_.setP4(reco::Candidate::LorentzVector(0,pair.leg1().py()/1000.,0,0));
++    obj->leg2_.setP4(reco::Candidate::LorentzVector(0,pair.leg2().py()/1000.,0,0));
++  } else {
++    obj->leg1_.setP4(j1corr);
++    obj->leg2_.setP4(j2corr);
++    obj->setChi2(kinfitstatus.second);
++    
+   }
++  //obj->leg1_.setP4(reco::Candidate::PolarLorentzVector(j1corr.Pt(),j1corr.Eta(),j1corr.Phi(),j1corr.M() ) );
++  //obj->leg2_.setP4(reco::Candidate::PolarLorentzVector(j2corr.Pt(),j2corr.Eta(),j2corr.Phi(),j2corr.M() ) );
+ 
+-  obj->leg1_.setP4(reco::Candidate::PolarLorentzVector(j1corr.Pt(),j1corr.Eta(),j1corr.Phi(),j1corr.M() ) );
+-  obj->leg2_.setP4(reco::Candidate::PolarLorentzVector(j2corr.Pt(),j2corr.Eta(),j2corr.Phi(),j2corr.M() ) );
+-
+-  TLorentzVector newComposite=j1corr + j2corr;
+-  obj->setP4( reco::Candidate::PolarLorentzVector(newComposite.Pt(),newComposite.Eta(),newComposite.Phi(),newComposite.M() ));
++  reco::Candidate::LorentzVector newComposite=j1corr + j2corr;
++  //obj->setP4( reco::Candidate::PolarLorentzVector(newComposite.Pt(),newComposite.Eta(),newComposite.Phi(),newComposite.M() ));
++  obj->setP4( newComposite);
+ }
+ 
+ 
+Index: HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h,v
+retrieving revision 1.4
+diff -u -r1.4 JetKinFitterConst.h
+--- HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	23 Apr 2012 13:35:22 -0000	1.4
++++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	15 Nov 2012 13:15:18 -0000
+@@ -3,6 +3,7 @@
+ #include "TLorentzVector.h"
+ #include "TMatrixD.h"
+ 
++#include "DataFormats/Candidate/interface/Candidate.h"
+ #include "PhysicsTools/KinFitter/interface/TFitConstraintM.h"
+ #include "PhysicsTools/KinFitter/interface/TFitParticleEtEtaPhi.h"
+ #include "PhysicsTools/KinFitter/interface/TKinFitter.h"
+@@ -15,7 +16,7 @@
+   JetKinFitterConst(float m, float merr ):M_(m),Merr_(merr){};//mass constraint and its error
+   ~JetKinFitterConst(){};
+   //void setJet4Mom(TLorentzVector j1in,TLorentzVector j2in);
+-  int getCorrJets(TLorentzVector& j1in,TLorentzVector& j2in) const;
++  std::pair<int, double> getCorrJets(reco::Candidate::LorentzVector& j1in,reco::Candidate::LorentzVector& j2in) const;
+   //int Refit();
+ 
+ private:
+Index: HiggsAna/HLLJJCommon/plugins/Plugins.cc
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/Plugins.cc,v
+retrieving revision 1.17
+diff -u -r1.17 Plugins.cc
+--- HiggsAna/HLLJJCommon/plugins/Plugins.cc	18 Oct 2012 08:46:43 -0000	1.17
++++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	15 Nov 2012 13:15:18 -0000
+@@ -4,7 +4,7 @@
+ #include "HiggsAna/HLLJJCommon/plugins/HLTWeightProducer.h" 
+ #include "HiggsAna/HLLJJCommon/plugins/PTWeightAnalyzer.h" 
+ #include "HiggsAna/HLLJJCommon/plugins/BScaler.h" 
+-#include "HiggsAna/HLLJJCommon/plugins/QGProducer.h" 
++//#include "HiggsAna/HLLJJCommon/plugins/QGProducer.h" 
+ #include "HiggsAna/HLLJJCommon/plugins/QGAnalyzer.h" 
+ #include "HiggsAna/HLLJJCommon/plugins/QGFiller.h" 
+ #include "HiggsAna/HLLJJCommon/plugins/LDProducer.h" 
+@@ -25,7 +25,7 @@
+ #include "AnalysisDataFormats/HiggsAna/interface/CompoundTypesHZZLL.h"
+ 
+ #include "HiggsAna/HLLJJCommon/plugins/DummyGenProducer.h"
+-#include "HiggsAna/HLLJJCommon/plugins/DummyConversionProducer.h"
++//#include "HiggsAna/HLLJJCommon/plugins/DummyConversionProducer.h"
+ 
+ #include "FWCore/Framework/interface/MakerMacros.h"
+ 
+@@ -56,7 +56,7 @@
+ 
+ 
+ DEFINE_FWK_MODULE(BScaler);
+-DEFINE_FWK_MODULE(QGProducer);
++//DEFINE_FWK_MODULE(QGProducer);
+ DEFINE_FWK_MODULE(PUWeightProducer);
+ //DEFINE_FWK_MODULE(RhoWeightProducer);
+ DEFINE_FWK_MODULE(PTWeightProducer);
+@@ -108,4 +108,4 @@
+ 
+ 
+ DEFINE_FWK_MODULE(DummyGenProducer);
+-DEFINE_FWK_MODULE(DummyConversionProducer);
++//DEFINE_FWK_MODULE(DummyConversionProducer);
+Index: HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc,v
+retrieving revision 1.3
+diff -u -r1.3 JetKinFitterConst.cc
+--- HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	7 May 2011 14:37:17 -0000	1.3
++++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	15 Nov 2012 13:15:19 -0000
+@@ -1,17 +1,19 @@
+ #include "HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h"
+ #include "Francesco/KinFitter/src/DiJetKinFitter.h"
+ 
+-int JetKinFitterConst::getCorrJets(TLorentzVector& j1in,TLorentzVector& j2in) const{
++typedef reco::Candidate::LorentzVector LorentzVector;
++
++std::pair<int, double> JetKinFitterConst::getCorrJets(LorentzVector& j1in,LorentzVector& j2in) const {
+   int status=0;
+   
+   DiJetKinFitter fitalgo("kinfitter","kinfitter",M_);
+   
+-  std::pair<TLorentzVector,TLorentzVector> result = fitalgo.fit(j1in,j2in);
++  std::pair<LorentzVector,LorentzVector> result = fitalgo.fit(j1in,j2in);
+   
+   status = fitalgo.getStatus();
+ 
+   j1in=result.first;
+   j2in=result.second;
+ 
+-  return status;
++  return std::make_pair(status, fitalgo.getChi2());
+ }
