@@ -4,7 +4,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.19
 diff -u -r1.19 DiObject.h
 --- AnalysisDataFormats/CMGTools/interface/DiObject.h	17 Jan 2012 12:51:07 -0000	1.19
-+++ AnalysisDataFormats/CMGTools/interface/DiObject.h	15 Nov 2012 13:15:09 -0000
++++ AnalysisDataFormats/CMGTools/interface/DiObject.h	15 Nov 2012 15:04:15 -0000
 @@ -11,6 +11,7 @@
  
  template <typename T, typename U> class DiObject;
@@ -66,7 +66,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/interface/DiObjectFacto
 retrieving revision 1.14
 diff -u -r1.14 DiObjectFactory.h
 --- CMGTools/Common/interface/DiObjectFactory.h	28 Feb 2012 15:45:19 -0000	1.14
-+++ CMGTools/Common/interface/DiObjectFactory.h	15 Nov 2012 13:15:09 -0000
++++ CMGTools/Common/interface/DiObjectFactory.h	15 Nov 2012 15:04:15 -0000
 @@ -60,6 +60,7 @@
      return cmg::DiObject<T,U>(l1,l2);
  }
@@ -82,14 +82,14 @@ diff -u -r1.14 DiObjectFactory.h
 +*/
  
  }
-
+ 
 Index: CMGTools/RootTools/python/fwlite/MultiLoop.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/RootTools/python/fwlite/MultiLoop.py,v
 retrieving revision 1.10
 diff -u -r1.10 MultiLoop.py
---- CMGTools/RootTools/python/fwlite/MultiLoop.py       14 Nov 2012 16:44:52 -0000      1.10
-+++ CMGTools/RootTools/python/fwlite/MultiLoop.py       15 Nov 2012 14:02:43 -0000
+--- CMGTools/RootTools/python/fwlite/MultiLoop.py	14 Nov 2012 16:44:52 -0000	1.10
++++ CMGTools/RootTools/python/fwlite/MultiLoop.py	15 Nov 2012 15:04:18 -0000
 @@ -123,6 +123,8 @@
                                   'src/CMGTools/WMass/python/analyzers'] ))
      sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
@@ -105,7 +105,7 @@ RCS file: /local/reps/CMSSW/CMSSW/DataFormats/Candidate/interface/LeafCandidate.
 retrieving revision 1.24
 diff -u -r1.24 LeafCandidate.h
 --- DataFormats/Candidate/interface/LeafCandidate.h	27 Oct 2011 16:29:58 -0000	1.24
-+++ DataFormats/Candidate/interface/LeafCandidate.h	15 Nov 2012 13:15:18 -0000
++++ DataFormats/Candidate/interface/LeafCandidate.h	15 Nov 2012 15:04:20 -0000
 @@ -39,7 +39,7 @@
        cachePolarFixed_( false ), cacheCartesianFixed_( false ) { }
      // constructor from candidate                                                         
@@ -115,14 +115,31 @@ diff -u -r1.24 LeafCandidate.h
        , mass_( c.p4().mass() ),
        vertex_( c.vertex() ), pdgId_( c.pdgId() ), status_( c.status() ),
        cachePolarFixed_( false ), cacheCartesianFixed_( false ) {}
+Index: Francesco/KinFitter/src/BuildFile.xml
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/BuildFile.xml,v
+retrieving revision 1.1
+diff -u -r1.1 BuildFile.xml
+--- Francesco/KinFitter/src/BuildFile.xml	7 May 2011 13:51:55 -0000	1.1
++++ Francesco/KinFitter/src/BuildFile.xml	15 Nov 2012 15:04:21 -0000
+@@ -1,7 +1,4 @@
+-<flags CXXFLAGS="-I$(CMSSW_RELEASE_BASE)/src/PhysicsTools/KinFitter/interface/"/>
+-
+-<use name="PhysicsTools/KinFitter"/>                                                         
++<use name="PhysicsTools/KinFitter"/>
+ <export>
+-  <lib   name="1" />
+-  <use name="PhysicsTools/KinFitter"/>  
++  <lib   name="1"/>
+ </export>
 Index: Francesco/KinFitter/src/DiJetKinFitter.cc
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc,v
 retrieving revision 1.3
 diff -u -r1.3 DiJetKinFitter.cc
 --- Francesco/KinFitter/src/DiJetKinFitter.cc	21 May 2011 15:35:53 -0000	1.3
-+++ Francesco/KinFitter/src/DiJetKinFitter.cc	15 Nov 2012 13:15:18 -0000
-@@ -1,13 +1,13 @@
++++ Francesco/KinFitter/src/DiJetKinFitter.cc	15 Nov 2012 15:04:21 -0000
+@@ -1,11 +1,11 @@
  #include "DiJetKinFitter.h"
  
 -#include "TFitConstraintM.h"
@@ -133,27 +150,18 @@ diff -u -r1.3 DiJetKinFitter.cc
 +#include "PhysicsTools/KinFitter/interface/TFitParticleEtEtaPhi.h"
  
  #include <iostream>
+-
 +typedef reco::Candidate::LorentzVector LorentzVector;
  
--
--DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass ) : TKinFitter( name, title ) {
-+DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass ) : TKinFitter( name, title ), width_(-1) {
+ DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass ) : TKinFitter( name, title ) {
  
-   name_ = name;
-   title_ = title;
-@@ -15,27 +15,44 @@
+@@ -15,27 +15,33 @@
  
  }
  
-+DiJetKinFitter::DiJetKinFitter( const TString&  name, const TString& title, double mass, double width ) : TKinFitter( name, title ) {
-+
-+  name_ = name;
-+  title_ = title;
-+  mass_ = mass;
-+  width_ = width;
-+}
++DiJetKinFitter::~DiJetKinFitter(){}
  
- 
+-
 -std::pair<TLorentzVector,TLorentzVector> DiJetKinFitter::fit(TLorentzVector jet1, TLorentzVector jet2 ) {
 +std::pair<LorentzVector,LorentzVector> DiJetKinFitter::fit(LorentzVector jet1, LorentzVector jet2 ) {
  
@@ -189,15 +197,11 @@ diff -u -r1.3 DiJetKinFitter.cc
 +  std::vector<TAbsFitParticle*> par1;
 +  par1.push_back(fitJet1);
 +  par1.push_back(fitJet2);
-+  if (width_ > 0.) {
-+    mCons_jets = new TFitConstraintMGaus( "ZMassConstraint_jets", "ZMass-Constraint", &par1, 0 , mass_, width_);
-+  } else { 
-+    mCons_jets = new TFitConstraintM( "ZMassConstraint_jets", "ZMass-Constraint", &par1, 0, mass_);
-+  }
++  mCons_jets = new TFitConstraintM( "ZMassConstraint_jets", "ZMass-Constraint", &par1, 0, mass_);
  
    
    this->addMeasParticle( fitJet1 );
-@@ -52,10 +69,12 @@
+@@ -52,10 +58,12 @@
    //Perform the fit
    TKinFitter::fit();
  
@@ -213,7 +217,7 @@ diff -u -r1.3 DiJetKinFitter.cc
    jetpair.first  = jet1_kinfit;
    jetpair.second = jet2_kinfit;
  
-@@ -231,7 +250,13 @@
+@@ -231,7 +239,13 @@
  
  }
  
@@ -234,7 +238,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 DiJetKinFitter.h
 --- Francesco/KinFitter/src/DiJetKinFitter.h	5 Apr 2011 15:42:53 -0000	1.1
-+++ Francesco/KinFitter/src/DiJetKinFitter.h	15 Nov 2012 13:15:18 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.h	15 Nov 2012 15:04:21 -0000
 @@ -8,7 +8,8 @@
  #ifndef DiJetKinFitter_h
  #define DiJetKinFitter_h
@@ -253,11 +257,11 @@ diff -u -r1.1 DiJetKinFitter.h
 -  DiJetKinFitter( const TString&  name, const TString& title, double mass = 91.1876 );
 +  typedef reco::Candidate::LorentzVector LorentzVector;
 +  DiJetKinFitter( const TString&  name, const TString& title, double mass );
-+  DiJetKinFitter( const TString&  name, const TString& title, double mass , double width );
++  virtual ~DiJetKinFitter();
  
    void set_mass( double mass ) { mass_ = mass; };
  
-@@ -25,14 +27,19 @@
+@@ -25,7 +27,9 @@
    double ErrEta(double Et, double Eta); 
    double ErrPhi(double Et, double Eta); 
  
@@ -268,12 +272,11 @@ diff -u -r1.1 DiJetKinFitter.h
  
   private:
  
-   double mass_;
-+  double width_;
+@@ -33,6 +37,8 @@
    TString name_;
    TString title_;
  
-+  ClassDef(DiJetKinFitter, 1);
++  //ClassDef(DiJetKinFitter, 1);
 +
  };
  
@@ -284,7 +287,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.cc,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.cc
 --- Francesco/KinFitter/src/GlobalFitter.cc	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.cc	15 Nov 2012 13:15:18 -0000
++++ Francesco/KinFitter/src/GlobalFitter.cc	15 Nov 2012 15:04:21 -0000
 @@ -1,10 +1,9 @@
  #include "GlobalFitter.h"
  
@@ -306,7 +309,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.h
 --- Francesco/KinFitter/src/GlobalFitter.h	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.h	15 Nov 2012 13:15:18 -0000
++++ Francesco/KinFitter/src/GlobalFitter.h	15 Nov 2012 15:04:21 -0000
 @@ -6,7 +6,7 @@
  #ifndef GlobalFitter_h
  #define GlobalFitter_h
@@ -322,7 +325,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/DiO
 retrieving revision 1.5
 diff -u -r1.5 DiObjectKinFitFactory.h
 --- HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	23 Apr 2012 13:35:22 -0000	1.5
-+++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	15 Nov 2012 13:15:18 -0000
++++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	15 Nov 2012 15:04:21 -0000
 @@ -66,21 +66,31 @@
  void cmg::DiObjectKinFitFactory<T, U>::set(const cmg::DiObject<T,U>& pair, cmg::DiObject<T,U>* const obj) const{
  
@@ -373,7 +376,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/Jet
 retrieving revision 1.4
 diff -u -r1.4 JetKinFitterConst.h
 --- HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	23 Apr 2012 13:35:22 -0000	1.4
-+++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	15 Nov 2012 13:15:18 -0000
++++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	15 Nov 2012 15:04:21 -0000
 @@ -3,6 +3,7 @@
  #include "TLorentzVector.h"
  #include "TMatrixD.h"
@@ -397,7 +400,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/Plugi
 retrieving revision 1.17
 diff -u -r1.17 Plugins.cc
 --- HiggsAna/HLLJJCommon/plugins/Plugins.cc	18 Oct 2012 08:46:43 -0000	1.17
-+++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	15 Nov 2012 13:15:18 -0000
++++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	15 Nov 2012 15:04:21 -0000
 @@ -4,7 +4,7 @@
  #include "HiggsAna/HLLJJCommon/plugins/HLTWeightProducer.h" 
  #include "HiggsAna/HLLJJCommon/plugins/PTWeightAnalyzer.h" 
@@ -437,7 +440,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/src/JetKinFit
 retrieving revision 1.3
 diff -u -r1.3 JetKinFitterConst.cc
 --- HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	7 May 2011 14:37:17 -0000	1.3
-+++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	15 Nov 2012 13:15:19 -0000
++++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	15 Nov 2012 15:04:22 -0000
 @@ -1,17 +1,19 @@
  #include "HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h"
  #include "Francesco/KinFitter/src/DiJetKinFitter.h"
