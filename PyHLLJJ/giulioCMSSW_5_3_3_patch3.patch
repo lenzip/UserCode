@@ -4,7 +4,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.19
 diff -u -r1.19 DiObject.h
 --- AnalysisDataFormats/CMGTools/interface/DiObject.h	17 Jan 2012 12:51:07 -0000	1.19
-+++ AnalysisDataFormats/CMGTools/interface/DiObject.h	15 Nov 2012 15:04:15 -0000
++++ AnalysisDataFormats/CMGTools/interface/DiObject.h	22 Nov 2012 19:16:44 -0000
 @@ -11,6 +11,7 @@
  
  template <typename T, typename U> class DiObject;
@@ -66,7 +66,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/interface/DiObjectFacto
 retrieving revision 1.14
 diff -u -r1.14 DiObjectFactory.h
 --- CMGTools/Common/interface/DiObjectFactory.h	28 Feb 2012 15:45:19 -0000	1.14
-+++ CMGTools/Common/interface/DiObjectFactory.h	15 Nov 2012 15:04:15 -0000
++++ CMGTools/Common/interface/DiObjectFactory.h	22 Nov 2012 19:16:44 -0000
 @@ -60,6 +60,7 @@
      return cmg::DiObject<T,U>(l1,l2);
  }
@@ -89,7 +89,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/RootTools/python/fwlite/MultiL
 retrieving revision 1.10
 diff -u -r1.10 MultiLoop.py
 --- CMGTools/RootTools/python/fwlite/MultiLoop.py	14 Nov 2012 16:44:52 -0000	1.10
-+++ CMGTools/RootTools/python/fwlite/MultiLoop.py	15 Nov 2012 15:04:18 -0000
++++ CMGTools/RootTools/python/fwlite/MultiLoop.py	22 Nov 2012 19:16:44 -0000
 @@ -123,6 +123,8 @@
                                   'src/CMGTools/WMass/python/analyzers'] ))
      sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
@@ -105,7 +105,7 @@ RCS file: /local/reps/CMSSW/CMSSW/DataFormats/Candidate/interface/LeafCandidate.
 retrieving revision 1.24
 diff -u -r1.24 LeafCandidate.h
 --- DataFormats/Candidate/interface/LeafCandidate.h	27 Oct 2011 16:29:58 -0000	1.24
-+++ DataFormats/Candidate/interface/LeafCandidate.h	15 Nov 2012 15:04:20 -0000
++++ DataFormats/Candidate/interface/LeafCandidate.h	22 Nov 2012 19:16:44 -0000
 @@ -39,7 +39,7 @@
        cachePolarFixed_( false ), cacheCartesianFixed_( false ) { }
      // constructor from candidate                                                         
@@ -121,7 +121,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/BuildFile.xml,v
 retrieving revision 1.1
 diff -u -r1.1 BuildFile.xml
 --- Francesco/KinFitter/src/BuildFile.xml	7 May 2011 13:51:55 -0000	1.1
-+++ Francesco/KinFitter/src/BuildFile.xml	15 Nov 2012 15:04:21 -0000
++++ Francesco/KinFitter/src/BuildFile.xml	22 Nov 2012 19:16:44 -0000
 @@ -1,7 +1,4 @@
 -<flags CXXFLAGS="-I$(CMSSW_RELEASE_BASE)/src/PhysicsTools/KinFitter/interface/"/>
 -
@@ -138,7 +138,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc,v
 retrieving revision 1.3
 diff -u -r1.3 DiJetKinFitter.cc
 --- Francesco/KinFitter/src/DiJetKinFitter.cc	21 May 2011 15:35:53 -0000	1.3
-+++ Francesco/KinFitter/src/DiJetKinFitter.cc	15 Nov 2012 15:04:21 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.cc	22 Nov 2012 19:16:44 -0000
 @@ -1,11 +1,11 @@
  #include "DiJetKinFitter.h"
  
@@ -238,7 +238,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 DiJetKinFitter.h
 --- Francesco/KinFitter/src/DiJetKinFitter.h	5 Apr 2011 15:42:53 -0000	1.1
-+++ Francesco/KinFitter/src/DiJetKinFitter.h	15 Nov 2012 15:04:21 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.h	22 Nov 2012 19:16:44 -0000
 @@ -8,7 +8,8 @@
  #ifndef DiJetKinFitter_h
  #define DiJetKinFitter_h
@@ -287,7 +287,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.cc,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.cc
 --- Francesco/KinFitter/src/GlobalFitter.cc	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.cc	15 Nov 2012 15:04:21 -0000
++++ Francesco/KinFitter/src/GlobalFitter.cc	22 Nov 2012 19:16:44 -0000
 @@ -1,10 +1,9 @@
  #include "GlobalFitter.h"
  
@@ -309,7 +309,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.h
 --- Francesco/KinFitter/src/GlobalFitter.h	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.h	15 Nov 2012 15:04:21 -0000
++++ Francesco/KinFitter/src/GlobalFitter.h	22 Nov 2012 19:16:44 -0000
 @@ -6,7 +6,7 @@
  #ifndef GlobalFitter_h
  #define GlobalFitter_h
@@ -319,13 +319,109 @@ diff -u -r1.1 GlobalFitter.h
  #include "TLorentzVector.h"
  
  
+Index: HiggsAna/HEEJJ/python/diElectron_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/diElectron_cff.py,v
+retrieving revision 1.3
+diff -u -r1.3 diElectron_cff.py
+--- HiggsAna/HEEJJ/python/diElectron_cff.py	12 May 2012 21:59:30 -0000	1.3
++++ HiggsAna/HEEJJ/python/diElectron_cff.py	22 Nov 2012 19:16:44 -0000
+@@ -11,7 +11,7 @@
+ cmgDiElectronHistograms.inputCollection=cms.InputTag("cmgDiElectronSel2L2Q")
+ 
+ 
+-diElectronSequence = cms.Sequence(
++diElectronSequence2L2Q = cms.Sequence(
+     cmgDiElectron2L2Q +
+     cmgDiElectronSel2L2Q +
+     cmgDiElectronCount +
+Index: HiggsAna/HEEJJ/python/electron_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/electron_cff.py,v
+retrieving revision 1.14
+diff -u -r1.14 electron_cff.py
+--- HiggsAna/HEEJJ/python/electron_cff.py	3 Jun 2012 19:34:40 -0000	1.14
++++ HiggsAna/HEEJJ/python/electron_cff.py	22 Nov 2012 19:16:44 -0000
+@@ -8,7 +8,7 @@
+     cut = cms.string(' (abs(pdgId)==11 )&& abs(mother.pdgId)==23 ')
+ )
+ 
+-selectedPatElectrons  = cms.EDProducer("PATElectronCleaner",
++selectedPatElectrons2L2Q  = cms.EDProducer("PATElectronCleaner",
+                                         src = cms.InputTag("patElectronsWithTrigger"), #selectedPatElectronsAK5
+                                         preselection = cms.string(''),
+                                         checkOverlaps = cms.PSet( genLeptons = cms.PSet( src = cms.InputTag("genSelectorZDaughterE"),
+@@ -24,34 +24,34 @@
+                                         )
+ 
+ 
+-
+-cmgElectron.cfg.inputCollection="selectedPatElectrons"
++cmgElectron2L2Q = cmgElectron.clone()
++cmgElectron2L2Q.cfg.inputCollection="selectedPatElectrons"
+ 
+ # ele ID requirements
+-cmgElectron.cuts.mvaTrigSel =mvaTrigEleId.clone() 
+-cmgElectron.cuts.wp95c = wp95cEleId.clone()
+-###cmgElectron.cuts.CombIsoVBTF95 = CombIsoVBTF95EleId.clone()
+-cmgElectron.cuts.cutBasedVeto = cutBasedVetoEleId.clone()
+-cmgElectron.cuts.cutBasedLoose = cutBasedLooseEleId.clone()
+-cmgElectron.cuts.cutBasedMedium = cutBasedMediumEleId.clone()
+-cmgElectron.cuts.cutBasedTight = cutBasedTightEleId.clone()
+-cmgElectron.cuts.conversionVeto = cms.PSet(
++cmgElectron2L2Q.cuts.mvaTrigSel =mvaTrigEleId.clone() 
++cmgElectron2L2Q.cuts.wp95c = wp95cEleId.clone()
++###cmgElectron2L2Q.cuts.CombIsoVBTF95 = CombIsoVBTF95EleId.clone()
++cmgElectron2L2Q.cuts.cutBasedVeto = cutBasedVetoEleId.clone()
++cmgElectron2L2Q.cuts.cutBasedLoose = cutBasedLooseEleId.clone()
++cmgElectron2L2Q.cuts.cutBasedMedium = cutBasedMediumEleId.clone()
++cmgElectron2L2Q.cuts.cutBasedTight = cutBasedTightEleId.clone()
++cmgElectron2L2Q.cuts.conversionVeto = cms.PSet(
+     patFlag=cms.string('sourcePtr().passConversionVeto()')    
+     )
+ 
+ ### Isolation requirements (also embedded in CombIsoVBTFXX and wp95c)
+-cmgElectron.cuts.reliso = cms.PSet ( reliso = cms.string(" (sourcePtr.get.dr03HcalTowerSumEt + sourcePtr.get.dr03EcalRecHitSumEt + sourcePtr.get.dr03TkSumPt) / et < 0.15 ") )
++cmgElectron2L2Q.cuts.reliso = cms.PSet ( reliso = cms.string(" (sourcePtr.get.dr03HcalTowerSumEt + sourcePtr.get.dr03EcalRecHitSumEt + sourcePtr.get.dr03TkSumPt) / et < 0.15 ") )
+ 
+ 
+ ### kinematic requirements
+-cmgElectron.cuts.kinematics = eKinematics.clone()
++cmgElectron2L2Q.cuts.kinematics = eKinematics.clone()
+ 
+ ### HLT extra-requirements (otherwise trigger ID tighter than offline)
+ # AB: should we put trigger matching here ?
+-cmgElectron.cuts.HLTPatch = HLTPatch.clone()
++cmgElectron2L2Q.cuts.HLTPatch = HLTPatch.clone()
+ 
+-cmgElectron.cuts.genLepton = cms.PSet( genLepton = cms.string("sourcePtr().get().hasOverlaps('genLeptons')"))
++cmgElectron2L2Q.cuts.genLepton = cms.PSet( genLepton = cms.string("sourcePtr().get().hasOverlaps('genLeptons')"))
+  
+-eleSequence = cms.Sequence(genSelectorZDaughterE + selectedPatElectrons + cmgElectron + cmgElectronSel)
++eleSequence2L2Q = cms.Sequence(genSelectorZDaughterE + selectedPatElectrons2L2Q + cmgElectron2L2Q + cmgElectronSel)
+ 
+-print cmgElectron.cuts.HLTPatch
++print cmgElectron2L2Q.cuts.HLTPatch
+Index: HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py,v
+retrieving revision 1.13
+diff -u -r1.13 selEventsElectron_cfi.py
+--- HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	5 Jun 2012 10:11:48 -0000	1.13
++++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	22 Nov 2012 19:16:44 -0000
+@@ -31,4 +31,4 @@
+    minNumber = cms.uint32(0)
+  )
+ 
+-selectedElectronSequence = cms.Sequence(electronPreselNoIso+electronPresel+selectedElectronCandFilter)
++selectedElectronSequence2L2Q = cms.Sequence(electronPreselNoIso+electronPresel+selectedElectronCandFilter)
 Index: HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h,v
 retrieving revision 1.5
 diff -u -r1.5 DiObjectKinFitFactory.h
 --- HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	23 Apr 2012 13:35:22 -0000	1.5
-+++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	15 Nov 2012 15:04:21 -0000
++++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	22 Nov 2012 19:16:44 -0000
 @@ -66,21 +66,31 @@
  void cmg::DiObjectKinFitFactory<T, U>::set(const cmg::DiObject<T,U>& pair, cmg::DiObject<T,U>* const obj) const{
  
@@ -376,7 +472,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/Jet
 retrieving revision 1.4
 diff -u -r1.4 JetKinFitterConst.h
 --- HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	23 Apr 2012 13:35:22 -0000	1.4
-+++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	15 Nov 2012 15:04:21 -0000
++++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	22 Nov 2012 19:16:44 -0000
 @@ -3,6 +3,7 @@
  #include "TLorentzVector.h"
  #include "TMatrixD.h"
@@ -400,7 +496,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/Plugi
 retrieving revision 1.17
 diff -u -r1.17 Plugins.cc
 --- HiggsAna/HLLJJCommon/plugins/Plugins.cc	18 Oct 2012 08:46:43 -0000	1.17
-+++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	15 Nov 2012 15:04:21 -0000
++++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	22 Nov 2012 19:16:44 -0000
 @@ -4,7 +4,7 @@
  #include "HiggsAna/HLLJJCommon/plugins/HLTWeightProducer.h" 
  #include "HiggsAna/HLLJJCommon/plugins/PTWeightAnalyzer.h" 
@@ -434,13 +530,254 @@ diff -u -r1.17 Plugins.cc
  DEFINE_FWK_MODULE(DummyGenProducer);
 -DEFINE_FWK_MODULE(DummyConversionProducer);
 +//DEFINE_FWK_MODULE(DummyConversionProducer);
+Index: HiggsAna/HLLJJCommon/python/FinalSelection_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/FinalSelection_cff.py,v
+retrieving revision 1.14
+diff -u -r1.14 FinalSelection_cff.py
+--- HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	18 Oct 2012 08:46:43 -0000	1.14
++++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	22 Nov 2012 19:16:45 -0000
+@@ -28,45 +28,82 @@
+                                   cut = cms.string("getSelection(\"cuts_btags_btag2\")")
+                                   )
+ 
+-
+ # compute Likelihood discriminant for different btag categories
+ LDZero=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
+                       src       =cms.InputTag("ZeroTag"),
+                       spin      =cms.untracked.int32(0),
+-                      paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
+-                      nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                      paramfile = cms.FileInPath("Alessio/RooFitUtil/data/allSignalParams.txt"),
++                      nhanfile = cms.FileInPath("Alessio/RooFitUtil/data/fqqTable.txt"),                      
+                       )
+ LDOne=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
+                      src       =cms.InputTag("OneTag"),
+                      spin      =cms.untracked.int32(0),
+-                     paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
+-                     nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                     paramfile = cms.FileInPath("Alessio/RooFitUtil/data/allSignalParams.txt"),
++                     nhanfile = cms.FileInPath("Alessio/RooFitUtil/data/fqqTable.txt"),                      
+                      )
+ LDTwo=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
+                      src       =cms.InputTag("TwoTag"),
+                      spin      =cms.untracked.int32(0),
+-                     paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
+-                     nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                     paramfile = cms.FileInPath("Alessio/RooFitUtil/data/allSignalParams.txt"),
++                     nhanfile = cms.FileInPath("Alessio/RooFitUtil/data/fqqTable.txt"),                      
+                      )
+ LDZeroKinFit=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
+                           src       =cms.InputTag("ZeroTagKinFit"),
+                             spin      =cms.untracked.int32(0),
+-                            paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
+-                            nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                            paramfile = cms.FileInPath("Alessio/RooFitUtil/data/allSignalParams.txt"),
++                            nhanfile = cms.FileInPath("Alessio/RooFitUtil/data/fqqTable.txt"),                      
+                           )
+ LDOneKinFit=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
+                           src       =cms.InputTag("OneTagKinFit"),
+                            spin      =cms.untracked.int32(0),
+-                           paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
+-                           nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                           paramfile = cms.FileInPath("Alessio/RooFitUtil/data/allSignalParams.txt"),
++                           nhanfile = cms.FileInPath("Alessio/RooFitUtil/data/fqqTable.txt"),                      
+                          )
+ LDTwoKinFit=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
+                            src       =cms.InputTag("TwoTagKinFit"),
+                            spin      =cms.untracked.int32(0),
+-                           paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
+-                           nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                           paramfile = cms.FileInPath("Alessio/RooFitUtil/data/allSignalParams.txt"),
++                           nhanfile = cms.FileInPath("Alessio/RooFitUtil/data/fqqTable.txt"),                      
+                            )
+ 
++## compute Likelihood discriminant for different btag categories
++#LDZero=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
++                      #src       =cms.InputTag("ZeroTag"),
++                      #spin      =cms.untracked.int32(0),
++                      #paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
++                      #nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                      #)
++#LDOne=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
++                     #src       =cms.InputTag("OneTag"),
++                     #spin      =cms.untracked.int32(0),
++                     #paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
++                     #nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                     #)
++#LDTwo=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
++                     #src       =cms.InputTag("TwoTag"),
++                     #spin      =cms.untracked.int32(0),
++                     #paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
++                     #nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                     #)
++#LDZeroKinFit=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
++                          #src       =cms.InputTag("ZeroTagKinFit"),
++                            #spin      =cms.untracked.int32(0),
++                            #paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
++                            #nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                          #)
++#LDOneKinFit=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
++                          #src       =cms.InputTag("OneTagKinFit"),
++                           #spin      =cms.untracked.int32(0),
++                           #paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
++                           #nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                         #)
++#LDTwoKinFit=cms.EDProducer("DiElectronDiJetHiggsLDProducer",
++                           #src       =cms.InputTag("TwoTagKinFit"),
++                           #spin      =cms.untracked.int32(0),
++                           #paramfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/allSignalParams.txt"),
++                           #nhanfile = cms.FileInPath("Alessio/RooFitUtil/src/PDFs/fqqTable.txt"),                      
++                           #)
++
+ # filter each categorie separately
+ FinalSelectorZeroKinFit=cms.EDProducer("DiElectronDiJetHiggsQGLDSelector",
+                                        src       =cms.InputTag("ZeroTagKinFit"),
+@@ -74,10 +111,10 @@
+                                        QGsrc     =cms.InputTag("qglikelihood"),
+                                        LDsrc     =cms.InputTag("LDZeroKinFit","LD"),
+                                        LDsrcsec  =cms.InputTag("LDZero","LD"),
+-                                       LDExpression = cms.string("0.00025*x + 0.55"),
++                                       LDExpression = cms.string("-9999."),  #("0.00025*x + 0.55")
+                                        QGExpression = cms.string("-9999."),
+                                        METsrc    = cms.InputTag("patMETsRaw"), #patMETs has Type1 corr but dummy METsign
+-                                       METcut    = cms.string("abs(pt)>-1."),
++                                       METcut    = cms.string("abs(pt)>-1."),  # always true, so no met cut for 0 and 1 tag (next)
+                                        )
+ FinalSelectorOneKinFit=cms.EDProducer("DiElectronDiJetHiggsQGLDSelector",
+                                       src       =cms.InputTag("OneTagKinFit"),
+@@ -85,7 +122,7 @@
+                                       QGsrc     =cms.InputTag("qglikelihood"),
+                                       LDsrc     =cms.InputTag("LDOneKinFit","LD"),
+                                       LDsrcsec  =cms.InputTag("LDOne","LD"),
+-                                      LDExpression = cms.string("0.000656*x + 0.302"),
++                                      LDExpression = cms.string("-9999."),  #("0.000656*x + 0.302")
+                                       QGExpression = cms.string("-9999."),
+                                       METsrc    = cms.InputTag("patMETsRaw"), #patMETsAK5NoPUSub
+                                       METcut    = cms.string("abs(pt)>-1."),
+@@ -96,10 +133,10 @@
+                                       QGsrc     =cms.InputTag("qglikelihood"),
+                                       LDsrc     =cms.InputTag("LDTwoKinFit","LD"),
+                                       LDsrcsec  =cms.InputTag("LDTwo","LD"),
+-                                      LDExpression = cms.string("0.5"),
++                                      LDExpression = cms.string("-9999"),  #("0.5")
+                                       QGExpression = cms.string("-9999."),
+                                       METsrc    = cms.InputTag("patMETsRaw"), #patMETsAK5NoPUSub
+-                                      METcut    = cms.string("significance <10."),                                      
++                                      METcut    = cms.string("significance <10."), # hardcoded metsign cut for 2 tags.
+                                       )
+ 
+ # merge selected candidates to pick the best
+@@ -114,13 +151,14 @@
+ ################
+ ## Add VBF section
+ vbfString = cms.string("vbfptr.isAvailable")
+-LDString0 = cms.string("userFloat(\"LD\") > 0.00025 * userFloat(\"primaryMass\") + 0.55") 
+-LDString1 = cms.string("userFloat(\"LD\") > 0.000656* userFloat(\"primaryMass\") + 0.302") 
+-LDString2 = cms.string("userFloat(\"LD\") > 0.5") 
+-bString0  = cms.string("getSelection(\"cuts_btags_btag0\")") 
+-bString1  = cms.string("getSelection(\"cuts_btags_btag1\")") 
+-bString2  = cms.string("getSelection(\"cuts_btags_btag2\")") 
++LDString0 = cms.string("userFloat(\"LD\") > -1")  #("userFloat(\"LD\") > 0.00025 * userFloat(\"primaryMass\") + 0.55")
++LDString1 = cms.string("userFloat(\"LD\") > -1")  #("userFloat(\"LD\") > 0.000656* userFloat(\"primaryMass\") + 0.302")
++LDString2 = cms.string("userFloat(\"LD\") > -1")  #("userFloat(\"LD\") > 0.5")
++bString0  = cms.string("getSelection(\"cuts_btags_btag0\")")
++bString1  = cms.string("getSelection(\"cuts_btags_btag1\")")
++bString2  = cms.string("getSelection(\"cuts_btags_btag2\")")
+ 
++# Changing LD>-1 above makes these degenerate, except for btag012.
+ VBFTagger = cms.EDProducer("DiElectronDiJetHiggsTagger",
+                            src=cms.InputTag("MergedCategories"),
+                            cuts = cms.PSet( vbfLDb0 = cms.PSet( vbf = vbfString,
+@@ -162,28 +200,29 @@
+ 
+ MergedSignal = cms.EDFilter("CmgDiElectronDiJetHiggsSelector",
+                               src = cms.InputTag("VBFTagger"),
+-                              cut = cms.string("leg2.getSelection(\"cuts_isSignal\") && ("
+-                                           #    +"   getSelection(\"tag_vbfLDb2\") " # remove to skip VBF tagging
+-                                           #    +"|| getSelection(\"tag_vbfLDb1\") " # remove to skip VBF tagging
+-                                           #    +"|| getSelection(\"tag_vbfLDb0\") " # remove to skip VBF tagging
+-                                               +"  getSelection(\"tag_LDb2\")     "
++                              cut = cms.string("leg2.getSelection(\"cuts_isSignal\") &&"
++                                               +" ( getSelection(\"tag_vbfLDb2\") " # remove to skip VBF tagging
++                                               +"|| getSelection(\"tag_vbfLDb1\") " # remove to skip VBF tagging
++                                               +"|| getSelection(\"tag_vbfLDb0\") " # remove to skip VBF tagging
++                                               +"||  getSelection(\"tag_LDb2\")     "
+                                                +"|| getSelection(\"tag_LDb1\")    "
+-                                               +"|| getSelection(\"tag_LDb0\")  ) "
+-                                           #    +"|| getSelection(\"tag_vbfb2\")   " # remove to skip VBF tagging
+-                                           #    +"|| getSelection(\"tag_vbfb1\")   " # remove to skip VBF tagging
+-                                           #    +"|| getSelection(\"tag_vbfb0\")  )" # remove to skip VBF tagging
++                                               +"|| getSelection(\"tag_LDb0\")  "
++                                               +"|| getSelection(\"tag_vbfb2\")   " # remove to skip VBF tagging
++                                               +"|| getSelection(\"tag_vbfb1\")   " # remove to skip VBF tagging
++                                               +"|| getSelection(\"tag_vbfb0\")  )" # remove to skip VBF tagging
+                                                )
+                             )
+ 
+ MergedSignalSecondary = MergedSignal.clone(src = cms.InputTag("VBFTaggerSecondary"))
+ 
+ 
++# Goes through the (now LD degenerate) levels above, and then applies the mass selection.
+ BestSelectorKinFit=cms.EDProducer("DiElectronDiJetHiggsBestCandidateSelector",
+                                   src               =cms.InputTag("MergedSignal"),
+                                   secondary         =cms.InputTag("MergedSignalSecondary"),
+                                   btagpriority      =cms.bool(True),
+-                                  btagSelectionList =cms.vstring("tag_LDb2","tag_LDb1","tag_LDb0"),#highest priority to lowest priority
+-                                  #btagSelectionList =cms.vstring("tag_vbfLDb2","tag_vbfLDb1","tag_vbfLDb0","tag_LDb2","tag_LDb1","tag_LDb0","tag_vbfb2","tag_vbfb1","tag_vbfb0")
++                                  #btagSelectionList =cms.vstring("tag_LDb2","tag_LDb1","tag_LDb0"),#highest priority to lowest priority
++                                  btagSelectionList =cms.vstring("tag_vbfLDb2","tag_vbfLDb1","tag_vbfLDb0","tag_LDb2","tag_LDb1","tag_LDb0","tag_vbfb2","tag_vbfb1","tag_vbfb0")
+                                   )          #highest priority to lowest priority;
+ 					     # to remove vbf tagging, shorten to ("tag_LDb2","tag_LDb1","tag_LDb0")
+ FinalFilter = cms.EDFilter("CandViewCountFilter",
+Index: HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py,v
+retrieving revision 1.5
+diff -u -r1.5 jetKinematics_cfi.py
+--- HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	13 May 2012 11:58:49 -0000	1.5
++++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	22 Nov 2012 19:16:50 -0000
+@@ -2,19 +2,29 @@
+ 
+ 
+ jetKinematics = cms.PSet(
+-    pt = cms.string('pt() > 30'),
++    pt = cms.string('pt() > 15'),
+     eta = cms.string('abs(eta()) < 2.4'),
+     phi = cms.string('abs(phi()) < 3.2')
+     )
+ 
+ 
+ zjj = cms.PSet(
+-    mass = cms.string('mass() >= 60 && mass() < 130'),
++    mass = cms.string('mass() >= 50 && mass() < 140'),
+ )
+ isSignal = cms.PSet(
+-    mass = cms.string('mass() >= 75 && mass() < 105'),
++    mass = cms.string('mass() >= 60 && mass() < 100'),
+ )
+ isSideband = cms.PSet(
+-    mass = cms.string('(mass() >= 60 && mass() < 75) || ( mass() >= 105 && mass() < 130 )'),
++    mass = cms.string('(mass() >= 50 && mass() < 60) || ( mass() >= 100 && mass() < 140 )'),
+ )
+ 
++
++#zjj = cms.PSet(
++    #mass = cms.string('mass() >= 60 && mass() < 130'),
++#)
++#isSignal = cms.PSet(
++    #mass = cms.string('mass() >= 75 && mass() < 105'),
++#)
++#isSideband = cms.PSet(
++    #mass = cms.string('(mass() >= 60 && mass() < 75) || ( mass() >= 105 && mass() < 130 )'),
++#)
 Index: HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc,v
 retrieving revision 1.3
 diff -u -r1.3 JetKinFitterConst.cc
 --- HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	7 May 2011 14:37:17 -0000	1.3
-+++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	15 Nov 2012 15:04:22 -0000
++++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	22 Nov 2012 19:16:50 -0000
 @@ -1,17 +1,19 @@
  #include "HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h"
  #include "Francesco/KinFitter/src/DiJetKinFitter.h"
@@ -464,3 +801,124 @@ diff -u -r1.3 JetKinFitterConst.cc
 -  return status;
 +  return std::make_pair(status, fitalgo.getChi2());
  }
+Index: HiggsAna/HMMJJ/python/diMuon_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/diMuon_cff.py,v
+retrieving revision 1.2
+diff -u -r1.2 diMuon_cff.py
+--- HiggsAna/HMMJJ/python/diMuon_cff.py	27 May 2011 12:15:04 -0000	1.2
++++ HiggsAna/HMMJJ/python/diMuon_cff.py	22 Nov 2012 19:16:54 -0000
+@@ -6,9 +6,9 @@
+ from CMGTools.Common.skims.cmgDiMuonCount_cfi import *
+ from CMGTools.Common.histograms.cmgDiMuonHistograms_cfi import *
+ 
+-diMuonSequence = cms.Sequence(
+-    cmgDiMuon  
+-   + cmgDiMuonSel 
++diMuonSequence2L2Q = cms.Sequence(
++    cmgDiMuon2L2Q  
++   + cmgDiMuonSel2L2Q 
+    + cmgDiMuonCount 
+    +cmgDiMuonHistograms
+ )
+Index: HiggsAna/HMMJJ/python/muon_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/muon_cff.py,v
+retrieving revision 1.5
+diff -u -r1.5 muon_cff.py
+--- HiggsAna/HMMJJ/python/muon_cff.py	22 May 2012 16:50:11 -0000	1.5
++++ HiggsAna/HMMJJ/python/muon_cff.py	22 Nov 2012 19:16:54 -0000
+@@ -5,7 +5,7 @@
+     src = cms.InputTag("genParticles"),
+     cut = cms.string(' (abs(pdgId)==13 )&& abs(mother.pdgId)==23 ')
+ )
+-selectedPatMuons  = cms.EDProducer("PATMuonCleaner",
++selectedPatMuons2L2Q  = cms.EDProducer("PATMuonCleaner",
+                                    src = cms.InputTag("patMuonsWithTrigger"), #selectedPatMuonsAK5
+                                    preselection = cms.string(''),
+                                    checkOverlaps = cms.PSet( genLeptons = cms.PSet( src = cms.InputTag("genSelectorZDaughterMu"),
+@@ -31,6 +31,6 @@
+ #     genLepton = cms.string("sourcePtr().get().hasOverlaps('genLeptons')")
+ #     )
+  
+-muonSequence = cms.Sequence(genSelectorZDaughterMu + selectedPatMuons + cmgMuon)
++muonSequence2L2Q = cms.Sequence(genSelectorZDaughterMu + selectedPatMuons2L2Q + cmgMuon2L2Q)
+ 
+ 
+Index: HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py,v
+retrieving revision 1.5
+diff -u -r1.5 cmgDiMuon_cfi.py
+--- HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	27 Sep 2011 15:16:22 -0000	1.5
++++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	22 Nov 2012 19:16:54 -0000
+@@ -8,7 +8,7 @@
+ )
+ from HiggsAna.HMMJJ.selections.zmumu_cfi import zmumu
+ 
+-cmgDiMuon = cms.EDFilter(
++cmgDiMuon2L2Q = cms.EDFilter(
+     "DiMuonPOProducer",
+     cfg = dimuonFactory.clone(),
+     cuts = cms.PSet(
+Index: HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py,v
+retrieving revision 1.5
+diff -u -r1.5 cmgMuon_cfi.py
+--- HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	13 May 2012 16:42:56 -0000	1.5
++++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	22 Nov 2012 19:16:55 -0000
+@@ -15,7 +15,7 @@
+ from HiggsAna.HMMJJ.selections.muKinematics_cfi import muKinematics
+ #from HiggsAna.HMMJJ.selections.muontrigger_cfi import muontrigger
+ 
+-cmgMuon = cms.EDFilter("MuonPOProducer",
++cmgMuon2L2Q = cms.EDFilter("MuonPOProducer",
+     cfg = muonFactory.clone(),
+     cuts = cms.PSet(
+                kinematics = muKinematics.clone(),
+Index: HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py,v
+retrieving revision 1.1
+diff -u -r1.1 cmgDiMuonSel_cfi.py
+--- HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
++++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	22 Nov 2012 19:16:55 -0000
+@@ -4,7 +4,7 @@
+ # as they are subject to change. 
+ # you should override these cuts in your analysis.
+ 
+-cmgDiMuonSel = cms.EDFilter(
++cmgDiMuonSel2L2Q = cms.EDFilter(
+     "CmgDiMuonSelector",
+     src = cms.InputTag( "cmgDiMuon" ),
+     cut = cms.string( "getSelection(\"cuts_zmumu\")" )
+Index: HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py,v
+retrieving revision 1.1
+diff -u -r1.1 cmgMuonSel_cfi.py
+--- HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
++++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	22 Nov 2012 19:16:55 -0000
+@@ -4,7 +4,7 @@
+ # as they are subject to change. 
+ # you should override these cuts in your analysis.
+ 
+-cmgMuonSel = cms.EDFilter(
++cmgMuonSel2L2Q = cms.EDFilter(
+     "CmgMuonSelector",
+     src = cms.InputTag( "cmgMuon" ),
+     cut = cms.string( "pt()>5" )
+Index: HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py,v
+retrieving revision 1.7
+diff -u -r1.7 selEventsMuon_cff.py
+--- HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	4 Jun 2012 15:59:00 -0000	1.7
++++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	22 Nov 2012 19:16:55 -0000
+@@ -24,4 +24,4 @@
+    minNumber = cms.uint32(0)
+  )
+ 
+-selectedMuonSequence = cms.Sequence(muonPreselNoIso+muonPresel+selectedMuonCandFilter)
++selectedMuonSequence2L2Q = cms.Sequence(muonPreselNoIso+muonPresel+selectedMuonCandFilter)
