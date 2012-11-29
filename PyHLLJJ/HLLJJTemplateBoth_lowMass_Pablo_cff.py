@@ -20,7 +20,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200))
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 5000
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
-                                        SkipEvent = cms.untracked.vstring('ProductNotFound')
+                                        #SkipEvent = cms.untracked.vstring('ProductNotFound')
                                         )
 ########################################################
 ## Conditions 
@@ -143,12 +143,12 @@ for module in pathsplit:
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 
-#from CMGTools.Common.PAT.patCMGSchedule_cff import getSchedule
-#process.schedule = getSchedule(process, runOnMC, runOnFastSim)
+from CMGTools.Common.PAT.patCMGSchedule_cff import getSchedule
+process.schedule = getSchedule(process, runOnMC, runOnFastSim)
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+#process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 ## Options and Output Report
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
@@ -184,22 +184,32 @@ if options.mcordata == "DATA" and options.json!="" :
 #################
 # Event filter  #
 #################
-process.badEventFilter = cms.EDFilter("HLTHighLevel",
-                                     TriggerResultsTag =
-                                      cms.InputTag("TriggerResults","","AODSIM"),
-                                      HLTPaths =
-                                      cms.vstring('primaryVertexFilterPath',
-                                                  'noscrapingFilterPath',
-                                                  'hcalLaserEventFilterPath',
-                                                  'HBHENoiseFilterPath',
-                                                  #'totalKinematicsFilterPath' #only for Madgraph MC
-                                                  ),
-                                      eventSetupPathsKey = cms.string(''),
-                                      # how to deal with multiple triggers: True (OR) accept if ANY is true, False
-                                      #(AND) accept if ALL are true
-                                      andOr = cms.bool(False), 
-                                      throw = cms.bool(True)    # throw exception on unknown path names
-                                      ) 
+
+process.load('HLTrigger.HLTfilters.triggerResultsFilter_cfi')
+process.triggerResultsFilter.triggerConditions = cms.vstring('HLT_primaryVertexFilterPath',
+                                                  'HLT_noscrapingFilterPath',
+                                                  'HLT_hcalLaserEventFilterPath',
+                                                  'HLT_HBHENoiseFilterPath',
+                                                  #'HLT_totalKinematicsFilterPath' #only for Madgraph MC
+                                                  )
+process.triggerResultsFilter.l1tResults = ''                                                  
+
+#process.badEventFilter = cms.EDFilter("HLTHighLevel",
+#                                     TriggerResultsTag =
+#                                      cms.InputTag("TriggerResults"), #,"","CMG"),
+#                                      HLTPaths =
+#                                      cms.vstring('primaryVertexFilterPath',
+#                                                  'noscrapingFilterPath',
+#                                                  'hcalLaserEventFilterPath',
+#                                                  'HBHENoiseFilterPath',
+#                                                  #'totalKinematicsFilterPath' #only for Madgraph MC
+#                                                  ),
+#                                      eventSetupPathsKey = cms.string(''),
+#                                      # how to deal with multiple triggers: True (OR) accept if ANY is true, False
+#                                      #(AND) accept if ALL are true
+#                                      andOr = cms.bool(False), 
+#                                      throw = cms.bool(True)    # throw exception on unknown path names
+#                                      ) 
 
 ###########
 # Output  #
@@ -323,15 +333,12 @@ process.load('CMGTools.Common.selections.cutSummaryMuon_cfi')  #needed?
 process.load('HiggsAna.HMMJJ.muon_cff')
 process.load('HiggsAna.HMMJJ.diMuon_cff')
 process.zmumusummary = process.cutSummaryMuon.clone(inputCollection = cms.InputTag("cmgDiMuon"))
-
 process.load('HiggsAna.HMMJJ.skims.selEventsMuon_cff')
 process.load('HiggsAna.HMMJJ.skims.selEventsZ_cff')
 process.load('HiggsAna.HMMJJ.higgs_cff')
-
 #process.load('HiggsAna.HLLJJCommon.histograms.recoLeptonHistos_cff')
 #process.recoMuHistos = process.recoLeptonHistos.clone(src = "muonPresel")
-
-#process.muonSequence2L2Q.insert(0,process.PUseq)
+process.muonSequence2L2Q.insert(0,process.PUseq)
 
 process.analysisSequenceMuons = cms.Sequence(
     process.muonSequence2L2Q
@@ -381,14 +388,16 @@ process.analysisSequenceHZZMM = cms.Sequence(
     process.higgsSequenceMu
     )
 
-process.schedule = cms.Schedule(process.p)
+#process.schedule = cms.Schedule(process.p)
 #preselections need to have their own paths only if we want to select all events passing up to preselection level
 if options.selection == "presel":
-    process.preselEle = cms.Path(process.badEventFilter+process.analysisSequenceHZZEE)
-    process.preselMu = cms.Path(process.badEventFilter+process.analysisSequenceHZZMM)
+    process.preselEle = cms.Path(process.analysisSequenceHZZEE)
+    process.preselMu = cms.Path(process.analysisSequenceHZZMM)
     process.schedule.append(process.preselEle)
     process.schedule.append(process.preselMu)
 
+process.badEventPath = cms.EndPath(process.triggerResultsFilter)
+process.schedule.append(process.badEventPath)
 process.schedule.append(process.outpath)    
 
 ##############

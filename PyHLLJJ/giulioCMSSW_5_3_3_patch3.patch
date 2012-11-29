@@ -4,7 +4,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.19
 diff -u -r1.19 DiObject.h
 --- AnalysisDataFormats/CMGTools/interface/DiObject.h	17 Jan 2012 12:51:07 -0000	1.19
-+++ AnalysisDataFormats/CMGTools/interface/DiObject.h	22 Nov 2012 19:16:44 -0000
++++ AnalysisDataFormats/CMGTools/interface/DiObject.h	29 Nov 2012 11:00:41 -0000
 @@ -11,6 +11,7 @@
  
  template <typename T, typename U> class DiObject;
@@ -60,13 +60,30 @@ diff -u -r1.19 DiObject.h
  
  };
  
+Index: AnalysisDataFormats/CMGTools/interface/Muon.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/Muon.h,v
+retrieving revision 1.11
+diff -u -r1.11 Muon.h
+--- AnalysisDataFormats/CMGTools/interface/Muon.h	28 Aug 2012 16:07:40 -0000	1.11
++++ AnalysisDataFormats/CMGTools/interface/Muon.h	29 Nov 2012 11:00:41 -0000
+@@ -55,7 +55,8 @@
+     }
+     bool isPF() const{
+       //return this->sourcePtr()->isPFMuon(); //this is not functional in release < 52X
+-      assert ((*(this->sourcePtr()))->hasUserFloat("isPFMuon")); //this is normally added by PATPFMuonEmbedder module. see comment above
++      //GIULIO
++      //assert ((*(this->sourcePtr()))->hasUserFloat("isPFMuon")); //this is normally added by PATPFMuonEmbedder module. see comment above
+       return (*(this->sourcePtr()))->userFloat("isPFMuon"); 
+     }
+     
 Index: CMGTools/Common/interface/DiObjectFactory.h
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/interface/DiObjectFactory.h,v
 retrieving revision 1.14
 diff -u -r1.14 DiObjectFactory.h
 --- CMGTools/Common/interface/DiObjectFactory.h	28 Feb 2012 15:45:19 -0000	1.14
-+++ CMGTools/Common/interface/DiObjectFactory.h	22 Nov 2012 19:16:44 -0000
++++ CMGTools/Common/interface/DiObjectFactory.h	29 Nov 2012 11:00:41 -0000
 @@ -60,6 +60,7 @@
      return cmg::DiObject<T,U>(l1,l2);
  }
@@ -83,13 +100,135 @@ diff -u -r1.14 DiObjectFactory.h
  
  }
  
+Index: CMGTools/Common/python/PAT/addFilterPaths_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/python/PAT/addFilterPaths_cff.py,v
+retrieving revision 1.7
+diff -u -r1.7 addFilterPaths_cff.py
+--- CMGTools/Common/python/PAT/addFilterPaths_cff.py	2 Oct 2012 09:02:09 -0000	1.7
++++ CMGTools/Common/python/PAT/addFilterPaths_cff.py	29 Nov 2012 11:00:41 -0000
+@@ -15,7 +15,7 @@
+     cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
+     filter = cms.bool(True)
+     )
+-primaryVertexFilterPath = cms.Path(primaryVertexFilter)
++HLT_primaryVertexFilterPath = cms.Path(primaryVertexFilter)
+ 
+ noscraping = cms.EDFilter(
+     "FilterOutScraping",
+@@ -24,11 +24,11 @@
+     numtrack = cms.untracked.uint32(10),
+     thresh = cms.untracked.double(0.25)
+     )
+-noscrapingFilterPath = cms.Path(noscraping)
++HLT_noscrapingFilterPath = cms.Path(noscraping)
+ 
+ #catches events with a bug in the Madgraph config
+ from GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi import totalKinematicsFilter
+-totalKinematicsFilterPath = cms.Path(totalKinematicsFilter)
++HLT_totalKinematicsFilterPath = cms.Path(totalKinematicsFilter)
+ 
+ ##
+ # MET related
+@@ -40,21 +40,21 @@
+ 
+ ## The iso-based HBHE noise filter
+ from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import HBHENoiseFilter
+-HBHENoiseFilterPath = cms.Path(HBHENoiseFilter)
++HLT_HBHENoiseFilterPath = cms.Path(HBHENoiseFilter)
+ 
+ ## The CSC beam halo tight filter
+ from RecoMET.METAnalyzers.CSCHaloFilter_cfi import CSCTightHaloFilter
+-CSCTightHaloFilterPath = cms.Path(CSCTightHaloFilter)
++HLT_CSCTightHaloFilterPath = cms.Path(CSCTightHaloFilter)
+ 
+ ## The HCAL laser filter
+ from RecoMET.METFilters.hcalLaserEventFilter_cfi import hcalLaserEventFilter
+-hcalLaserEventFilterPath = cms.Path(hcalLaserEventFilter)
++HLT_hcalLaserEventFilterPath = cms.Path(hcalLaserEventFilter)
+ 
+ ## The ECAL dead cell trigger primitive filter
+ from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import EcalDeadCellTriggerPrimitiveFilter
+ ## For AOD and RECO recommendation to use recovered rechits
+ EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag("ecalTPSkimNA")
+-EcalDeadCellTriggerPrimitiveFilterPath = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
++HLT_EcalDeadCellTriggerPrimitiveFilterPath = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
+ 
+ 
+ ## The Good vertices collection needed by the tracking failure filter
+@@ -70,7 +70,7 @@
+ trackingFailureFilter.VertexSource = "goodVertices"
+ trackingFailureFilter.JetSource = 'ak5PFJets'
+ trackingFailureSequence = cms.Sequence(goodVertices*trackingFailureFilter)
+-trackingFailureFilterPath = cms.Path(trackingFailureSequence)
++HLT_trackingFailureFilterPath = cms.Path(trackingFailureSequence)
+ 
+ 
+ metNoiseCleaning = cms.Sequence(primaryVertexFilter+
+@@ -82,7 +82,7 @@
+                                 trackingFailureSequence
+                                 )
+ 
+-metNoiseCleaningPath = cms.Path(metNoiseCleaning)
++HLT_metNoiseCleaningPath = cms.Path(metNoiseCleaning)
+ 
+ from CMGTools.Common.Tools.cmsswRelease import isNewerThan
+ if isNewerThan('CMSSW_5_2_0'):
+@@ -91,7 +91,7 @@
+     hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
+     #the ee bad sc filter is only available in 5X 
+     from RecoMET.METFilters.eeBadScFilter_cfi import eeBadScFilter
+-    eeBadScFilterPath = cms.Path(eeBadScFilter)
++    HLT_eeBadScFilterPath = cms.Path(eeBadScFilter)
+     metNoiseCleaning +=  eeBadScFilter 
+ else:
+     print >> sys.stderr, 'hcalLaserFilterFromAOD only available in releases >= 5.2'
+Index: CMGTools/Common/python/PAT/patCMGSchedule_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/python/PAT/patCMGSchedule_cff.py,v
+retrieving revision 1.8
+diff -u -r1.8 patCMGSchedule_cff.py
+--- CMGTools/Common/python/PAT/patCMGSchedule_cff.py	2 Oct 2012 09:02:09 -0000	1.8
++++ CMGTools/Common/python/PAT/patCMGSchedule_cff.py	29 Nov 2012 11:00:41 -0000
+@@ -6,21 +6,21 @@
+ 
+     result = cms.Schedule(
+         process.p,
+-        process.EcalDeadCellTriggerPrimitiveFilterPath,
+-        process.hcalLaserEventFilterPath,
+-        process.trackingFailureFilterPath,
+-        process.primaryVertexFilterPath,
+-        process.noscrapingFilterPath,
+-        process.metNoiseCleaningPath
++        process.HLT_EcalDeadCellTriggerPrimitiveFilterPath,
++        process.HLT_hcalLaserEventFilterPath,
++        process.HLT_trackingFailureFilterPath,
++        process.HLT_primaryVertexFilterPath,
++        process.HLT_noscrapingFilterPath,
++        process.HLT_metNoiseCleaningPath
+         # process.eeBadScFilterPath,
+         )
+     if isNewerThan('CMSSW_5_2_0'):
+-        result.append( process.eeBadScFilterPath )
++        result.append( process.HLT_eeBadScFilterPath )
+     if runOnMC:
+-        result.append(process.totalKinematicsFilterPath)
++        result.append(process.HLT_totalKinematicsFilterPath)
+     if not( runOnFastSim ):
+-        result.append(process.CSCTightHaloFilterPath)
+-        result.append(process.HBHENoiseFilterPath)
++        result.append(process.HLT_CSCTightHaloFilterPath)
++        result.append(process.HLT_HBHENoiseFilterPath)
+     else:
+         process.metNoiseCleaningPath.remove(process.CSCTightHaloFilter)
+         process.metNoiseCleaningPath.remove(process.HBHENoiseFilter)
 Index: CMGTools/RootTools/python/fwlite/MultiLoop.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/RootTools/python/fwlite/MultiLoop.py,v
 retrieving revision 1.10
 diff -u -r1.10 MultiLoop.py
 --- CMGTools/RootTools/python/fwlite/MultiLoop.py	14 Nov 2012 16:44:52 -0000	1.10
-+++ CMGTools/RootTools/python/fwlite/MultiLoop.py	22 Nov 2012 19:16:44 -0000
++++ CMGTools/RootTools/python/fwlite/MultiLoop.py	29 Nov 2012 11:00:47 -0000
 @@ -123,6 +123,8 @@
                                   'src/CMGTools/WMass/python/analyzers'] ))
      sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
@@ -105,7 +244,7 @@ RCS file: /local/reps/CMSSW/CMSSW/DataFormats/Candidate/interface/LeafCandidate.
 retrieving revision 1.24
 diff -u -r1.24 LeafCandidate.h
 --- DataFormats/Candidate/interface/LeafCandidate.h	27 Oct 2011 16:29:58 -0000	1.24
-+++ DataFormats/Candidate/interface/LeafCandidate.h	22 Nov 2012 19:16:44 -0000
++++ DataFormats/Candidate/interface/LeafCandidate.h	29 Nov 2012 11:00:54 -0000
 @@ -39,7 +39,7 @@
        cachePolarFixed_( false ), cacheCartesianFixed_( false ) { }
      // constructor from candidate                                                         
@@ -121,7 +260,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/BuildFile.xml,v
 retrieving revision 1.1
 diff -u -r1.1 BuildFile.xml
 --- Francesco/KinFitter/src/BuildFile.xml	7 May 2011 13:51:55 -0000	1.1
-+++ Francesco/KinFitter/src/BuildFile.xml	22 Nov 2012 19:16:44 -0000
++++ Francesco/KinFitter/src/BuildFile.xml	29 Nov 2012 11:00:55 -0000
 @@ -1,7 +1,4 @@
 -<flags CXXFLAGS="-I$(CMSSW_RELEASE_BASE)/src/PhysicsTools/KinFitter/interface/"/>
 -
@@ -138,7 +277,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc,v
 retrieving revision 1.3
 diff -u -r1.3 DiJetKinFitter.cc
 --- Francesco/KinFitter/src/DiJetKinFitter.cc	21 May 2011 15:35:53 -0000	1.3
-+++ Francesco/KinFitter/src/DiJetKinFitter.cc	22 Nov 2012 19:16:44 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.cc	29 Nov 2012 11:00:55 -0000
 @@ -1,11 +1,11 @@
  #include "DiJetKinFitter.h"
  
@@ -238,7 +377,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 DiJetKinFitter.h
 --- Francesco/KinFitter/src/DiJetKinFitter.h	5 Apr 2011 15:42:53 -0000	1.1
-+++ Francesco/KinFitter/src/DiJetKinFitter.h	22 Nov 2012 19:16:44 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.h	29 Nov 2012 11:00:55 -0000
 @@ -8,7 +8,8 @@
  #ifndef DiJetKinFitter_h
  #define DiJetKinFitter_h
@@ -287,7 +426,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.cc,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.cc
 --- Francesco/KinFitter/src/GlobalFitter.cc	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.cc	22 Nov 2012 19:16:44 -0000
++++ Francesco/KinFitter/src/GlobalFitter.cc	29 Nov 2012 11:00:56 -0000
 @@ -1,10 +1,9 @@
  #include "GlobalFitter.h"
  
@@ -309,7 +448,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.h
 --- Francesco/KinFitter/src/GlobalFitter.h	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.h	22 Nov 2012 19:16:44 -0000
++++ Francesco/KinFitter/src/GlobalFitter.h	29 Nov 2012 11:00:56 -0000
 @@ -6,7 +6,7 @@
  #ifndef GlobalFitter_h
  #define GlobalFitter_h
@@ -325,7 +464,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/diElectron_c
 retrieving revision 1.3
 diff -u -r1.3 diElectron_cff.py
 --- HiggsAna/HEEJJ/python/diElectron_cff.py	12 May 2012 21:59:30 -0000	1.3
-+++ HiggsAna/HEEJJ/python/diElectron_cff.py	22 Nov 2012 19:16:44 -0000
++++ HiggsAna/HEEJJ/python/diElectron_cff.py	29 Nov 2012 11:00:56 -0000
 @@ -11,7 +11,7 @@
  cmgDiElectronHistograms.inputCollection=cms.InputTag("cmgDiElectronSel2L2Q")
  
@@ -341,7 +480,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/electron_cff
 retrieving revision 1.14
 diff -u -r1.14 electron_cff.py
 --- HiggsAna/HEEJJ/python/electron_cff.py	3 Jun 2012 19:34:40 -0000	1.14
-+++ HiggsAna/HEEJJ/python/electron_cff.py	22 Nov 2012 19:16:44 -0000
++++ HiggsAna/HEEJJ/python/electron_cff.py	29 Nov 2012 11:00:56 -0000
 @@ -8,7 +8,7 @@
      cut = cms.string(' (abs(pdgId)==11 )&& abs(mother.pdgId)==23 ')
  )
@@ -408,7 +547,16 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.13
 diff -u -r1.13 selEventsElectron_cfi.py
 --- HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	5 Jun 2012 10:11:48 -0000	1.13
-+++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	22 Nov 2012 19:16:44 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	29 Nov 2012 11:00:56 -0000
+@@ -2,7 +2,7 @@
+ 
+ electronPreselNoIso = cms.EDFilter(
+     "CmgElectronSelector",
+-    src = cms.InputTag("cmgElectron"),
++    src = cms.InputTag("cmgElectron2L2Q"),
+     cut = cms.string( "getSelection(\"cuts_kinematics\") "
+                       +"&& (getSelection(\"cuts_cutBasedLoose_eidEE\")||getSelection(\"cuts_cutBasedLoose_eidEB\") )"
+                       +"&& getSelection(\"cuts_HLTPatch\")" 
 @@ -31,4 +31,4 @@
     minNumber = cms.uint32(0)
   )
@@ -421,7 +569,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/DiO
 retrieving revision 1.5
 diff -u -r1.5 DiObjectKinFitFactory.h
 --- HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	23 Apr 2012 13:35:22 -0000	1.5
-+++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	22 Nov 2012 19:16:44 -0000
++++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	29 Nov 2012 11:00:56 -0000
 @@ -66,21 +66,31 @@
  void cmg::DiObjectKinFitFactory<T, U>::set(const cmg::DiObject<T,U>& pair, cmg::DiObject<T,U>* const obj) const{
  
@@ -472,7 +620,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/Jet
 retrieving revision 1.4
 diff -u -r1.4 JetKinFitterConst.h
 --- HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	23 Apr 2012 13:35:22 -0000	1.4
-+++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	22 Nov 2012 19:16:44 -0000
++++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	29 Nov 2012 11:00:56 -0000
 @@ -3,6 +3,7 @@
  #include "TLorentzVector.h"
  #include "TMatrixD.h"
@@ -496,7 +644,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/Plugi
 retrieving revision 1.17
 diff -u -r1.17 Plugins.cc
 --- HiggsAna/HLLJJCommon/plugins/Plugins.cc	18 Oct 2012 08:46:43 -0000	1.17
-+++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	22 Nov 2012 19:16:44 -0000
++++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	29 Nov 2012 11:00:56 -0000
 @@ -4,7 +4,7 @@
  #include "HiggsAna/HLLJJCommon/plugins/HLTWeightProducer.h" 
  #include "HiggsAna/HLLJJCommon/plugins/PTWeightAnalyzer.h" 
@@ -536,7 +684,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/FinalS
 retrieving revision 1.14
 diff -u -r1.14 FinalSelection_cff.py
 --- HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	18 Oct 2012 08:46:43 -0000	1.14
-+++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	22 Nov 2012 19:16:45 -0000
++++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	29 Nov 2012 11:00:56 -0000
 @@ -28,45 +28,82 @@
                                    cut = cms.string("getSelection(\"cuts_btags_btag2\")")
                                    )
@@ -736,7 +884,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/select
 retrieving revision 1.5
 diff -u -r1.5 jetKinematics_cfi.py
 --- HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	13 May 2012 11:58:49 -0000	1.5
-+++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	22 Nov 2012 19:16:50 -0000
++++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	29 Nov 2012 11:00:56 -0000
 @@ -2,19 +2,29 @@
  
  
@@ -777,7 +925,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/src/JetKinFit
 retrieving revision 1.3
 diff -u -r1.3 JetKinFitterConst.cc
 --- HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	7 May 2011 14:37:17 -0000	1.3
-+++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	22 Nov 2012 19:16:50 -0000
++++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	29 Nov 2012 11:00:56 -0000
 @@ -1,17 +1,19 @@
  #include "HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h"
  #include "Francesco/KinFitter/src/DiJetKinFitter.h"
@@ -807,7 +955,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/diMuon_cff.p
 retrieving revision 1.2
 diff -u -r1.2 diMuon_cff.py
 --- HiggsAna/HMMJJ/python/diMuon_cff.py	27 May 2011 12:15:04 -0000	1.2
-+++ HiggsAna/HMMJJ/python/diMuon_cff.py	22 Nov 2012 19:16:54 -0000
++++ HiggsAna/HMMJJ/python/diMuon_cff.py	29 Nov 2012 11:00:57 -0000
 @@ -6,9 +6,9 @@
  from CMGTools.Common.skims.cmgDiMuonCount_cfi import *
  from CMGTools.Common.histograms.cmgDiMuonHistograms_cfi import *
@@ -827,7 +975,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/muon_cff.py,
 retrieving revision 1.5
 diff -u -r1.5 muon_cff.py
 --- HiggsAna/HMMJJ/python/muon_cff.py	22 May 2012 16:50:11 -0000	1.5
-+++ HiggsAna/HMMJJ/python/muon_cff.py	22 Nov 2012 19:16:54 -0000
++++ HiggsAna/HMMJJ/python/muon_cff.py	29 Nov 2012 11:00:57 -0000
 @@ -5,7 +5,7 @@
      src = cms.InputTag("genParticles"),
      cut = cms.string(' (abs(pdgId)==13 )&& abs(mother.pdgId)==23 ')
@@ -851,7 +999,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cm
 retrieving revision 1.5
 diff -u -r1.5 cmgDiMuon_cfi.py
 --- HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	27 Sep 2011 15:16:22 -0000	1.5
-+++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	22 Nov 2012 19:16:54 -0000
++++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	29 Nov 2012 11:00:57 -0000
 @@ -8,7 +8,7 @@
  )
  from HiggsAna.HMMJJ.selections.zmumu_cfi import zmumu
@@ -867,7 +1015,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cm
 retrieving revision 1.5
 diff -u -r1.5 cmgMuon_cfi.py
 --- HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	13 May 2012 16:42:56 -0000	1.5
-+++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	22 Nov 2012 19:16:55 -0000
++++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	29 Nov 2012 11:00:57 -0000
 @@ -15,7 +15,7 @@
  from HiggsAna.HMMJJ.selections.muKinematics_cfi import muKinematics
  #from HiggsAna.HMMJJ.selections.muontrigger_cfi import muontrigger
@@ -883,42 +1031,191 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgDiM
 retrieving revision 1.1
 diff -u -r1.1 cmgDiMuonSel_cfi.py
 --- HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	22 Nov 2012 19:16:55 -0000
-@@ -4,7 +4,7 @@
++++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	29 Nov 2012 11:00:57 -0000
+@@ -4,9 +4,9 @@
  # as they are subject to change. 
  # you should override these cuts in your analysis.
  
 -cmgDiMuonSel = cms.EDFilter(
 +cmgDiMuonSel2L2Q = cms.EDFilter(
      "CmgDiMuonSelector",
-     src = cms.InputTag( "cmgDiMuon" ),
+-    src = cms.InputTag( "cmgDiMuon" ),
++    src = cms.InputTag( "cmgDiMuon2L2Q" ),
      cut = cms.string( "getSelection(\"cuts_zmumu\")" )
+     )
+ 
 Index: HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py,v
 retrieving revision 1.1
 diff -u -r1.1 cmgMuonSel_cfi.py
 --- HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	22 Nov 2012 19:16:55 -0000
-@@ -4,7 +4,7 @@
++++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	29 Nov 2012 11:00:57 -0000
+@@ -4,9 +4,9 @@
  # as they are subject to change. 
  # you should override these cuts in your analysis.
  
 -cmgMuonSel = cms.EDFilter(
 +cmgMuonSel2L2Q = cms.EDFilter(
      "CmgMuonSelector",
-     src = cms.InputTag( "cmgMuon" ),
+-    src = cms.InputTag( "cmgMuon" ),
++    src = cms.InputTag( "cmgMuon2L2Q" ),
      cut = cms.string( "pt()>5" )
+     )
+ 
 Index: HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py,v
 retrieving revision 1.7
 diff -u -r1.7 selEventsMuon_cff.py
 --- HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	4 Jun 2012 15:59:00 -0000	1.7
-+++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	22 Nov 2012 19:16:55 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	29 Nov 2012 11:00:57 -0000
+@@ -2,7 +2,7 @@
+ 
+ muonPreselNoIso = cms.EDFilter(
+     "CMGMuonSelector",
+-    src = cms.InputTag("cmgMuon"),
++    src = cms.InputTag("cmgMuon2L2Q"),
+     cut = cms.string( "getSelection(\"cuts_kinematics\") && getSelection(\"cuts_tightPFmuon\") " )
+     )
+ 
 @@ -24,4 +24,4 @@
     minNumber = cms.uint32(0)
   )
  
 -selectedMuonSequence = cms.Sequence(muonPreselNoIso+muonPresel+selectedMuonCandFilter)
 +selectedMuonSequence2L2Q = cms.Sequence(muonPreselNoIso+muonPresel+selectedMuonCandFilter)
+Index: HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py,v
+retrieving revision 1.5
+diff -u -r1.5 selEventsZ_cff.py
+--- HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	27 Sep 2011 15:16:23 -0000	1.5
++++ HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	29 Nov 2012 11:00:57 -0000
+@@ -2,7 +2,7 @@
+ 
+ ZmmCand = cms.EDFilter(
+     "CmgDiMuonSelector",
+-    src = cms.InputTag("cmgDiMuon"),
++    src = cms.InputTag("cmgDiMuon2L2Q"),
+     cut = cms.string( "getSelection(\"cuts_zmumu\")&& getSelection(\"cuts_charge\")" )
+     )
+ 
+Index: HiggsAna/PyHLLJJ/HLLJJTemplateBoth_lowMass_Pablo_cff.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/Lenzip/PyHLLJJ/HLLJJTemplateBoth_lowMass_Pablo_cff.py,v
+retrieving revision 1.1
+diff -u -r1.1 HLLJJTemplateBoth_lowMass_Pablo_cff.py
+--- HiggsAna/PyHLLJJ/HLLJJTemplateBoth_lowMass_Pablo_cff.py	22 Nov 2012 19:15:56 -0000	1.1
++++ HiggsAna/PyHLLJJ/HLLJJTemplateBoth_lowMass_Pablo_cff.py	29 Nov 2012 11:00:57 -0000
+@@ -20,7 +20,7 @@
+ process.load("FWCore.MessageLogger.MessageLogger_cfi")
+ process.MessageLogger.cerr.FwkReport.reportEvery = 5000
+ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
+-                                        SkipEvent = cms.untracked.vstring('ProductNotFound')
++                                        #SkipEvent = cms.untracked.vstring('ProductNotFound')
+                                         )
+ ########################################################
+ ## Conditions 
+@@ -143,12 +143,12 @@
+ 
+ ## Geometry and Detector Conditions (needed for a few patTuple production steps)
+ 
+-#from CMGTools.Common.PAT.patCMGSchedule_cff import getSchedule
+-#process.schedule = getSchedule(process, runOnMC, runOnFastSim)
++from CMGTools.Common.PAT.patCMGSchedule_cff import getSchedule
++process.schedule = getSchedule(process, runOnMC, runOnFastSim)
+ 
+ ## MessageLogger
+ process.load("FWCore.MessageLogger.MessageLogger_cfi")
+-process.MessageLogger.cerr.FwkReport.reportEvery = 10
++#process.MessageLogger.cerr.FwkReport.reportEvery = 10
+ 
+ ## Options and Output Report
+ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+@@ -184,22 +184,32 @@
+ #################
+ # Event filter  #
+ #################
+-process.badEventFilter = cms.EDFilter("HLTHighLevel",
+-                                     TriggerResultsTag =
+-                                      cms.InputTag("TriggerResults","","AODSIM"),
+-                                      HLTPaths =
+-                                      cms.vstring('primaryVertexFilterPath',
+-                                                  'noscrapingFilterPath',
+-                                                  'hcalLaserEventFilterPath',
+-                                                  'HBHENoiseFilterPath',
+-                                                  #'totalKinematicsFilterPath' #only for Madgraph MC
+-                                                  ),
+-                                      eventSetupPathsKey = cms.string(''),
+-                                      # how to deal with multiple triggers: True (OR) accept if ANY is true, False
+-                                      #(AND) accept if ALL are true
+-                                      andOr = cms.bool(False), 
+-                                      throw = cms.bool(True)    # throw exception on unknown path names
+-                                      ) 
++
++process.load('HLTrigger.HLTfilters.triggerResultsFilter_cfi')
++process.triggerResultsFilter.triggerConditions = cms.vstring('HLT_primaryVertexFilterPath',
++                                                  'HLT_noscrapingFilterPath',
++                                                  'HLT_hcalLaserEventFilterPath',
++                                                  'HLT_HBHENoiseFilterPath',
++                                                  #'HLT_totalKinematicsFilterPath' #only for Madgraph MC
++                                                  )
++process.triggerResultsFilter.l1tResults = ''                                                  
++
++#process.badEventFilter = cms.EDFilter("HLTHighLevel",
++#                                     TriggerResultsTag =
++#                                      cms.InputTag("TriggerResults"), #,"","CMG"),
++#                                      HLTPaths =
++#                                      cms.vstring('primaryVertexFilterPath',
++#                                                  'noscrapingFilterPath',
++#                                                  'hcalLaserEventFilterPath',
++#                                                  'HBHENoiseFilterPath',
++#                                                  #'totalKinematicsFilterPath' #only for Madgraph MC
++#                                                  ),
++#                                      eventSetupPathsKey = cms.string(''),
++#                                      # how to deal with multiple triggers: True (OR) accept if ANY is true, False
++#                                      #(AND) accept if ALL are true
++#                                      andOr = cms.bool(False), 
++#                                      throw = cms.bool(True)    # throw exception on unknown path names
++#                                      ) 
+ 
+ ###########
+ # Output  #
+@@ -323,15 +333,12 @@
+ process.load('HiggsAna.HMMJJ.muon_cff')
+ process.load('HiggsAna.HMMJJ.diMuon_cff')
+ process.zmumusummary = process.cutSummaryMuon.clone(inputCollection = cms.InputTag("cmgDiMuon"))
+-
+ process.load('HiggsAna.HMMJJ.skims.selEventsMuon_cff')
+ process.load('HiggsAna.HMMJJ.skims.selEventsZ_cff')
+ process.load('HiggsAna.HMMJJ.higgs_cff')
+-
+ #process.load('HiggsAna.HLLJJCommon.histograms.recoLeptonHistos_cff')
+ #process.recoMuHistos = process.recoLeptonHistos.clone(src = "muonPresel")
+-
+-#process.muonSequence2L2Q.insert(0,process.PUseq)
++process.muonSequence2L2Q.insert(0,process.PUseq)
+ 
+ process.analysisSequenceMuons = cms.Sequence(
+     process.muonSequence2L2Q
+@@ -381,14 +388,16 @@
+     process.higgsSequenceMu
+     )
+ 
+-process.schedule = cms.Schedule(process.p)
++#process.schedule = cms.Schedule(process.p)
+ #preselections need to have their own paths only if we want to select all events passing up to preselection level
+ if options.selection == "presel":
+-    process.preselEle = cms.Path(process.badEventFilter+process.analysisSequenceHZZEE)
+-    process.preselMu = cms.Path(process.badEventFilter+process.analysisSequenceHZZMM)
++    process.preselEle = cms.Path(process.analysisSequenceHZZEE)
++    process.preselMu = cms.Path(process.analysisSequenceHZZMM)
+     process.schedule.append(process.preselEle)
+     process.schedule.append(process.preselMu)
+ 
++process.badEventPath = cms.EndPath(process.triggerResultsFilter)
++process.schedule.append(process.badEventPath)
+ process.schedule.append(process.outpath)    
+ 
+ ##############
