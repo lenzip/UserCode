@@ -14,8 +14,8 @@ process = cms.Process("CMG")
 ###########
 # Options #
 ###########
-#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents))
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents))
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200))
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 5000
@@ -151,7 +151,7 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 #process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 ## Options and Output Report
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+#process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 print sep_line
 
