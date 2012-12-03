@@ -220,25 +220,25 @@ process.out = cms.OutputModule("PoolOutputModule",
                                                                       'keep *_*_*_CMG'
                                                                       )
                                )
-if options.selection != "none":
-    process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring() )
+#if options.selection != "none":
+process.out.SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring() )
 
-if options.selection == "full":
-    if options.lepton == "both" or options.lepton == "ele":
-        process.out.SelectEvents.SelectEvents.append("cmgHZZEE")
-        process.out.SelectEvents.SelectEvents.append("cmgHZZEESideband")
-    if options.lepton == "both" or options.lepton == "mu":
-        process.out.SelectEvents.SelectEvents.append("cmgHZZMM")
-        process.out.SelectEvents.SelectEvents.append("cmgHZZMMSideband")
-if options.selection == "presel":
-    if options.lepton == "both" or options.lepton == "ele":
-        process.out.SelectEvents.SelectEvents.append("preselEle")
-    if options.lepton == "both" or options.lepton == "mu":
-        process.out.SelectEvents.SelectEvents.append("preselMu")
+#if options.selection == "full":
+#    if options.lepton == "both" or options.lepton == "ele":
+#        process.out.SelectEvents.SelectEvents.append("cmgHZZEE")
+#        process.out.SelectEvents.SelectEvents.append("cmgHZZEESideband")
+#    if options.lepton == "both" or options.lepton == "mu":
+#        process.out.SelectEvents.SelectEvents.append("cmgHZZMM")
+#        process.out.SelectEvents.SelectEvents.append("cmgHZZMMSideband")
+#if options.selection == "presel":
+if options.lepton == "both" or options.lepton == "ele":
+  process.out.SelectEvents.SelectEvents.append("preselEle")
+if options.lepton == "both" or options.lepton == "mu":
+  process.out.SelectEvents.SelectEvents.append("preselMu")
     
 #print process.out.SelectEvents.SelectEvents
 
-process.outpath = cms.EndPath(process.out)
+#process.outpath = cms.EndPath(process.out)
 #from CMGTools.Common.PAT.patCMGSchedule_cff import getSchedule
 #process.schedule = getSchedule(process, runOnMC, runOnFastSim)
 #process.schedule.append( process.outpath )
@@ -376,29 +376,57 @@ cloneProcessingSnippet(process,process.higgsSequence, "Mu")
 
 process.analysisSequenceHZZEE = cms.Sequence(
     process.analysisSequenceElectrons +
-    process.analysisSequenceMuons +
+#    process.analysisSequenceMuons +
     process.analysisSequenceJets +
     process.higgsSequenceEle
     )
 
 process.analysisSequenceHZZMM = cms.Sequence(
-    process.analysisSequenceElectrons +
+#    process.analysisSequenceElectrons +
     process.analysisSequenceMuons +
     process.analysisSequenceJets +
     process.higgsSequenceMu
     )
 
+process.badEventFilters = cms.Sequence(process.primaryVertexFilter+
+                                       process.noscraping+
+                                       process.hcalLaserEventFilter+
+                                       process.HBHENoiseFilter)
+
 #process.schedule = cms.Schedule(process.p)
 #preselections need to have their own paths only if we want to select all events passing up to preselection level
+##if options.selection == "presel":
+##    process.preselEle = cms.Path(process.analysisSequenceHZZEE)
+##    process.preselMu = cms.Path(process.analysisSequenceHZZMM)
+##    process.schedule.append(process.preselEle)
+##    process.schedule.append(process.preselMu)
 if options.selection == "presel":
-    process.preselEle = cms.Path(process.analysisSequenceHZZEE)
-    process.preselMu = cms.Path(process.analysisSequenceHZZMM)
-    process.schedule.append(process.preselEle)
-    process.schedule.append(process.preselMu)
+  #muons
+  process.cmgDiMuonSel2L2Q.filter=True 
+  process.ZmmCand.filter=True
+  process.selectedHiggsCandFilter.minNumber=1
+  process.selectedZmmCandFilter.minNumber=1
+  process.selectedMuonCandFilter.minNumber=2
+  #electrons
+  process.cmgDiElectronSel2L2Q.filter=True
+  process.ZeeCand.filter=True
+  process.selectedElectronCandFilter.minNumber = 2
+  process.selectedHiggsCandFilter.minNumber = 1
+  process.selectedZeeCandFilter.minNumber = 1
+  #jets
+  process.selectedJetCandFilter.minNumber=2
+  process.selectedJetCandFilter.filter=True
+  process.jetCountFilter.minNumber=2
+  process.selectedZjjCandFilter.minNumber=1
 
-process.badEventPath = cms.EndPath(process.triggerResultsFilter)
-process.schedule.append(process.badEventPath)
-process.schedule.append(process.outpath)    
+process.preselEle = cms.Path(process.badEventFilters+process.analysisSequenceHZZEE)
+process.preselMu = cms.Path(process.badEventFilters+process.analysisSequenceHZZMM)
+process.schedule.append(process.preselEle)
+process.schedule.append(process.preselMu)
+
+
+process.OutPath = cms.EndPath(process.triggerResultsFilter*process.out)
+process.schedule.append(process.OutPath)    
 
 ##############
 ## Low mass ##
@@ -406,29 +434,29 @@ process.schedule.append(process.outpath)
 
 # gen level
 process.genHCompositZll.cuts.zmumu.zmumu.leg1_kinematics.pt = cms.string('(leg1().pt() > 10 && leg2().pt() > 20)||(leg1().pt() > 20 && leg2().pt() > 10)')
-process.genHCompositZll.cuts.zmumu.zmumu.mass = cms.string('mass() >= 12 && mass() <= 75')
-process.genHCompositZll.cuts.zee.zee.pt = cms.string('(leg1().pt() > 10 && leg2().pt() > 20)||(leg1().pt() > 20 && leg2().pt() > 10)')
-process.genHCompositZll.cuts.zee.zee.mass = cms.string('mass() >= 12 && mass() <= 75')
-process.genHCompositeLeptons.cuts.eKinematics.pt = cms.string('pt() > 10')
-process.genHCompositeLeptons.cuts.muKinematics.pt = cms.string('pt() > 10')
+process.genHCompositZll.cuts.zmumu.zmumu.mass = cms.string('mass() >= 12 ') #&& mass() <= 75')
+process.genHCompositZll.cuts.zee.zee.pt = cms.string('(leg1().pt() > 5 && leg2().pt() > 10)||(leg1().pt() > 10 && leg2().pt() > 5)')
+process.genHCompositZll.cuts.zee.zee.mass = cms.string('mass() >= 12 ') #&& mass() <= 75')
+process.genHCompositeLeptons.cuts.eKinematics.pt = cms.string('pt() > 5')
+process.genHCompositeLeptons.cuts.muKinematics.pt = cms.string('pt() > 5')
 
 # reco level
 process.cmgElectron2L2Q.cuts.kinematics.pt = cms.string('pt() > 5')
-process.cmgDiElectron2L2Q.cuts.zee_kinematics.mass = cms.string('mass() >= 12 && mass() <= 75')
+process.cmgDiElectron2L2Q.cuts.zee_kinematics.mass = cms.string('mass() >= 12')
 process.cmgDiElectron2L2Q.cuts.zee_kinematics.pt = cms.string('(leg1().pt() > 5 && leg2().pt() > 10)||(leg1().pt() > 10 && leg2().pt() > 5)')
 process.cmgMuon2L2Q.cuts.kinematics.pt = cms.string('pt() > 5')
-process.cmgDiMuon2L2Q.cuts.zmumu.mass = cms.string('mass() >= 12 && mass() <= 75')
+process.cmgDiMuon2L2Q.cuts.zmumu.mass = cms.string('mass() >= 12 ')
 process.cmgDiMuon2L2Q.cuts.zmumu.leg1_kinematics = cms.string('(leg1().pt() > 5 && leg2().pt() > 10)||(leg1().pt() > 10 && leg2().pt() > 5)')
 
 process.eKinematics.pt = cms.string('pt() > 5')
 process.zee_kinematics.pt = cms.string('(leg1().pt() > 5 && leg2().pt() > 10)||(leg1().pt() > 10 && leg2().pt() > 5)')
-process.zee_kinematics.mass = cms.string('mass() >= 12 && mass() <= 75')
+process.zee_kinematics.mass = cms.string('mass() >= 12 ')
 process.zee.leg1_kinematics.pt = cms.string('pt() > 5')
-process.zee.mass = cms.string('mass() >= 12 && mass() <= 75')
+process.zee.mass = cms.string('mass() >= 12 ')
 
 process.muKinematics.pt = cms.string('pt() > 5')
 process.zmumu.leg1_kinematics.pt = cms.string('(leg1().pt() > 5 && leg2().pt() > 10)||(leg1().pt() > 10 && leg2().pt() > 5)')
-process.zmumu.mass = cms.string('mass() >= 12 && mass() <= 75')
+process.zmumu.mass = cms.string('mass() >= 12 ')
 
 
 ########################################
