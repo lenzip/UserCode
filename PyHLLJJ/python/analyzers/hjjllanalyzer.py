@@ -16,13 +16,13 @@ from math import pi, sqrt, acos
 from sets import Set
 import numpy
 
-#from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
+from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
         
 class hjjllanalyzer( Analyzer ):
 
     def declareHandles(self):
         super(hjjllanalyzer, self).declareHandles()
-        self.handles['jets'] = AutoHandle ('jetIDJet',
+        self.handles['jets'] = AutoHandle ('cmgJet',
                                            'std::vector<cmg::PFJet>')
         self.mchandles['genParticles'] = AutoHandle( 'genParticles',
                                                      'std::vector<reco::GenParticle>' )
@@ -133,9 +133,9 @@ class hjjllanalyzer( Analyzer ):
         #for i in range(self.handles['trigger'].product().size()):
         #  print trignames.triggerName(i)
         trigger = iEvent.object().triggerResultsByName('HLT') #self.handles['trigger'].product()
-        event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v17') else 0
+        event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v16') else 0
         #print "dimuon: %d" %event.dimuonTrigger
-        event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17')  else 0
+        event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15')  else 0
         #print "dielectron: %d" %event.dielectronTrigger
         
 
@@ -159,12 +159,12 @@ class hjjllanalyzer( Analyzer ):
 
         if len(event.leadingmuons) == 2:
           event.dimuonmass = ( event.leadingmuons[0].p4() + event.leadingmuons[1].p4() ).mass()
-          if event.dimuonmass < 999999.:
+          if event.dimuonmass < 70.:
             event.step+=1
 
         if len(event.leadingelectrons) == 2:
           event.dielectronmass = ( event.leadingelectrons[0].p4() + event.leadingelectrons[1].p4() ).mass()
-          if event.dielectronmass < 999999.:
+          if event.dielectronmass < 70.:
             event.step+=1
 
         if not self.handles['jets'].isValid():
@@ -197,62 +197,56 @@ class hjjllanalyzer( Analyzer ):
         event.mumu = []
         event.ee = []
         event.jj = []
-        sortedhmumujj = []
-        if self.handles['hmumujj'].isValid():
-          for i in range(self.handles['hmumujj'].product().size()):
-            sortedhmumujj.append((self.handles['hmumujj'].product())[i])
-          sortedhmumujj.sort(key=lambda a: a.leg2().fitChi2())
-          if len(sortedhmumujj) > 0:
-            hmumujj = sortedhmumujj[0]
-            event.hmumujj.append(hmumujj)
-            event.mumu.append(hmumujj.leg1())
-            event.jj.append(hmumujj.leg2())
+        if len(self.handles['hmumujj'].product()) > 0:
+          #if len(self.handles['hmumujj'].product()) != 1:
+            #print "WARNING! more than one hmumujj candidates"
+          hmumujj = self.handles['hmumujj'].product()[0]
+          event.hmumujj.append(hmumujj)
+          event.mumu.append(hmumujj.leg1())
+          event.jj.append(hmumujj.leg2())
 
-        if self.handles['heejj'].isValid():
-          sortedheejj = []
-          for i in range(self.handles['heejj'].product().size()):
-            sortedheejj.append((self.handles['heejj'].product())[i])
-          sortedheejj.sort(key=lambda a: a.leg2().fitChi2())
-          if len(sortedheejj) > 0:
-            if len(sortedhmumujj) != 0:
-              print "WARNING! found and heejj when and hmumujj is already present"
-            heejj = sortedheejj[0]
-            event.heejj.append(heejj)
-            event.ee.append(heejj.leg1())
-            event.jj.append(heejj.leg2())
+        if len(self.handles['heejj'].product()) > 0:
+          if len(event.hmumujj) != 0:
+            print "WARNING! found and heejj when and hmumujj is already present"
+          #if len(self.handles['heejj'].product()) != 1:
+            #print "WARNING! more than one heejj candidates"
+          heejj = self.handles['heejj'].product()[0]
+          event.heejj.append(heejj)
+          event.ee.append(heejj.leg1())
+          event.jj.append(heejj.leg2())
 
         #refit the candidates
-#        hrefit = []
+        hrefit = []
         event.truezhad = self.zhad
-#        for candidate in self.handles['hmumujjnofit'].product():
-#          jjnofit = candidate.leg2()
-#          jet1 = jjnofit.leg1().p4()
-#          jet2 = jjnofit.leg2().p4()
-#          #if len(self.zhad):
-#          #  kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", self.zhad[0].mass())
-#          #else:  
-#          kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", 91.1876, 5.)
-#          result = kinfitter.fit(jet1, jet2)
-#          chi2 = kinfitter.getChi2()
-#          hfit = copy.deepcopy(candidate)
-#          hfit.leg2().leg1().setP4(result.first)
-#          hfit.leg2().leg2().setP4(result.second)
-#          hfit.leg2().setP4(result.first+result.second)
-#          hfit.setP4(hfit.leg1().p4()+result.first+result.second)
-#          t = hfit, chi2
-#          hrefit.append(t)
+        for candidate in self.handles['hmumujjnofit'].product():
+          jjnofit = candidate.leg2()
+          jet1 = jjnofit.leg1().p4()
+          jet2 = jjnofit.leg2().p4()
+          #if len(self.zhad):
+          #  kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", self.zhad[0].mass())
+          #else:  
+          kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", 91.1876, 5.)
+          result = kinfitter.fit(jet1, jet2)
+          chi2 = kinfitter.getChi2()
+          hfit = copy.deepcopy(candidate)
+          hfit.leg2().leg1().setP4(result.first)
+          hfit.leg2().leg2().setP4(result.second)
+          hfit.leg2().setP4(result.first+result.second)
+          hfit.setP4(hfit.leg1().p4()+result.first+result.second)
+          t = hfit, chi2
+          hrefit.append(t)
 
-#        hrefit.sort(key=lambda a: a[1])
-#        event.hbest = []
-#        event.deltaPhiLJ = []
-#        if len(hrefit):
-#          event.hbest.append((hrefit[0])[0])
-#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
-#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg2().phi()) ) ) 
-#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
-#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg2().phi()) ) )
+        hrefit.sort(key=lambda a: a[1])
+        event.hbest = []
+        event.deltaPhiLJ = []
+        if len(hrefit):
+          event.hbest.append((hrefit[0])[0])
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg2().phi()) ) ) 
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg2().phi()) ) )
 
-#        event.deltaPhiLJ.sort() 
+        event.deltaPhiLJ.sort() 
         #print event.deltaPhiLJ
           
 
