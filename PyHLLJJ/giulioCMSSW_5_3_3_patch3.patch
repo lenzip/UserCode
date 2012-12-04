@@ -4,7 +4,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.19
 diff -u -r1.19 DiObject.h
 --- AnalysisDataFormats/CMGTools/interface/DiObject.h	17 Jan 2012 12:51:07 -0000	1.19
-+++ AnalysisDataFormats/CMGTools/interface/DiObject.h	3 Dec 2012 16:19:16 -0000
++++ AnalysisDataFormats/CMGTools/interface/DiObject.h	4 Dec 2012 15:17:32 -0000
 @@ -11,6 +11,7 @@
  
  template <typename T, typename U> class DiObject;
@@ -66,7 +66,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.11
 diff -u -r1.11 Muon.h
 --- AnalysisDataFormats/CMGTools/interface/Muon.h	28 Aug 2012 16:07:40 -0000	1.11
-+++ AnalysisDataFormats/CMGTools/interface/Muon.h	3 Dec 2012 16:19:16 -0000
++++ AnalysisDataFormats/CMGTools/interface/Muon.h	4 Dec 2012 15:17:32 -0000
 @@ -55,7 +55,8 @@
      }
      bool isPF() const{
@@ -83,7 +83,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/interface/DiObjectFacto
 retrieving revision 1.14
 diff -u -r1.14 DiObjectFactory.h
 --- CMGTools/Common/interface/DiObjectFactory.h	28 Feb 2012 15:45:19 -0000	1.14
-+++ CMGTools/Common/interface/DiObjectFactory.h	3 Dec 2012 16:19:16 -0000
++++ CMGTools/Common/interface/DiObjectFactory.h	4 Dec 2012 15:17:33 -0000
 @@ -60,6 +60,7 @@
      return cmg::DiObject<T,U>(l1,l2);
  }
@@ -106,7 +106,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/python/PAT/addFilterPat
 retrieving revision 1.7
 diff -u -r1.7 addFilterPaths_cff.py
 --- CMGTools/Common/python/PAT/addFilterPaths_cff.py	2 Oct 2012 09:02:09 -0000	1.7
-+++ CMGTools/Common/python/PAT/addFilterPaths_cff.py	3 Dec 2012 16:19:16 -0000
++++ CMGTools/Common/python/PAT/addFilterPaths_cff.py	4 Dec 2012 15:17:34 -0000
 @@ -15,7 +15,7 @@
      cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
      filter = cms.bool(True)
@@ -189,7 +189,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/python/PAT/patCMGSchedu
 retrieving revision 1.8
 diff -u -r1.8 patCMGSchedule_cff.py
 --- CMGTools/Common/python/PAT/patCMGSchedule_cff.py	2 Oct 2012 09:02:09 -0000	1.8
-+++ CMGTools/Common/python/PAT/patCMGSchedule_cff.py	3 Dec 2012 16:19:16 -0000
++++ CMGTools/Common/python/PAT/patCMGSchedule_cff.py	4 Dec 2012 15:17:34 -0000
 @@ -6,21 +6,21 @@
  
      result = cms.Schedule(
@@ -228,13 +228,15 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/RootTools/python/fwlite/MultiL
 retrieving revision 1.10
 diff -u -r1.10 MultiLoop.py
 --- CMGTools/RootTools/python/fwlite/MultiLoop.py	14 Nov 2012 16:44:52 -0000	1.10
-+++ CMGTools/RootTools/python/fwlite/MultiLoop.py	3 Dec 2012 16:19:24 -0000
-@@ -123,6 +123,8 @@
++++ CMGTools/RootTools/python/fwlite/MultiLoop.py	4 Dec 2012 15:17:42 -0000
+@@ -123,6 +123,10 @@
                                   'src/CMGTools/WMass/python/analyzers'] ))
      sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
                                   'src/CMGTools/ZJetsTutorial/python/analyzers'] ))
 +    sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
 +                                 'src/CMGTools/ZJetsTutorial/python/analyzers'] ))
++    sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
++                                 'src/HiggsAna/PyHLLJJ/python/analyzers'] ))                             
      selComps = [comp for comp in cfg.config.components if len(comp.files)>0]
      selComps = split(selComps)
      for comp in selComps:
@@ -244,7 +246,7 @@ RCS file: /local/reps/CMSSW/CMSSW/DataFormats/Candidate/interface/LeafCandidate.
 retrieving revision 1.24
 diff -u -r1.24 LeafCandidate.h
 --- DataFormats/Candidate/interface/LeafCandidate.h	27 Oct 2011 16:29:58 -0000	1.24
-+++ DataFormats/Candidate/interface/LeafCandidate.h	3 Dec 2012 16:19:30 -0000
++++ DataFormats/Candidate/interface/LeafCandidate.h	4 Dec 2012 15:17:48 -0000
 @@ -39,7 +39,7 @@
        cachePolarFixed_( false ), cacheCartesianFixed_( false ) { }
      // constructor from candidate                                                         
@@ -260,7 +262,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/BuildFile.xml,v
 retrieving revision 1.1
 diff -u -r1.1 BuildFile.xml
 --- Francesco/KinFitter/src/BuildFile.xml	7 May 2011 13:51:55 -0000	1.1
-+++ Francesco/KinFitter/src/BuildFile.xml	3 Dec 2012 16:19:33 -0000
++++ Francesco/KinFitter/src/BuildFile.xml	4 Dec 2012 15:17:51 -0000
 @@ -1,7 +1,4 @@
 -<flags CXXFLAGS="-I$(CMSSW_RELEASE_BASE)/src/PhysicsTools/KinFitter/interface/"/>
 -
@@ -277,7 +279,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc,v
 retrieving revision 1.3
 diff -u -r1.3 DiJetKinFitter.cc
 --- Francesco/KinFitter/src/DiJetKinFitter.cc	21 May 2011 15:35:53 -0000	1.3
-+++ Francesco/KinFitter/src/DiJetKinFitter.cc	3 Dec 2012 16:19:34 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.cc	4 Dec 2012 15:17:51 -0000
 @@ -1,11 +1,11 @@
  #include "DiJetKinFitter.h"
  
@@ -377,7 +379,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 DiJetKinFitter.h
 --- Francesco/KinFitter/src/DiJetKinFitter.h	5 Apr 2011 15:42:53 -0000	1.1
-+++ Francesco/KinFitter/src/DiJetKinFitter.h	3 Dec 2012 16:19:34 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.h	4 Dec 2012 15:17:51 -0000
 @@ -8,7 +8,8 @@
  #ifndef DiJetKinFitter_h
  #define DiJetKinFitter_h
@@ -426,7 +428,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.cc,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.cc
 --- Francesco/KinFitter/src/GlobalFitter.cc	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.cc	3 Dec 2012 16:19:34 -0000
++++ Francesco/KinFitter/src/GlobalFitter.cc	4 Dec 2012 15:17:51 -0000
 @@ -1,10 +1,9 @@
  #include "GlobalFitter.h"
  
@@ -448,7 +450,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.h
 --- Francesco/KinFitter/src/GlobalFitter.h	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.h	3 Dec 2012 16:19:34 -0000
++++ Francesco/KinFitter/src/GlobalFitter.h	4 Dec 2012 15:17:51 -0000
 @@ -6,7 +6,7 @@
  #ifndef GlobalFitter_h
  #define GlobalFitter_h
@@ -464,7 +466,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/diElectron_c
 retrieving revision 1.3
 diff -u -r1.3 diElectron_cff.py
 --- HiggsAna/HEEJJ/python/diElectron_cff.py	12 May 2012 21:59:30 -0000	1.3
-+++ HiggsAna/HEEJJ/python/diElectron_cff.py	3 Dec 2012 16:19:34 -0000
++++ HiggsAna/HEEJJ/python/diElectron_cff.py	4 Dec 2012 15:17:51 -0000
 @@ -11,7 +11,7 @@
  cmgDiElectronHistograms.inputCollection=cms.InputTag("cmgDiElectronSel2L2Q")
  
@@ -480,7 +482,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/electron_cff
 retrieving revision 1.14
 diff -u -r1.14 electron_cff.py
 --- HiggsAna/HEEJJ/python/electron_cff.py	3 Jun 2012 19:34:40 -0000	1.14
-+++ HiggsAna/HEEJJ/python/electron_cff.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HEEJJ/python/electron_cff.py	4 Dec 2012 15:17:52 -0000
 @@ -8,7 +8,7 @@
      cut = cms.string(' (abs(pdgId)==11 )&& abs(mother.pdgId)==23 ')
  )
@@ -547,7 +549,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/cmgDiE
 retrieving revision 1.3
 diff -u -r1.3 cmgDiElectronSel_cfi.py
 --- HiggsAna/HEEJJ/python/skims/cmgDiElectronSel_cfi.py	24 Apr 2012 09:32:31 -0000	1.3
-+++ HiggsAna/HEEJJ/python/skims/cmgDiElectronSel_cfi.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HEEJJ/python/skims/cmgDiElectronSel_cfi.py	4 Dec 2012 15:17:52 -0000
 @@ -6,6 +6,7 @@
  
  cmgDiElectronSel2L2Q = cms.EDFilter(
@@ -562,7 +564,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/cmgHig
 retrieving revision 1.2
 diff -u -r1.2 cmgHiggsSel_cff.py
 --- HiggsAna/HEEJJ/python/skims/cmgHiggsSel_cff.py	22 Sep 2011 14:36:56 -0000	1.2
-+++ HiggsAna/HEEJJ/python/skims/cmgHiggsSel_cff.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HEEJJ/python/skims/cmgHiggsSel_cff.py	4 Dec 2012 15:17:52 -0000
 @@ -3,11 +3,13 @@
  
  cmgHiggsSel = cms.EDFilter(
@@ -583,7 +585,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.13
 diff -u -r1.13 selEventsElectron_cfi.py
 --- HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	5 Jun 2012 10:11:48 -0000	1.13
-+++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	4 Dec 2012 15:17:52 -0000
 @@ -2,7 +2,7 @@
  
  electronPreselNoIso = cms.EDFilter(
@@ -605,7 +607,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.1
 diff -u -r1.1 selEventsHiggs_cfi.py
 --- HiggsAna/HEEJJ/python/skims/selEventsHiggs_cfi.py	11 May 2011 10:41:59 -0000	1.1
-+++ HiggsAna/HEEJJ/python/skims/selEventsHiggs_cfi.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsHiggs_cfi.py	4 Dec 2012 15:17:52 -0000
 @@ -3,6 +3,6 @@
  
  selectedHiggsCandFilter = cms.EDFilter("CandViewCountFilter",
@@ -620,7 +622,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.6
 diff -u -r1.6 selEventsZ_cff.py
 --- HiggsAna/HEEJJ/python/skims/selEventsZ_cff.py	24 Apr 2012 09:32:31 -0000	1.6
-+++ HiggsAna/HEEJJ/python/skims/selEventsZ_cff.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsZ_cff.py	4 Dec 2012 15:17:52 -0000
 @@ -2,6 +2,7 @@
  
  ZeeCand = cms.EDFilter(
@@ -635,7 +637,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/DiO
 retrieving revision 1.5
 diff -u -r1.5 DiObjectKinFitFactory.h
 --- HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	23 Apr 2012 13:35:22 -0000	1.5
-+++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	4 Dec 2012 15:17:52 -0000
 @@ -66,21 +66,31 @@
  void cmg::DiObjectKinFitFactory<T, U>::set(const cmg::DiObject<T,U>& pair, cmg::DiObject<T,U>* const obj) const{
  
@@ -686,7 +688,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/Jet
 retrieving revision 1.4
 diff -u -r1.4 JetKinFitterConst.h
 --- HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	23 Apr 2012 13:35:22 -0000	1.4
-+++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	4 Dec 2012 15:17:52 -0000
 @@ -3,6 +3,7 @@
  #include "TLorentzVector.h"
  #include "TMatrixD.h"
@@ -710,7 +712,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/Plugi
 retrieving revision 1.17
 diff -u -r1.17 Plugins.cc
 --- HiggsAna/HLLJJCommon/plugins/Plugins.cc	18 Oct 2012 08:46:43 -0000	1.17
-+++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	4 Dec 2012 15:17:52 -0000
 @@ -4,7 +4,7 @@
  #include "HiggsAna/HLLJJCommon/plugins/HLTWeightProducer.h" 
  #include "HiggsAna/HLLJJCommon/plugins/PTWeightAnalyzer.h" 
@@ -750,7 +752,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/FinalS
 retrieving revision 1.14
 diff -u -r1.14 FinalSelection_cff.py
 --- HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	18 Oct 2012 08:46:43 -0000	1.14
-+++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	4 Dec 2012 15:17:52 -0000
 @@ -28,45 +28,82 @@
                                    cut = cms.string("getSelection(\"cuts_btags_btag2\")")
                                    )
@@ -950,7 +952,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/jet_cf
 retrieving revision 1.31
 diff -u -r1.31 jet_cff.py
 --- HiggsAna/HLLJJCommon/python/jet_cff.py	21 Aug 2012 12:46:52 -0000	1.31
-+++ HiggsAna/HLLJJCommon/python/jet_cff.py	3 Dec 2012 16:19:35 -0000
++++ HiggsAna/HLLJJCommon/python/jet_cff.py	4 Dec 2012 15:17:52 -0000
 @@ -10,7 +10,7 @@
  
  jetCountFilter = cms.EDFilter("CandViewCountFilter",
@@ -960,13 +962,78 @@ diff -u -r1.31 jet_cff.py
  )
  
  genSelectorZDaughter = cms.EDFilter("GenParticleSelector",
+@@ -29,7 +29,7 @@
+ # and they are done with the PAT-jets in PAT-tuples. Impossible
+ # to remake the puMVA VM because PF jets in our PAT-tuple miss
+ # embedded PF constituents
+-from HiggsAna.HLLJJCommon.factories.cmgJet_cfi import cmgJet as cmgJetRaw
++from HiggsAna.HLLJJCommon.factories.cmgJet_cfi import cmgJet2L2QTemplate as cmgJetRaw
+ cmgJetRaw.cfg.PFJetFactory.inputCollection=cms.InputTag('selectedPatJets')#"selectedPatJets")
+ #cmgJet = cmgJetRaw.clone()
+ 
+@@ -106,7 +106,7 @@
+ 
+ 
+ 
+-cmgJet = cms.EDProducer("BScaler",
++cmgJet2L2Q = cms.EDProducer("BScaler",
+                         src = cms.InputTag("cmgJetR2"),
+                         btagSysFactor = cms.double(1.0),
+                         bTagAlgoName=cms.string("JP"),
+@@ -174,6 +174,6 @@
+ #    + ak5PFJets*ak5PFJetsL1FastL2L3 *qglAK5PF 
+     + cmgJetRaw
+     + cmgJetR2
+-    + cmgJet
++    + cmgJet2L2Q
+     ) 
+ 
+Index: HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py,v
+retrieving revision 1.14
+diff -u -r1.14 cmgDiJet_cfi.py
+--- HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py	14 Sep 2012 15:34:15 -0000	1.14
++++ HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py	4 Dec 2012 15:17:53 -0000
+@@ -9,7 +9,7 @@
+ 
+ #from CMGTools.Common.selections.kinematics_cfi import dijetKinematics
+ from HiggsAna.HLLJJCommon.selections.jetKinematics_cfi import zjj,isSignal,isSideband
+-cmgDiJet = cms.EDFilter(
++cmgDiJet2L2Q = cms.EDFilter(
+     "DiPFJetPOProducer",
+     cfg = diJetFactory.clone(),
+     cuts = cms.PSet(
+@@ -55,5 +55,5 @@
+                           )
+ 
+ 
+-diJetSequence = cms.Sequence(cmgDiJet + VBFPairsAll + VBFPairs)
++diJetSequence = cms.Sequence(cmgDiJet2L2Q + VBFPairsAll + VBFPairs)
+ 
+Index: HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py,v
+retrieving revision 1.18
+diff -u -r1.18 cmgJet_cfi.py
+--- HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py	21 Aug 2012 12:46:53 -0000	1.18
++++ HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py	4 Dec 2012 15:17:53 -0000
+@@ -24,7 +24,7 @@
+ from HiggsAna.HLLJJCommon.selections.jetKinematics_cfi import jetKinematics
+ from HiggsAna.HLLJJCommon.selections.jetid_cfi import *
+ 
+-cmgJet = cms.EDFilter(
++cmgJet2L2QTemplate = cms.EDFilter(
+     "PFJetSmearPOProducer", 
+     cfg = cms.PSet( PFJetFactory = pfJetFactory.clone(), 
+                     applyResolution = cms.bool(False),
 Index: HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py,v
 retrieving revision 1.5
 diff -u -r1.5 jetKinematics_cfi.py
 --- HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	13 May 2012 11:58:49 -0000	1.5
-+++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	3 Dec 2012 16:19:36 -0000
++++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	4 Dec 2012 15:17:53 -0000
 @@ -2,19 +2,29 @@
  
  
@@ -1007,8 +1074,15 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/skims/
 retrieving revision 1.9
 diff -u -r1.9 selEventsPFJet_cff.py
 --- HiggsAna/HLLJJCommon/python/skims/selEventsPFJet_cff.py	27 Apr 2012 13:46:54 -0000	1.9
-+++ HiggsAna/HLLJJCommon/python/skims/selEventsPFJet_cff.py	3 Dec 2012 16:19:36 -0000
-@@ -9,7 +9,8 @@
++++ HiggsAna/HLLJJCommon/python/skims/selEventsPFJet_cff.py	4 Dec 2012 15:17:53 -0000
+@@ -3,17 +3,18 @@
+ jetIDJet = cms.EDFilter(
+ #    "CmgBaseJetSelector",
+     "CmgPFJetSelector",
+-    src = cms.InputTag("cmgJet"),
++    src = cms.InputTag("cmgJet2L2Q"),
+     cut = cms.string( " getSelection(\"cuts_jetKinematics\") && getSelection(\"cuts_looseJetId\")")
+     )
  
  selectedJetCandFilter = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag('jetIDJet'),
@@ -1018,14 +1092,26 @@ diff -u -r1.9 selEventsPFJet_cff.py
   )
  
  vbfJet = cms.EDFilter("CmgPFJetSelector",
+-                      src = cms.InputTag("cmgJet"),
++                      src = cms.InputTag("cmgJet2L2Q"),
+                       cut = cms.string("getSelection(\"cuts_looseJetId\") && getSelection(\"cuts_jetKinematics_pt\")")
+                       )
+ 
 Index: HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py,v
 retrieving revision 1.2
 diff -u -r1.2 selEventsZjj_cff.py
 --- HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py	28 Apr 2011 11:40:27 -0000	1.2
-+++ HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py	3 Dec 2012 16:19:36 -0000
-@@ -8,7 +8,7 @@
++++ HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py	4 Dec 2012 15:17:53 -0000
+@@ -2,13 +2,13 @@
+ 
+ ZjjCand = cms.EDFilter(
+      "DiJetSelector",  #created
+-     src = cms.InputTag("cmgDiJet"),
++     src = cms.InputTag("cmgDiJet2L2Q"),
+      cut = cms.string( "getSelection(\"cuts_zjj\")" ) #created
+      )
  
  selectedZjjCandFilter = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag('ZjjCand'),
@@ -1040,7 +1126,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/src/JetKinFit
 retrieving revision 1.3
 diff -u -r1.3 JetKinFitterConst.cc
 --- HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	7 May 2011 14:37:17 -0000	1.3
-+++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	3 Dec 2012 16:19:36 -0000
++++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	4 Dec 2012 15:17:53 -0000
 @@ -1,17 +1,19 @@
  #include "HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h"
  #include "Francesco/KinFitter/src/DiJetKinFitter.h"
@@ -1070,7 +1156,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/diMuon_cff.p
 retrieving revision 1.2
 diff -u -r1.2 diMuon_cff.py
 --- HiggsAna/HMMJJ/python/diMuon_cff.py	27 May 2011 12:15:04 -0000	1.2
-+++ HiggsAna/HMMJJ/python/diMuon_cff.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/diMuon_cff.py	4 Dec 2012 15:17:54 -0000
 @@ -6,9 +6,9 @@
  from CMGTools.Common.skims.cmgDiMuonCount_cfi import *
  from CMGTools.Common.histograms.cmgDiMuonHistograms_cfi import *
@@ -1090,7 +1176,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/muon_cff.py,
 retrieving revision 1.5
 diff -u -r1.5 muon_cff.py
 --- HiggsAna/HMMJJ/python/muon_cff.py	22 May 2012 16:50:11 -0000	1.5
-+++ HiggsAna/HMMJJ/python/muon_cff.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/muon_cff.py	4 Dec 2012 15:17:54 -0000
 @@ -5,7 +5,7 @@
      src = cms.InputTag("genParticles"),
      cut = cms.string(' (abs(pdgId)==13 )&& abs(mother.pdgId)==23 ')
@@ -1114,7 +1200,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cm
 retrieving revision 1.5
 diff -u -r1.5 cmgDiMuon_cfi.py
 --- HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	27 Sep 2011 15:16:22 -0000	1.5
-+++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	4 Dec 2012 15:17:54 -0000
 @@ -8,7 +8,7 @@
  )
  from HiggsAna.HMMJJ.selections.zmumu_cfi import zmumu
@@ -1130,7 +1216,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cm
 retrieving revision 1.5
 diff -u -r1.5 cmgMuon_cfi.py
 --- HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	13 May 2012 16:42:56 -0000	1.5
-+++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	4 Dec 2012 15:17:54 -0000
 @@ -2,7 +2,7 @@
  
  from CMGTools.Common.factories.cmgLepton_cfi import leptonFactory
@@ -1155,7 +1241,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgDiM
 retrieving revision 1.1
 diff -u -r1.1 cmgDiMuonSel_cfi.py
 --- HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	4 Dec 2012 15:17:54 -0000
 @@ -4,9 +4,10 @@
  # as they are subject to change. 
  # you should override these cuts in your analysis.
@@ -1175,7 +1261,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgMuo
 retrieving revision 1.1
 diff -u -r1.1 cmgMuonSel_cfi.py
 --- HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	4 Dec 2012 15:17:54 -0000
 @@ -4,9 +4,9 @@
  # as they are subject to change. 
  # you should override these cuts in your analysis.
@@ -1194,7 +1280,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEve
 retrieving revision 1.1
 diff -u -r1.1 selEventsHiggs_cfi.py
 --- HiggsAna/HMMJJ/python/skims/selEventsHiggs_cfi.py	27 May 2011 12:16:41 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/selEventsHiggs_cfi.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsHiggs_cfi.py	4 Dec 2012 15:17:54 -0000
 @@ -3,6 +3,6 @@
  
  selectedHiggsCandFilter = cms.EDFilter("CandViewCountFilter",
@@ -1209,7 +1295,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEve
 retrieving revision 1.7
 diff -u -r1.7 selEventsMuon_cff.py
 --- HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	4 Jun 2012 15:59:00 -0000	1.7
-+++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	4 Dec 2012 15:17:54 -0000
 @@ -2,7 +2,7 @@
  
  muonPreselNoIso = cms.EDFilter(
@@ -1231,7 +1317,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEve
 retrieving revision 1.5
 diff -u -r1.5 selEventsZ_cff.py
 --- HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	27 Sep 2011 15:16:23 -0000	1.5
-+++ HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	3 Dec 2012 16:19:37 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	4 Dec 2012 15:17:54 -0000
 @@ -2,7 +2,8 @@
  
  ZmmCand = cms.EDFilter(
@@ -1248,3 +1334,229 @@ diff -u -r1.5 selEventsZ_cff.py
  selectedZSequence = cms.Sequence(ZmmCand+selectedZmmCandFilter)
 -
 -
+Index: HiggsAna/PyHLLJJ/VBFH125newpresel_cfg.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/Lenzip/PyHLLJJ/VBFH125newpresel_cfg.py,v
+retrieving revision 1.1
+diff -u -r1.1 VBFH125newpresel_cfg.py
+--- HiggsAna/PyHLLJJ/VBFH125newpresel_cfg.py	15 Nov 2012 11:32:32 -0000	1.1
++++ HiggsAna/PyHLLJJ/VBFH125newpresel_cfg.py	4 Dec 2012 15:17:54 -0000
+@@ -5,11 +5,14 @@
+ VBFH125newpresel = cfg.MCComponent(
+     name = 'VBFH125newpresel',
+     files = [
+-'root://eoscms//eos/cms/store/cmst3/user/lenzip/cmgTuple/2012/Summer12/newpresel/VBF_HToZZTo2L2Q_M_125_8TeV_powheg_pythia6_CMG/cmgTuple_0.root',    
+-'root://eoscms//eos/cms/store/cmst3/user/lenzip/cmgTuple/2012/Summer12/newpresel/VBF_HToZZTo2L2Q_M_125_8TeV_powheg_pythia6_CMG/cmgTuple_1.root',   
+-'root://eoscms//eos/cms/store/cmst3/user/lenzip/cmgTuple/2012/Summer12/newpresel/VBF_HToZZTo2L2Q_M_125_8TeV_powheg_pythia6_CMG/cmgTuple_2.root',    
+-'root://eoscms//eos/cms/store/cmst3/user/lenzip/cmgTuple/2012/Summer12/newpresel/VBF_HToZZTo2L2Q_M_125_8TeV_powheg_pythia6_CMG/cmgTuple_3.root',    
+-'root://eoscms//eos/cms/store/cmst3/user/lenzip/cmgTuple/2012/Summer12/newpresel/VBF_HToZZTo2L2Q_M_125_8TeV_powheg_pythia6_CMG/cmgTuple_4.root'    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_0.root',    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_1.root',    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_2.root',    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_3.root',    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_4.root',    
++#'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_5.root',    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_6.root',    
++'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2/cmgTuple_7.root',    
+     ],
+     
+     xSection = 0.00114477 * 11050000, 
+Index: HiggsAna/PyHLLJJ/hlljj_plot.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/Lenzip/PyHLLJJ/hlljj_plot.py,v
+retrieving revision 1.1
+diff -u -r1.1 hlljj_plot.py
+--- HiggsAna/PyHLLJJ/hlljj_plot.py	15 Nov 2012 11:32:32 -0000	1.1
++++ HiggsAna/PyHLLJJ/hlljj_plot.py	4 Dec 2012 15:17:54 -0000
+@@ -60,9 +60,9 @@
+     #["test/VBFH125nopresel_28/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",1446.,"VBFH125","VBFH125"],
+     #["test/DYJets10To50nopresel_13/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000,"DY10to50","DY10to50"],
+     #["test/DYJets50nopresel_14/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710,"DY50","DY50"],
+-    ["test/VBFH125newpresel_101/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"],
+-    ["test/DYJets10To50newpresel_6/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000*0.069*0.0372747,"DY10to50","DY10to50"],
+-    ["test/DYJets50newpresel_3/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710*0.0034592,"DY50","DY50"],
++    ["test/VBFH125newpresel_18/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"],
++#    ["test/DYJets10To50newpresel_6/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000*0.069*0.0372747,"DY10to50","DY10to50"],
++#    ["test/DYJets50newpresel_3/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710*0.0034592,"DY50","DY50"],
+ 
+     ]
+ treename="hjjlltreeproducer_hjjllanalyzer"
+Index: HiggsAna/PyHLLJJ/python/analyzers/hjjllanalyzer.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/Lenzip/PyHLLJJ/python/analyzers/hjjllanalyzer.py,v
+retrieving revision 1.1
+diff -u -r1.1 hjjllanalyzer.py
+--- HiggsAna/PyHLLJJ/python/analyzers/hjjllanalyzer.py	15 Nov 2012 11:32:34 -0000	1.1
++++ HiggsAna/PyHLLJJ/python/analyzers/hjjllanalyzer.py	4 Dec 2012 15:17:55 -0000
+@@ -16,13 +16,13 @@
+ from sets import Set
+ import numpy
+ 
+-from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
++#from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
+         
+ class hjjllanalyzer( Analyzer ):
+ 
+     def declareHandles(self):
+         super(hjjllanalyzer, self).declareHandles()
+-        self.handles['jets'] = AutoHandle ('cmgJet',
++        self.handles['jets'] = AutoHandle ('jetIDJet',
+                                            'std::vector<cmg::PFJet>')
+         self.mchandles['genParticles'] = AutoHandle( 'genParticles',
+                                                      'std::vector<reco::GenParticle>' )
+@@ -133,9 +133,9 @@
+         #for i in range(self.handles['trigger'].product().size()):
+         #  print trignames.triggerName(i)
+         trigger = iEvent.object().triggerResultsByName('HLT') #self.handles['trigger'].product()
+-        event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v16') else 0
++        event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v17') else 0
+         #print "dimuon: %d" %event.dimuonTrigger
+-        event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15')  else 0
++        event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17')  else 0
+         #print "dielectron: %d" %event.dielectronTrigger
+         
+ 
+@@ -159,12 +159,12 @@
+ 
+         if len(event.leadingmuons) == 2:
+           event.dimuonmass = ( event.leadingmuons[0].p4() + event.leadingmuons[1].p4() ).mass()
+-          if event.dimuonmass < 70.:
++          if event.dimuonmass < 999999.:
+             event.step+=1
+ 
+         if len(event.leadingelectrons) == 2:
+           event.dielectronmass = ( event.leadingelectrons[0].p4() + event.leadingelectrons[1].p4() ).mass()
+-          if event.dielectronmass < 70.:
++          if event.dielectronmass < 999999.:
+             event.step+=1
+ 
+         if not self.handles['jets'].isValid():
+@@ -197,56 +197,62 @@
+         event.mumu = []
+         event.ee = []
+         event.jj = []
+-        if len(self.handles['hmumujj'].product()) > 0:
+-          #if len(self.handles['hmumujj'].product()) != 1:
+-            #print "WARNING! more than one hmumujj candidates"
+-          hmumujj = self.handles['hmumujj'].product()[0]
+-          event.hmumujj.append(hmumujj)
+-          event.mumu.append(hmumujj.leg1())
+-          event.jj.append(hmumujj.leg2())
+-
+-        if len(self.handles['heejj'].product()) > 0:
+-          if len(event.hmumujj) != 0:
+-            print "WARNING! found and heejj when and hmumujj is already present"
+-          #if len(self.handles['heejj'].product()) != 1:
+-            #print "WARNING! more than one heejj candidates"
+-          heejj = self.handles['heejj'].product()[0]
+-          event.heejj.append(heejj)
+-          event.ee.append(heejj.leg1())
+-          event.jj.append(heejj.leg2())
++        sortedhmumujj = []
++        if self.handles['hmumujj'].isValid():
++          for i in range(self.handles['hmumujj'].product().size()):
++            sortedhmumujj.append((self.handles['hmumujj'].product())[i])
++          sortedhmumujj.sort(key=lambda a: a.leg2().fitChi2())
++          if len(sortedhmumujj) > 0:
++            hmumujj = sortedhmumujj[0]
++            event.hmumujj.append(hmumujj)
++            event.mumu.append(hmumujj.leg1())
++            event.jj.append(hmumujj.leg2())
++
++        if self.handles['heejj'].isValid():
++          sortedheejj = []
++          for i in range(self.handles['heejj'].product().size()):
++            sortedheejj.append((self.handles['heejj'].product())[i])
++          sortedheejj.sort(key=lambda a: a.leg2().fitChi2())
++          if len(sortedheejj) > 0:
++            if len(sortedhmumujj) != 0:
++              print "WARNING! found and heejj when and hmumujj is already present"
++            heejj = sortedheejj[0]
++            event.heejj.append(heejj)
++            event.ee.append(heejj.leg1())
++            event.jj.append(heejj.leg2())
+ 
+         #refit the candidates
+-        hrefit = []
++#        hrefit = []
+         event.truezhad = self.zhad
+-        for candidate in self.handles['hmumujjnofit'].product():
+-          jjnofit = candidate.leg2()
+-          jet1 = jjnofit.leg1().p4()
+-          jet2 = jjnofit.leg2().p4()
+-          #if len(self.zhad):
+-          #  kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", self.zhad[0].mass())
+-          #else:  
+-          kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", 91.1876, 5.)
+-          result = kinfitter.fit(jet1, jet2)
+-          chi2 = kinfitter.getChi2()
+-          hfit = copy.deepcopy(candidate)
+-          hfit.leg2().leg1().setP4(result.first)
+-          hfit.leg2().leg2().setP4(result.second)
+-          hfit.leg2().setP4(result.first+result.second)
+-          hfit.setP4(hfit.leg1().p4()+result.first+result.second)
+-          t = hfit, chi2
+-          hrefit.append(t)
+-
+-        hrefit.sort(key=lambda a: a[1])
+-        event.hbest = []
+-        event.deltaPhiLJ = []
+-        if len(hrefit):
+-          event.hbest.append((hrefit[0])[0])
+-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
+-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg2().phi()) ) ) 
+-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
+-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg2().phi()) ) )
++#        for candidate in self.handles['hmumujjnofit'].product():
++#          jjnofit = candidate.leg2()
++#          jet1 = jjnofit.leg1().p4()
++#          jet2 = jjnofit.leg2().p4()
++#          #if len(self.zhad):
++#          #  kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", self.zhad[0].mass())
++#          #else:  
++#          kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", 91.1876, 5.)
++#          result = kinfitter.fit(jet1, jet2)
++#          chi2 = kinfitter.getChi2()
++#          hfit = copy.deepcopy(candidate)
++#          hfit.leg2().leg1().setP4(result.first)
++#          hfit.leg2().leg2().setP4(result.second)
++#          hfit.leg2().setP4(result.first+result.second)
++#          hfit.setP4(hfit.leg1().p4()+result.first+result.second)
++#          t = hfit, chi2
++#          hrefit.append(t)
++
++#        hrefit.sort(key=lambda a: a[1])
++#        event.hbest = []
++#        event.deltaPhiLJ = []
++#        if len(hrefit):
++#          event.hbest.append((hrefit[0])[0])
++#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
++#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg2().phi()) ) ) 
++#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
++#          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg2().phi()) ) )
+ 
+-        event.deltaPhiLJ.sort() 
++#        event.deltaPhiLJ.sort() 
+         #print event.deltaPhiLJ
+           
+ 
+Index: HiggsAna/PyHLLJJ/python/analyzers/hjjlltreeproducer.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/Lenzip/PyHLLJJ/python/analyzers/hjjlltreeproducer.py,v
+retrieving revision 1.1
+diff -u -r1.1 hjjlltreeproducer.py
+--- HiggsAna/PyHLLJJ/python/analyzers/hjjlltreeproducer.py	15 Nov 2012 11:32:34 -0000	1.1
++++ HiggsAna/PyHLLJJ/python/analyzers/hjjlltreeproducer.py	4 Dec 2012 15:17:55 -0000
+@@ -154,9 +154,9 @@
+           fParticleVars('hee', subevent.ee[0])
+           fParticleVars('hjj', subevent.jj[0])  
+         
+-        if len(subevent.hbest) > 0:
+-          fParticleVars('hmumujjrefit', subevent.hbest[0])
+-          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
++#        if len(subevent.hbest) > 0:
++#          fParticleVars('hmumujjrefit', subevent.hbest[0])
++#          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
+         
+           
+ 

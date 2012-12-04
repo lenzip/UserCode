@@ -154,9 +154,9 @@ class hjjlltreeproducer( TreeAnalyzer ):
           fParticleVars('hee', subevent.ee[0])
           fParticleVars('hjj', subevent.jj[0])  
         
-        if len(subevent.hbest) > 0:
-          fParticleVars('hmumujjrefit', subevent.hbest[0])
-          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
+#        if len(subevent.hbest) > 0:
+#          fParticleVars('hmumujjrefit', subevent.hbest[0])
+#          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
         
           
 

@@ -60,9 +60,9 @@ mclist=[
     #["test/VBFH125nopresel_28/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",1446.,"VBFH125","VBFH125"],
     #["test/DYJets10To50nopresel_13/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000,"DY10to50","DY10to50"],
     #["test/DYJets50nopresel_14/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710,"DY50","DY50"],
-    ["test/VBFH125newpresel_101/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"],
-    ["test/DYJets10To50newpresel_6/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000*0.069*0.0372747,"DY10to50","DY10to50"],
-    ["test/DYJets50newpresel_3/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710*0.0034592,"DY50","DY50"],
+    ["test/VBFH125newpresel_18/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"],
+#    ["test/DYJets10To50newpresel_6/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000*0.069*0.0372747,"DY10to50","DY10to50"],
+#    ["test/DYJets50newpresel_3/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710*0.0034592,"DY50","DY50"],
 
     ]
 treename="hjjlltreeproducer_hjjllanalyzer"
