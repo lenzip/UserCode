@@ -1,5 +1,5 @@
 ### RPM external qd 2.3.13
-Source: http://lenzip.web.cern.ch/lenzip/qd-%{realversion}.tar.gz
+Source: http://crd.lbl.gov/~dhbailey/mpdist/qd-%{realversion}.tar.gz
 
 %prep
 %setup -n qd-%{realversion}

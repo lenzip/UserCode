@@ -1,5 +1,5 @@
 ### RPM external blackhat 0.9.9
-Source: http://lenzip.web.cern.ch/lenzip/blackhat-%{realversion}.tar.gz
+Source: http://www.hepforge.org/archive/blackhat/blackhat-%{realversion}.tar.gz
 
 Requires: qd
 %prep
