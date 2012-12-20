@@ -144,7 +144,11 @@ class hjjllanalyzer( Analyzer ):
         event.hmumujj_nomcmatch = []
         event.hjj_nomcmatch = []
         event.hmumu_nomcmatch = []
-        
+        has_hmumujj_mcmatch = False
+        if self.handles["hmumujjnofit"].isValid():
+            for i in range(self.handles["hmumujjnofit"].product().size()):
+                if (self.handles["hmumujjnofit"].product()[i]).size  as_hmumujj_mcmatch = False
+       
 
         for electron in self.handles['electrons'].product():
           event.leadingelectrons.append(Electron(electron))
