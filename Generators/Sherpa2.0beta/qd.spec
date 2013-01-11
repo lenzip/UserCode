@@ -7,6 +7,6 @@ Source: http://crd.lbl.gov/~dhbailey/mpdist/qd-%{realversion}.tar.gz
 # The following hack insures that the bins with the library linked explicitly
 # rather than indirectly, as required by the gold linker
 %build
-make
+make %{makeprocesses}
 %install
 make install
