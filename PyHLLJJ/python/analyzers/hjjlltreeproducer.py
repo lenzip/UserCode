@@ -55,7 +55,7 @@ class hjjlltreeproducer( TreeAnalyzer ):
         particleVars('heejj')
         particleVars('hee')
 
-        particleVars('truezhad')
+        particleVars('trueZhad')
 
         particleVars('hmumujjrefit')
 
@@ -76,16 +76,7 @@ class hjjlltreeproducer( TreeAnalyzer ):
         var('dimuonTrigger')
         var('dielectronTrigger')
         var('minDeltaPhiLJ')
-<<<<<<< hjjlltreeproducer.py
         var('nvertices')
-=======
-        var('maxDeltaPhiZJ')
-        var('deltaPhiZJ1')
-        var('deltaPhiZJ2')
-        var('deltaPhiJJ')
-        var('minDeltaPhiZJ')
-                                
->>>>>>> 1.4
         
         self.tree.book()
 
@@ -149,7 +140,7 @@ class hjjlltreeproducer( TreeAnalyzer ):
 #        fill('dielectronTrigger', subevent.dielectronTrigger)
 
         if (len(subevent.truezhad)):
-          fParticleVars('truezhad', subevent.truezhad[0])
+          fParticleVars('trueZhad', subevent.truezhad[0])
 
         if len(subevent.highptelectrons) > 0:
           fParticleVars('e1rec', subevent.highptelectrons[0])
@@ -210,13 +201,10 @@ class hjjlltreeproducer( TreeAnalyzer ):
 #          fParticleVars('hee', subevent.ee[0])
 #          fParticleVars('hjj', subevent.jj[0])  
         
-        if len(subevent.hbest) > 0:
-          fParticleVars('hmumujjrefit', subevent.hbest[0])
-          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
-          fill('deltaPhiJJ', subevent.deltaPhiJJ)
-          fill('deltaPhiZJ1', subevent.deltaPhiZJ1)
-          fill('deltaPhiZJ2', subevent.deltaPhiZJ2)
-          fill('minDeltaPhiZJ', subevent.deltaPhiZJ[0])
-          fill('maxDeltaPhiZJ', subevent.deltaPhiZJ[1])
-                                               
+#        if len(subevent.hbest) > 0:
+#          fParticleVars('hmumujjrefit', subevent.hbest[0])
+#          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
+        
+          
+
         self.tree.fill()

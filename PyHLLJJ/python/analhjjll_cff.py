@@ -27,6 +27,21 @@ def createTreeProducer( ana ):
                        anaName = 'hjjllanalyzer'
                        )
     return tp
+def createTreeCombinatorial (ana):
+    tp = cfg.Analyzer( '_'.join( ['hjjllcombinatorial','hjjllanalyzer'] ),
+
+
+                       anaName = 'hjjllanalyzer'
+                     )
+    return tp
+
+def createTreeEff (ana):
+    tp = cfg.Analyzer( '_'.join( ['hjjlltreeproducerEff','hjjllanalyzer'] ),
+
+
+                       anaName = 'hjjllanalyzer'
+                     )
+    return tp    
 
 # for debugging 
 stopper = cfg.Analyzer(
@@ -36,5 +51,7 @@ stopper = cfg.Analyzer(
 sequence = cfg.Sequence([
     hjjllAna,
     createTreeProducer( hjjllAna ),
+    #createTreeEff( hjjllAna ),
+    #createTreeCombinatorial ( hjjllAna )
     ])
 
