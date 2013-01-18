@@ -61,6 +61,11 @@ class hjjlltreeproducer( TreeAnalyzer ):
 
         var('step')
         var('njets')
+        var('iszee')
+        var('iszmumu')
+        var('truezlepmass')
+        
+        var('weight')
 
         var('deltaeta')
         var('cosdeltaphi')
@@ -71,12 +76,16 @@ class hjjlltreeproducer( TreeAnalyzer ):
         var('dimuonTrigger')
         var('dielectronTrigger')
         var('minDeltaPhiLJ')
+<<<<<<< hjjlltreeproducer.py
+        var('nvertices')
+=======
         var('maxDeltaPhiZJ')
         var('deltaPhiZJ1')
         var('deltaPhiZJ2')
         var('deltaPhiJJ')
         var('minDeltaPhiZJ')
                                 
+>>>>>>> 1.4
         
         self.tree.book()
 
@@ -114,6 +123,18 @@ class hjjlltreeproducer( TreeAnalyzer ):
 #
         subevent = getattr( event, self.cfg_ana.anaName )
         fill('step',subevent.step)
+        fill('iszee',subevent.iszee)
+        fill('iszmumu',subevent.iszmumu)
+        fill('truezlepmass',subevent.truezlepmass)
+        fill('weight',subevent.myweight)
+        fill('nvertices',subevent.nvertices)
+        fill('njets',len(subevent.alljets))
+        fill('dimuonTrigger', subevent.dimuonTrigger)
+        fill('dielectronTrigger', subevent.dielectronTrigger)
+        fill('dimuonHtTrigger', subevent.dimuonHtTrigger)
+        fill('dielectronHtTrigger', subevent.dielectronHtTrigger)
+        fill('ht', subevent.ht)
+
         if len(subevent.alljets)>0:
           fJetVars('j1rec', subevent.alljets[0])
         if len(subevent.alljets)>1:
@@ -122,25 +143,25 @@ class hjjlltreeproducer( TreeAnalyzer ):
           fJetVars('j3rec', subevent.alljets[2])
         if len(subevent.alljets)>3:  
           fJetVars('j4rec', subevent.alljets[3])  
-        fill('cosdeltaphigen',math.cos(subevent.genVBFdeltaPhi))
-        fill('njets',len(subevent.alljets))
-        fill('dimuonTrigger', subevent.dimuonTrigger)
-        fill('dielectronTrigger', subevent.dielectronTrigger)
+#        fill('cosdeltaphigen',math.cos(subevent.genVBFdeltaPhi))
+#        fill('njets',len(subevent.alljets))
+#        fill('dimuonTrigger', subevent.dimuonTrigger)
+#        fill('dielectronTrigger', subevent.dielectronTrigger)
 
         if (len(subevent.truezhad)):
           fParticleVars('truezhad', subevent.truezhad[0])
 
-        if len(subevent.leadingelectrons) > 0:
-          fParticleVars('e1rec', subevent.leadingelectrons[0])
-        if len(subevent.leadingelectrons) > 1:
-          fParticleVars('e2rec', subevent.leadingelectrons[1])
+        if len(subevent.highptelectrons) > 0:
+          fParticleVars('e1rec', subevent.highptelectrons[0])
+        if len(subevent.highptelectrons) > 1:
+          fParticleVars('e2rec', subevent.highptelectrons[1])
 
-        if len(subevent.leadingmuons) > 0:
-          fParticleVars('mu1rec', subevent.leadingmuons[0])
-        if len(subevent.leadingmuons) > 1:
-          fParticleVars('mu2rec', subevent.leadingmuons[1])   
-       
-        if (subevent.step >= 2):
+        if len(subevent.highptmuons) > 0:
+          fParticleVars('mu1rec', subevent.highptmuons[0])
+        if len(subevent.highptmuons) > 1:
+          fParticleVars('mu2rec', subevent.highptmuons[1])   
+
+        if (subevent.step >= 6):
           fill('deltaeta', subevent.deltaeta)
           fill('mjj', subevent.mjj)
           if subevent.deltaphi > -99:
@@ -158,7 +179,36 @@ class hjjlltreeproducer( TreeAnalyzer ):
         if len(subevent.heejj) > 0:
           fParticleVars('heejj', subevent.heejj[0])
           fParticleVars('hee', subevent.ee[0])
-          fParticleVars('hjj', subevent.jj[0])  
+          fParticleVars('hjj', subevent.jj[0])
+
+        if len(subevent.hbest) > 0:
+          fParticleVars('hmumujjrefit', subevent.hbest[0])
+          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
+          fill('deltaPhiJJ', subevent.deltaPhiJJ)
+          fill('deltaPhiZJ1', subevent.deltaPhiZJ1)
+          fill('deltaPhiZJ2', subevent.deltaPhiZJ2)
+          fill('minDeltaPhiZJ', subevent.deltaPhiZJ[0])
+          fill('maxDeltaPhiZJ', subevent.deltaPhiZJ[1]) 
+
+#        if (subevent.step >= 2):
+#          fill('deltaeta', subevent.deltaeta)
+#          fill('mjj', subevent.mjj)
+#          if subevent.deltaphi > -99:
+#            fill('cosdeltaphi', math.cos(subevent.deltaphi))
+#        if (subevent.step >= 3):
+#          fill('dimuonmass', subevent.dimuonmass)
+#          fill('dielectronmass', subevent.dielectronmass)
+
+#        if len(subevent.hmumujj) > 0:
+#          fParticleVars('hmumujj', subevent.hmumujj[0])
+#          fParticleVars('hmumu', subevent.mumu[0])
+#          fParticleVars('hjj', subevent.jj[0])
+
+
+#        if len(subevent.heejj) > 0:
+#          fParticleVars('heejj', subevent.heejj[0])
+#          fParticleVars('hee', subevent.ee[0])
+#          fParticleVars('hjj', subevent.jj[0])  
         
         if len(subevent.hbest) > 0:
           fParticleVars('hmumujjrefit', subevent.hbest[0])
