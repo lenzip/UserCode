@@ -3,6 +3,7 @@ from PhysicsTools.PatAlgos.tools.helpers import *
 import copy
 from HiggsAna.HLLJJCommon.cmdLine import options
 options.parseArguments()
+options.selection = 'none'
 print options.selection 
 
 runOnMC      = True
@@ -64,6 +65,7 @@ print sep_line
 print 'loading the main CMG sequence'
 
 process.load('CMGTools.Common.PAT.PATCMG_cff')
+process.load('CMGTools.RootTools.utils.vertexWeight.vertexWeight_cff')
 
 if runOnMC is False:
     # removing MC stuff
@@ -419,8 +421,10 @@ if options.selection == "presel":
   process.jetCountFilter.minNumber=2
   process.selectedZjjCandFilter.minNumber=1
 
+process.weights = cms.Path(process.vertexWeightSequence)
 process.preselEle = cms.Path(process.badEventFilters+process.analysisSequenceHZZEE)
 process.preselMu = cms.Path(process.badEventFilters+process.analysisSequenceHZZMM)
+process.schedule.append(process.weights)
 process.schedule.append(process.preselEle)
 process.schedule.append(process.preselMu)
 
