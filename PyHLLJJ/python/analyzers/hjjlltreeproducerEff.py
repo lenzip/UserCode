@@ -143,8 +143,8 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
               fill('{pName}Id'.format(pName=pName), True)
             else:
               fill('{pName}Id'.format(pName=pName), False)
-            if ( ( particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaTrigV0")>0.01 ) or
-               (  not particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaNonTrigV0")>0.01) ):
+            if ( ( particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaTrigV0")>0.01 ) ) : #or
+           #    (  not particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaNonTrigV0")>0.01) ):
               fill('{pName}mvaId'.format(pName=pName), True)
             else:
               fill('{pName}mvaId'.format(pName=pName), False)

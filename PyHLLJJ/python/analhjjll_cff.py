@@ -50,8 +50,8 @@ stopper = cfg.Analyzer(
 
 sequence = cfg.Sequence([
     hjjllAna,
-    createTreeProducer( hjjllAna ),
-    #createTreeEff( hjjllAna ),
+    #createTreeProducer( hjjllAna ),
+    createTreeEff( hjjllAna ),
     #createTreeCombinatorial ( hjjllAna )
     ])
 
