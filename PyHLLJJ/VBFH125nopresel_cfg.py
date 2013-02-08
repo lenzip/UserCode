@@ -5,14 +5,15 @@ from HiggsAna.PyHLLJJ.analhjjll_cff import *
 VBFH125noselection = cfg.MCComponent(
     name = 'VBFH125noselection',
     files = [
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_0.root',    
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_1.root',    
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_2.root',    
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_3.root',    
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_4.root',    
-#'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_5.root',    
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_6.root',    
-'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_7.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_0.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_1.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_2.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_3.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_4.root',    
+## #    'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_5.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_6.root',    
+##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_7.root',
+    'file:cmgTuple_numEvent2000.root'
 #  'file:../HLLJJCommon/prod/cmgTuple.root'
     ],
     

@@ -60,10 +60,10 @@ mclist=[
     #["test/VBFH125nopresel_28/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",1446.,"VBFH125","VBFH125"],
     #["test/DYJets10To50nopresel_13/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000,"DY10to50","DY10to50"],
     #["test/DYJets50nopresel_14/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710,"DY50","DY50"],
-    ["test/VBFH125newpresel_101/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"],
-    ["test/DYJets10To50newpresel_6/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000*0.069*0.0372747,"DY10to50","DY10to50"],
-    ["test/DYJets50newpresel_3/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710*0.0034592,"DY50","DY50"],
-
+#    ["test/VBFH125newpresel_101/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"],
+#    ["test/DYJets10To50newpresel_6/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",11050000*0.069*0.0372747,"DY10to50","DY10to50"],
+#    ["test/DYJets50newpresel_3/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",3503710*0.0034592,"DY50","DY50"],
+    ["test/VBFH125noselection_5/hjjlltreeproducer_hjjllanalyzer/hjjlltreeproducer_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125*5000","VBFH125*5000"], 
     ]
 treename="hjjlltreeproducer_hjjllanalyzer"
 
@@ -93,13 +93,19 @@ h1_list=[
 #    ["ntrt1_" ,"event.t1recNtrk", 10,0, 10,def_plot, "", "", "", ""],
 #    ["ntrt2_" ,"event.t2recNtrk", 10,0, 10,def_plot, "", "", "", ""],
 #    ["ntrt_"  ,"event.t2recNtrk+event.t1recNtrk", 10,0, 10,def_plot, "", "", "", ""],
+
     ["leadingmu_pt","event.mu1recPt", 100,0,200,def_plot, "", "", "", ""],
     ["leadinge_pt","event.e1recPt", 100,0,200,def_plot, "", "", "", ""],
     ["subleadingmu_pt","event.mu2recPt", 100,0,200,def_plot, "", "", "", ""],
     ["subleadinge_pt","event.e2recPt", 100,0,200,def_plot, "", "", "", ""],
     ["mjj", "event.mjj", 100, 0, 1000, def_plot, "", "", "", ""],
     ["deltaEta", "event.deltaeta", 100, 0, 10, def_plot, "", "", "", ""],
-    ["minDeltaPhiLJ", "event.minDeltaPhiLJ", 35, 0, 3.5, def_plot, "", "", "", ""]
+    ["minDeltaPhiLJ", "event.minDeltaPhiLJ", 35, 0, 3.5, def_plot, "", "", "", ""],
+    ["mu_pt","event.hmumuPt", 100,0,200,def_plot, "", "", "", ""],
+    ["e_pt","event.heePt", 100,0,200,def_plot, "", "", "", ""],
+    ["mu_eta","event.hmumuEta", 100,-2.5,2.5,def_plot, "", "", "", ""],
+    ["e_eta","event.heeEta", 100,-2.5,2.5,def_plot, "", "", "", ""],
+    
 #    ["nhfraction_t1","event.t1recNHFraction", 100,0,1,def_plot, "", "", "", ""],
 #    ["nhfraction_t2","event.t2recNHFraction", 100,0,1,def_plot, "", "", "", ""],
 #    ["chfraction_t1","event.t1recChFraction", 100,0,1,def_plot, "", "", "", ""],
@@ -249,7 +255,7 @@ for i,h1 in enumerate(h1_list):
         stackh_h.Add(h1loc[i])
     stackh_h.Draw()
     (h1glob[0])[i].Scale(5000)
-    (h1glob[0])[i].Draw("sames")
+    (h1glob[0])[i].Draw()
     if h1[8] != "":    
       stackh_h.GetXaxis().SetTitle(h1[8])    
     if h1[9] != "":

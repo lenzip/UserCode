@@ -126,14 +126,14 @@ class hjjlltreeproducer( TreeAnalyzer ):
         fill('dielectronHtTrigger', subevent.dielectronHtTrigger)
         fill('ht', subevent.ht)
 
-        if len(subevent.alljets)>0:
-          fJetVars('j1rec', subevent.alljets[0])
-        if len(subevent.alljets)>1:
-          fJetVars('j2rec', subevent.alljets[1])
-        if len(subevent.alljets)>2:
-          fJetVars('j3rec', subevent.alljets[2])
-        if len(subevent.alljets)>3:  
-          fJetVars('j4rec', subevent.alljets[3])  
+        if len(subevent.highptjets)>0:
+          fJetVars('j1rec', subevent.highptjets[0])
+        if len(subevent.highptjets)>1:
+          fJetVars('j2rec', subevent.highptjets[1])
+        if len(subevent.highptjets)>2:
+          fJetVars('j3rec', subevent.highptjets[2])
+        if len(subevent.highptjets)>3:  
+          fJetVars('j4rec', subevent.highptjets[3])  
 #        fill('cosdeltaphigen',math.cos(subevent.genVBFdeltaPhi))
 #        fill('njets',len(subevent.alljets))
 #        fill('dimuonTrigger', subevent.dimuonTrigger)

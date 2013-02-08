@@ -29,7 +29,9 @@ os.system("mkdir -p "+plot_dire)
 
 mclist=[
 
-    ["checkPresel/VBFH125noselection_51/hjjlltreeproducerEff_hjjllanalyzer/hjjlltreeproducerEff_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125","VBFH125"],
+    ["test_vbf/VBFH125noselection_9/hjjlltreeproducerEff_hjjllanalyzer/hjjlltreeproducerEff_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125","VBFH125"\
+ ]
+#    ["checkPresel/VBFH125noselection_51/hjjlltreeproducerEff_hjjllanalyzer/hjjlltreeproducerEff_hjjllanalyzer_tree.root",5.90*0.0538378,"VBFH125","VBFH125"],
     ]
 treename="hjjlltreeproducerEff_hjjllanalyzer"
 
@@ -89,8 +91,9 @@ def evalCondition(finalstep, flavor):
     if laststep == finalstep:
       break
     thisstep = eval('event.'+flavor+step)
-
-    if thisstep > 0: 
+    print "thisstep ", thisstep
+    
+    if thisstep > 0.9: 
       thiscondition = True
     else:
       thiscondition = False

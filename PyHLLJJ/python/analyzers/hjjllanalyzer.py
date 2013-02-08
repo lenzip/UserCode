@@ -36,10 +36,10 @@ class hjjllanalyzer( Analyzer ):
                                                      'std::vector<reco::GenParticle>' )
         self.handles['allmuons'] = AutoHandle( 'cmgMuon2L2Q', 'std::vector<cmg::Muon>' )                      
         self.handles['muons'] = AutoHandle( 'muonPresel',
-                                                     'std::vector<cmg::Muon>' )
+                                            'std::vector<cmg::Muon>' )
         self.handles['allelectrons'] = AutoHandle( 'cmgElectron2L2Q', 'std::vector<cmg::Electron>' )    
         self.handles['electrons'] = AutoHandle( 'electronPresel',
-                                                     'std::vector<cmg::Electron>' )
+                                                'std::vector<cmg::Electron>' )
         self.handles['trigger'] = AutoHandle(('TriggerResults', "", "HLT"), 'edm::TriggerResults')                                           
         self.handles['rho'] = AutoHandle(("kt6PFJetsForIso","rho"), "double")
         self.handles['hmumujj'] = AutoHandle('cmgHiggsSelKinFitMu', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Muon,cmg::Muon>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
@@ -157,6 +157,7 @@ class hjjllanalyzer( Analyzer ):
         #  event.genVBFdeltaPhi = deltaPhi(self.vbfjets[0].phi(), self.vbfjets[1].phi())
         event.step=0  
         event.alljets = []
+        event.highptjets = []          
         event.leadingmuons = []
         event.highptmuons = []
         event.highptelectrons = []
@@ -248,7 +249,12 @@ class hjjllanalyzer( Analyzer ):
         event.truezlepmass = self.zlep[0].p4().mass()
 
         #iEvent is of type ChainEvent
+
         trigger = iEvent.object().triggerResultsByName('HLT') #self.handles['trigger'].product()
+        #trignames = iEvent.object().triggerNames(self.handles['trigger'].product())
+        #for i in range(self.handles['trigger'].product().size()):
+        #    print trignames.triggerName(i)
+            
         event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v17') else 0
         event.dimuonHtTrigger = 1 if trigger.accept('HLT_DoubleMu8_Mass8_PFHT175_v6') else 0
         event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17')  else 0
@@ -357,13 +363,14 @@ class hjjllanalyzer( Analyzer ):
 #               event.dielectrons.append(die)  
 
         #2 jets with pt > 15
-        event.highptjets = []
+        #event.highptjets = []
         if not self.handles['jets'].isValid():
-          return
+            return
+            #print "no valid jet collection"
         for jet in self.handles['jets'].product():
           if jet.pt()>15.:
             event.highptjets.append(Jet(jet))
-
+            #print "jet pt: ", jet.pt()
         if len(event.highptjets)>1:
           event.step += 1
           self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
@@ -419,7 +426,8 @@ class hjjllanalyzer( Analyzer ):
         if self.handles['hmumujj'].isValid() and len(self.handles['hmumujj'].product()) > 0:
           hmumujj = self.handles['hmumujj'].product()[0]
           event.hmumujj.append(hmumujj)
-          event.mumu.append(hmumujj.leg1())
+          event.mumu.append(hmumujj.leg1().leg1())           
+          #event.mumu.append(hmumujj.leg1())
           event.jj.append(hmumujj.leg2())
 
         if self.handles['heejj'].isValid() and len(self.handles['heejj'].product()) > 0:
@@ -427,7 +435,9 @@ class hjjllanalyzer( Analyzer ):
             print "WARNING! found and heejj when and hmumujj is already present"
           heejj = self.handles['heejj'].product()[0]
           event.heejj.append(heejj)
-          event.ee.append(heejj.leg1())
+          #uncomment to look at electron from Higgs and not dielectron
+          event.ee.append(heejj.leg1().leg1())
+          #event.ee.append(heejj.leg1())
           event.jj.append(heejj.leg2())
   
         if len(event.hmumujj):
