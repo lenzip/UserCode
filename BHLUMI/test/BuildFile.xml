@@ -1,9 +1,0 @@
-<use name="FWCore/ParameterSet"/>
-<use name="FWCore/Framework"/>
-<use name="SimDataFormats/GeneratorProducts"/>
-<use name="FWCore/ServiceRegistry"/>
-<use name="CommonTools/UtilAlgos"/>
-<use name="root"/>
-<library   file="*.cc" name="GeneratorInterfaceBHLUMIAnalyzer">
-  <flags   EDM_PLUGIN="1"/>
-</library>
