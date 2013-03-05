@@ -4,8 +4,8 @@ import copy
 from HiggsAna.HLLJJCommon.cmdLine import options
 options.parseArguments()
 options.selection = 'presel'
-options.maxEvents = 100
-options.output = "cmgTupleTTJets.root" 
+#options.maxEvents = 100
+#options.output = "cmgTupleDYJets50_newpresel.root" 
 print options.selection 
 
 runOnMC      = True
@@ -52,8 +52,8 @@ process.source = datasetToSource(
 #    '/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'
 #    '/GluGluToHToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'
 #    '/DYJetsToLL_M-10To50filter_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'
-#    '/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'    
-    '/TTTo2L2Nu2B_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'
+    '/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'    
+#    '/TTTo2L2Nu2B_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM'
     )
 
 ###################BEGIN CMG SPECIFIC
@@ -288,6 +288,7 @@ for content in options.content:
         process.out.outputCommands.append( 'keep cmgBaseMETs_*_*_CMG')
         process.out.outputCommands.append( 'keep cmgMET*_*_*_CMG')
         process.out.outputCommands.append( 'keep *_addPileupInfo_*_*')
+        process.out.outputCommands.append( 'keep *_VBF*_*_*')
         
 
     if content == "trigger":
@@ -303,10 +304,17 @@ process.load('HiggsAna.HEEJJ.diElectron_cff')
 process.zeesummary = process.cutSummaryMuon.clone(inputCollection = cms.InputTag("cmgDiElectron2L2Q"))
 process.load('HiggsAna.HEEJJ.skims.selEventsElectron_cfi')
 process.load('HiggsAna.HEEJJ.skims.selEventsZ_cff')
+process.load('HiggsAna.HEEJJ.selections.heejjElectronId_cfi')
+process.cmgElectron2L2Q.cuts.loosemvaid = process.mvaNoTrigEleId.clone()
+process.electronPreselNoIso.cut = cms.string("getSelection(\"cuts_kinematics\") "
+                                             +"&& getSelection(\"cuts_loosemvaid\") "
+#                                             +"&& getSelection(\"cuts_\") "
+                                             +"&& getSelection(\"cuts_HLTPatch\")") 
+
 #process.load('HiggsAna.HLLJJCommon.histograms.recoLeptonHistos_cff')
 #process.recoEleHistos = process.recoLeptonHistos.clone(src="electronPresel")
-process.cmgDiElectron2L2Q.cfg.leg1Collection = cms.InputTag("cmgElectron2L2Q") 
-process.cmgDiElectron2L2Q.cfg.leg2Collection = cms.InputTag("cmgElectron2L2Q")
+#process.cmgDiElectron2L2Q.cfg.leg1Collection = cms.InputTag("cmgElectron2L2Q") 
+#process.cmgDiElectron2L2Q.cfg.leg2Collection = cms.InputTag("cmgElectron2L2Q")
 process.selectedElectronCandFilter.src = cms.InputTag("cmgElectron2L2Q")
 
 process.analysisSequenceElectrons = cms.Sequence(
@@ -360,8 +368,8 @@ process.load('HiggsAna.HMMJJ.skims.selEventsZ_cff')
 process.load('HiggsAna.HMMJJ.higgs_cff')
 #process.load('HiggsAna.HLLJJCommon.histograms.recoLeptonHistos_cff')
 #process.recoMuHistos = process.recoLeptonHistos.clone(src = "muonPresel")
-process.cmgDiMuon2L2Q.cfg.leg1Collection = cms.InputTag("cmgMuon2L2Q")
-process.cmgDiMuon2L2Q.cfg.leg2Collection = cms.InputTag("cmgMuon2L2Q")
+#process.cmgDiMuon2L2Q.cfg.leg1Collection = cms.InputTag("cmgMuon2L2Q")
+#process.cmgDiMuon2L2Q.cfg.leg2Collection = cms.InputTag("cmgMuon2L2Q")
 process.selectedMuonCandFilter.src = cms.InputTag("cmgMuon2L2Q")
 
 process.muonSequence2L2Q.insert(0,process.PUseq)
@@ -444,11 +452,15 @@ if options.selection == "presel":
   process.selectedHiggsCandFilter.minNumber = 1
   process.selectedZeeCandFilter.minNumber = 1
   #jets
-  process.selectedJetCandFilter.src = cms.InputTag("cmgJet2L2Q")
+  process.selectedJetCandFilter.src = cms.InputTag("jetIDJet")
   process.selectedJetCandFilter.minNumber=2
-  process.selectedJetCandFilter.filter=True
+  process.selectedJetCandFilter.filter = False
   process.jetCountFilter.minNumber=2
   process.selectedZjjCandFilter.minNumber=1
+  #higgs candidates
+  process.selectedHiggsCandFilterEle.minNumber = 1
+  process.selectedHiggsCandFilterMu.minNumber = 1
+    
 
 process.weights = cms.Path(process.vertexWeightSequence)
 process.preselEle = cms.Path(process.badEventFilters+process.analysisSequenceHZZEE)
@@ -477,24 +489,45 @@ process.genHCompositeLeptons.cuts.muKinematics.pt = cms.string('pt() > 5')
 process.cmgElectron2L2Q.cuts.kinematics.pt = cms.string('pt() > 10')
 process.cmgDiElectron2L2Q.cuts.zee_kinematics.mass = cms.string('mass() >= 12')
 process.cmgDiElectron2L2Q.cuts.zee_kinematics.pt = cms.string('(leg1().pt() > 10 && leg2().pt() > 10)')
+
 #||(leg1().pt() > 10 && leg2().pt() > 5)')
 process.cmgMuon2L2Q.cuts.kinematics.pt = cms.string('pt() > 10')
 process.cmgDiMuon2L2Q.cuts.zmumu.mass = cms.string('mass() >= 12 ')
 process.cmgDiMuon2L2Q.cuts.zmumu.leg1_kinematics = cms.string('(leg1().pt() > 10 && leg2().pt() > 10)')
 #||(leg1().pt() > 10 && leg2().pt() > 5)')
 
+#id for preselected electrons
+process.mvaNoTrigEleId.mvaTrigId = cms.string('sourcePtr().electronID(\"mvaNonTrigV0\")>0.7' )
+#process.cmgElectron2L2Q.cuts.loosemvaid.mvaTrigId= cms.string('sourcePtr().electronID(\"mvaNonTrigV0\") > 0.7')
+process.HLTPatch.endcap = cms.string('abs(sourcePtr().get().superCluster().get().eta()) > 1.4442 || (hadronicOverEm()<0.10 && SigmaIEtaIEta()<0.011 && abs(deltaPhiSuperClusterTrackAtVtx()) < 0.15 && abs(deltaEtaSuperClusterTrackAtVtx())<0.01)')
+process.HLTPatch.barrel = cms.string('abs(sourcePtr().get().superCluster().get().eta()) < 1.566  || (hadronicOverEm()<0.075 && SigmaIEtaIEta()<0.031 && abs(deltaPhiSuperClusterTrackAtVtx()) < 0.10 && abs(deltaEtaSuperClusterTrackAtVtx())<0.01)')
+#isolation for preselected electrons
+process.electronPresel.relisocut = cms.double(0.4)
+process.electronPresel.EAvals = cms.vdouble(0.13, 0.14, 0.07, 0.09, 0.11, 0.11, 0.14)
+
+#id for preselected muons
+process.muonPresel.relisocut = cms.double(0.2)
+process.muonPresel.EAvals = cms.vdouble(0.13, 0.14, 0.07, 0.09, 0.11, 0.11, 0.14)
+
 process.eKinematics.pt = cms.string('pt() > 10')
 process.zee_kinematics.pt = cms.string('(leg1().pt() > 10 && leg2().pt() > 10)')
 #||(leg1().pt() > 10 && leg2().pt() > 5)')
 process.zee_kinematics.mass = cms.string('mass() >= 12 ')
 process.zee.leg1_kinematics.pt = cms.string('pt() > 10')
-process.zee.mass = cms.string('mass() >= 12 ')
 
 process.muKinematics.pt = cms.string('pt() > 10')
 process.zmumu.leg1_kinematics.pt = cms.string('(leg1().pt() > 10 && leg2().pt() > 10)')
 #||(leg1().pt() > 10 && leg2().pt() > 5)')
+
+#Zll candidates selections
+process.ZeeCand.cut = cms.string( "getSelection(\"cuts_zee_kinematics\") && getSelection(\"cuts_charge\")" )
+process.zee.mass = cms.string('mass() >= 12 ')
+process.zjj.mass = cms.string('mass() >= 12 ')
 process.zmumu.mass = cms.string('mass() >= 12 ')
 
+#Higgs candidates selections
+process.cmgDiElectronDiJetEle.cuts.kinematics.mass = cms.string('mass >= 50')
+#process.cmgDiMuonDiJetEle.cuts.kinematics.mass = cms.string('mass >= 50')
 
 ########################################
 # Final Selection Sequence             #

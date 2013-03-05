@@ -2,7 +2,7 @@ import operator
 import itertools
 import copy
 
-from ROOT import TLorentzVector
+from ROOT import TLorentzVector,TSystem
 
 from CMGTools.RootTools.fwlite.Analyzer import Analyzer
 from CMGTools.RootTools.fwlite.Event import Event
@@ -16,6 +16,8 @@ from CMGTools.RootTools.utils.DeltaR import deltaR
 from math import pi, sqrt, acos
 from sets import Set
 import numpy
+
+gSystem.Load("TMVAClassification_BDT.class.C")
         
 class httanalyzer( Analyzer ):
 

@@ -9,4 +9,14 @@
 #python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets10To50newpresel_cfg.py -N 10000000 -p 0 -f
 #python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets50newpresel_cfg.py -N 10000000 -p 0 -f
 #python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test VBFH125newpresel_cfg.py -N 100000 -p 0 -f
-python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test_vbf2000 VBFH125nopresel_cfg.py -N 100000 -p 0 -f
+##python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsNoIso2_15 VBFH125nopresel2_15_cfg.py -N 100000 -p 0 -f &> log2_15.txt &
+##python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsNoIso2_20 VBFH125nopresel2_20_cfg.py -N 100000 -p 0 -f &> log2_20.txt &
+##python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsNoIso3_15 VBFH125nopresel3_15_cfg.py -N 100000 -p 0 -f &> log3_15.txt &
+##python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsNoIso3_20 VBFH125nopresel3_20_cfg.py -N 100000 -p 0 -f &> log3_20.txt &
+##python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsNoIso4_15 VBFH125nopresel4_15_cfg.py -N 100000 -p 0 -f &> log4_15.txt &
+##python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsNoIso4_20 VBFH125nopresel4_20_cfg.py -N 100000 -p 0 -f &> log4_20.txt &
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkJetsTT TTAntonioPresel3_20_cfg.py -N 10000 -p 0 -f 
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkAntonioPresel_V5 VBFH125V5presel2_15_cfg.py -N 100000 -p 0 -f 
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test VBFH125V5test.py -N 100000 -p 0 -f 
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkAntonioPresel_V4 VBFH125V4presel2_15_cfg.py -N 100000 -p 0 -f 
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py checkAntonioPresel_nopresel VBFH125nopresel2_15_cfg.py -N 100000 -p 0 -f 

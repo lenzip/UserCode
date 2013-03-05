@@ -2,7 +2,7 @@ import operator
 import itertools
 import copy
 
-from ROOT import TLorentzVector
+from ROOT import TLorentzVector,gSystem
 
 from CMGTools.RootTools.fwlite.Analyzer import Analyzer
 from CMGTools.RootTools.fwlite.Event import Event
@@ -15,52 +15,84 @@ from CMGTools.RootTools.utils.DeltaR import deltaR, deltaPhi
 from math import pi, sqrt, acos
 from sets import Set
 import numpy
-
+gSystem.CompileMacro("TMVAClassification_BDT.class.C")
+from ROOT import ReadBDT,vector
 #from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
 
 standardsteps = ['All events', 
                  'ptl1>10, ptl2>10', 
                  'ptl1>10, ptl2>10 with id', 
-                 'ptl1>10, ptl2>10 with id and iso',
+                 #'ptl1>10, ptl2>10 with id and iso',
                  '2 jets pt>15',
                  '2 jets pt>15 and id',
                  '50<mjj<140']
-        
+
 class hjjllanalyzer( Analyzer ):
 
     def declareHandles(self):
         super(hjjllanalyzer, self).declareHandles()
-        self.handles['jets'] = AutoHandle ('cmgJet2L2Q',
+        if self.cfg_ana.replicatepreselection:
+          self.handles['jets'] = AutoHandle ('cmgJet2L2Q',
                                            'std::vector<cmg::PFJet>')
-        self.mchandles['genParticles'] = AutoHandle( 'genParticles',
-                                                     'std::vector<reco::GenParticle>' )
-        self.handles['allmuons'] = AutoHandle( 'cmgMuon2L2Q', 'std::vector<cmg::Muon>' )                      
-        self.handles['muons'] = AutoHandle( 'muonPresel',
-                                            'std::vector<cmg::Muon>' )
-        self.handles['allelectrons'] = AutoHandle( 'cmgElectron2L2Q', 'std::vector<cmg::Electron>' )    
-        self.handles['electrons'] = AutoHandle( 'electronPresel',
-                                                'std::vector<cmg::Electron>' )
+          self.handles['allmuons'] = AutoHandle( 'cmgMuon2L2Q', 'std::vector<cmg::Muon>' )                      
+          self.handles['muons'] = AutoHandle( 'muonPresel',
+                                                     'std::vector<cmg::Muon>' )
+          self.handles['allelectrons'] = AutoHandle( 'cmgElectron2L2Q', 'std::vector<cmg::Electron>' )    
+          self.handles['electrons'] = AutoHandle( 'electronPresel',
+                                                     'std::vector<cmg::Electron>' )
         self.handles['trigger'] = AutoHandle(('TriggerResults', "", "HLT"), 'edm::TriggerResults')                                           
         self.handles['rho'] = AutoHandle(("kt6PFJetsForIso","rho"), "double")
-        self.handles['hmumujj'] = AutoHandle('cmgHiggsSelKinFitMu', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Muon,cmg::Muon>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
+        self.handles['hmumujj'] = AutoHandle('cmgHiggsSelMu', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Muon,cmg::Muon>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
         #self.handles['hmumujjnofit'] = AutoHandle('cmgHiggsSelMu', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Muon,cmg::Muon>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
 
-        self.handles['heejj'] = AutoHandle('cmgHiggsSelKinFitEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
+        self.handles['heejj'] = AutoHandle('cmgHiggsSelEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
         #self.handles['heejjnofit'] = AutoHandle('cmgHiggsSelEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
 
         self.handles['PUweight'] = AutoHandle('vertexWeightSummer12MC53XHCPData', 'double')
 
         self.handles['vertices'] = AutoHandle('goodOfflinePrimaryVertices', "vector<reco::Vertex>" )
+        if self.cfg_ana.matchgen:
+          self.mchandles['genParticles'] = AutoHandle( 'genParticles',
+                                                       'std::vector<reco::GenParticle>' )
+        if self.cfg_ana.matchgen and self.cfg_ana.matchvbfgen:
+          self.handles['genVBF'] = AutoHandle("genSelectorVBF", "vector<reco::GenParticle>")
+          self.mchandles['genParticles'] = AutoHandle( 'genParticles',
+                                                       'std::vector<reco::GenParticle>' )
+
+        #self.handles['vbfpairs'] = AutoHandle('VBFPairs', "std::vector<cmg::DiObject<cmg::PFJet,cmg::PFJet> >" )
 
         
         #self.handles['pf'] = AutoHandle ('particleFlow',
         #                                 'std::vector<reco::PFCandidate>')
 
+        print "min jets", self.cfg_ana.minjets 
+        print "min jet pt", self.cfg_ana.jetptmin 
+        self.domcmatching = self.cfg_ana.matchgen
+
+    #find recursively all the daughters with a given status of a particle 
+    def findAllDaughters(self, particle, status):
+      daughters = []
+      for i in range(particle.numberOfDaughters()):
+        if abs(particle.daughter(i).status())>abs(status):
+          daughters.extend(self.findAllDaughters(particle.daughter(i), status))
+        else:
+          daughters.append(particle.daughter(i))
+      return daughters    
+    
+    #build a composite candidate out of a list of candidates
+    def buildCompositeParticle(self, particles):
+      object = TLorentzVector(0., 0., 0., 0.) 
+      for particle in particles:
+        vector = TLorentzVector(particle.px(), particle.py(), particle.pz(), particle.energy())
+        object = object + vector
+      return object  
+
     def buildMCinfo(self, event):
         self.isHZZ = False
         self.zlep = [] 
         self.zhad = []
-        self.vbfjets = [] 
+        self.quarksfromz = []
+        self.vbfjets = []
 
         for ptc in self.mchandles['genParticles'].product():
             if ptc.status() != 3 :
@@ -94,9 +126,16 @@ class hjjllanalyzer( Analyzer ):
                   if abs(ptc.daughter(0).daughter(0).pdgId())>=11 and abs(ptc.daughter(0).daughter(0).pdgId())<=16:
                     self.zlep.append(ptc.daughter(0))
                     self.zhad.append(ptc.daughter(1))
+                    for idau in range(ptc.daughter(1).numberOfDaughters()):
+                      combinedVector = self.buildCompositeParticle(self.findAllDaughters(ptc.daughter(1).daughter(idau),2)) 
+                      self.quarksfromz.append(combinedVector)
+                      #print combinedVector.E(), ptc.daughter(1).daughter(idau).energy()
                   else :
                     self.zlep.append(ptc.daughter(1))
                     self.zhad.append(ptc.daughter(0))
+                    for idau in range(ptc.daughter(0).numberOfDaughters()):
+                      combinedVector = self.buildCompositeParticle(self.findAllDaughters(ptc.daughter(0).daughter(idau),2))
+                      self.quarksfromz.append(combinedVector)
                   self.isHZZ = True
                   #print "HZZ!"
 
@@ -135,16 +174,30 @@ class hjjllanalyzer( Analyzer ):
 
     def isEMCmatched(self,lepton):
         #return lepton.getSelection("cuts_genLepton") 
-        return lepton.sourcePtr().get().hasOverlaps("genLeptons") 
+        if self.domcmatching:
+          return lepton.sourcePtr().get().hasOverlaps("genLeptons") 
+        else:
+          return True
     
     def isMuMCmatched(self,lepton):
-        return lepton.sourcePtr().get().hasOverlaps("genLeptons") 
+        if self.domcmatching:
+          return lepton.sourcePtr().get().hasOverlaps("genLeptons") 
+        else:
+          return True
 
 
     def process(self, iEvent, event):
         self.readCollections( iEvent )
 
-        self.buildMCinfo(iEvent)
+        if self.domcmatching:
+          self.buildMCinfo(iEvent)
+        #print self.handles['genVBF'].product().size()
+        #if self.handles['vbfpairs'].isValid():
+        #  print "valid"
+        #  if self.handles['vbfpairs'].product().size() > 0:
+        #    print "size of VBF pairs",self.handles['vbfpairs'].product().size()
+        #else:
+        #  print "invalid vbfpairs"
 
         eventNumber = iEvent.eventAuxiliary().id().event()
         myEvent = Event(event.iEv)
@@ -157,7 +210,6 @@ class hjjllanalyzer( Analyzer ):
         #  event.genVBFdeltaPhi = deltaPhi(self.vbfjets[0].phi(), self.vbfjets[1].phi())
         event.step=0  
         event.alljets = []
-        event.highptjets = []          
         event.leadingmuons = []
         event.highptmuons = []
         event.highptelectrons = []
@@ -195,11 +247,21 @@ class hjjllanalyzer( Analyzer ):
         event.deltaPhiZJ1 = -1
         event.deltaPhiZJ2 = -1
         event.deltaPhiZJ = [] 
+        event.dimuons = []
+        event.highptjets = []
+        event.dijets = []
+        event.dielectrons = []
+        event.hmumujj_withmatchinfo = []
+        event.heejj_withmatchinfo = []
+        event.sortedCandidatesE = []
+        event.sortedCandidatesMu = []
+
+        #event.hmumujj_nomcmatch = []
 
 
-        if not self.handles['electrons'].isValid():
+        #if not self.handles['electrons'].isValid():
           #print "invalid collection!"
-          return
+        #  return
      
         if not self.handles['PUweight'].isValid():
           return
@@ -225,186 +287,218 @@ class hjjllanalyzer( Analyzer ):
         event.rho = self.handles['rho'].product()[0]  
           
 ########################BEGIN SELECTION PART        
-        self.counters.counter('countall').inc('All events', event.myweight)
-        self.counters.counter('countall_lowmass').inc('All events', event.myweight)
-        self.counters.counter('countall_highmass').inc('All events', event.myweight)
-        self.counters.counter('countelectron').inc('All events', event.myweight)
-        self.counters.counter('countelectron_lowmass').inc('All events', event.myweight)
-        self.counters.counter('countelectron_highmass').inc('All events', event.myweight)
-        self.counters.counter('countmuon').inc('All events', event.myweight)
-        self.counters.counter('countmuon_lowmass').inc('All events', event.myweight)
-        self.counters.counter('countmuon_highmass').inc('All events', event.myweight)
+        if self.cfg_ana.replicatepreselection:
 
-        if len(self.zlep) != 1:
-          print "problem with true zlep, number of daughters is",len(self.zlep)
-          return
-        if abs(self.zlep[0].daughter(0).pdgId())==11:
-          event.iszee = True
-        elif abs(self.zlep[0].daughter(0).pdgId())==13:
-          event.iszmumu = True
+          if (self.domcmatching):
+          #if (True):
+            if len(self.zlep) != 1:
+              print "problem with true zlep, number of daughters is",len(self.zlep)
+              return
+            if abs(self.zlep[0].daughter(0).pdgId())==11:
+              event.iszee = True
+            elif abs(self.zlep[0].daughter(0).pdgId())==13:
+              event.iszmumu = True
 
-        event.truezlep = self.zlep
-        event.truezhad = self.zhad
-        
-        event.truezlepmass = self.zlep[0].p4().mass()
-
-        #iEvent is of type ChainEvent
-
-        trigger = iEvent.object().triggerResultsByName('HLT') #self.handles['trigger'].product()
-        #trignames = iEvent.object().triggerNames(self.handles['trigger'].product())
-        #for i in range(self.handles['trigger'].product().size()):
-        #    print trignames.triggerName(i)
-            
-        event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v17') else 0
-        event.dimuonHtTrigger = 1 if trigger.accept('HLT_DoubleMu8_Mass8_PFHT175_v6') else 0
-        event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17')  else 0
-        event.dielectronHtTrigger = 1 if trigger.accept('HLT_DoubleEle8_CaloIdT_TrkIdVL_Mass8_PFHT175_v6') else 0
-
-        # 2 leptons, pt1>10., pt2 > 5
-        for electron in self.handles['allelectrons'].product():
-          event.leadingelectrons.append(Electron(electron))
-          if electron.pt()>10.:
-            event.highptelectrons.append(Electron(electron))
-
-        event.leadingelectrons.sort(key=lambda a: a.pt(), reverse = True)
-        event.highptelectrons.sort(key=lambda a: a.pt(), reverse = True)
-
-        for muon in self.handles['allmuons'].product():
-          event.leadingmuons.append(Muon(muon))
-          if muon.pt()>10.:
-            event.highptmuons.append(Muon(muon))
-            
-        event.leadingmuons.sort(key=lambda a: a.pt(), reverse = True)
-        event.highptmuons.sort(key=lambda a: a.pt(), reverse = True)
-
-        if ( (len(event.highptmuons)>1 and not (event.highptmuons[0].pt()<10)) and 
-            self.isMuMCmatched(event.highptmuons[0]) and self.isMuMCmatched(event.highptmuons[1])) :
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
-
-        elif ( (len(event.highptelectrons)>1 and not (event.highptelectrons[0].pt()<10)) and 
-              self.isEMCmatched(event.highptelectrons[0]) and self.isEMCmatched(event.highptelectrons[1]) ):
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
-        else:
-          return  
+            event.truezlep = self.zlep
+            event.truezhad = self.zhad
           
+            event.truezlepmass = self.zlep[0].p4().mass()
 
-        # 2 leptons, pt1>10., pt2 > 5 with id
-        event.leadingelectrons_id = []
-        for electron in event.leadingelectrons:
-          if electron.getSelection("cuts_kinematics") and \
-             (electron.getSelection("cuts_cutBasedLoose_eidEE") or \
-              electron.getSelection("cuts_cutBasedLoose_eidEB") ) and \
-             electron.getSelection("cuts_HLTPatch") :
-            event.leadingelectrons_id.append(Electron(electron))
-        
-        event.leadingmuons_id = []
-        for muon in event.leadingmuons:
-          if muon.getSelection("cuts_kinematics") and muon.getSelection("cuts_tightPFmuon"):
-            event.leadingmuons_id.append(Muon(muon))
-
-        if (len(event.leadingmuons_id)>1 and not event.leadingmuons_id[0].pt < 10 and 
-            self.isMuMCmatched(event.leadingmuons_id[0]) and self.isMuMCmatched(event.leadingmuons_id[1]) ):
-          event.step += 1
           self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+          #self.counters.counter('countall').inc('All events', event.myweight)
+          #self.counters.counter('countall_lowmass').inc('All events', event.myweight)
+          #self.counters.counter('countall_highmass').inc('All events', event.myweight)
+          if (event.iszmumu):
+            self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+          if (event.iszee):
+            self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
+          #self.counters.counter('countelectron').inc('All events', event.myweight)
+          #self.counters.counter('countelectron_lowmass').inc('All events', event.myweight)
+          #self.counters.counter('countelectron_highmass').inc('All events', event.myweight)
+          #self.counters.counter('countmuon').inc('All events', event.myweight)
+          #self.counters.counter('countmuon_lowmass').inc('All events', event.myweight)
+          #self.counters.counter('countmuon_highmass').inc('All events', event.myweight) 
 
-        elif  (len(event.leadingelectrons_id)>1 and not event.leadingelectrons_id[0].pt < 10 and
-              self.isEMCmatched(event.leadingelectrons_id[0]) and self.isEMCmatched(event.leadingelectrons_id[1])):
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
-        else:
-          return
-        
-        # 2 leptons, pt1>10., pt2 > 5 with id and iso
-        # N.B. now access muonPresel and electronPresel
-        event.preselElectrons = []
-        for electron in self.handles['electrons'].product():
-          if electron.pt()>10.:
-            event.preselElectrons.append(Electron(electron))
+          #iEvent is of type ChainEvent
+          trigger = iEvent.object().triggerResultsByName('HLT') #self.handles['trigger'].product()
+          event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v17') else 0
+          event.dimuonHtTrigger = 1 if trigger.accept('HLT_DoubleMu8_Mass8_PFHT175_v6') else 0
+          event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17')  else 0
+          event.dielectronHtTrigger = 1 if trigger.accept('HLT_DoubleEle8_CaloIdT_TrkIdVL_Mass8_PFHT175_v6') else 0
 
-        event.preselMuons = []
-        for muon in self.handles['muons'].product():
-          if muon.pt() > 10:
-            event.preselMuons.append(Muon(muon))
+          # 2 leptons, pt1>10., pt2 > 5
+          for electron in self.handles['allelectrons'].product():
+            event.leadingelectrons.append(Electron(electron))
+            if electron.pt()>10.:
+              event.highptelectrons.append(Electron(electron))
+
+          event.leadingelectrons.sort(key=lambda a: a.pt(), reverse = True)
+          event.highptelectrons.sort(key=lambda a: a.pt(), reverse = True)
+
+          for muon in self.handles['allmuons'].product():
+            event.leadingmuons.append(Muon(muon))
+            if muon.pt()>10.:
+              event.highptmuons.append(Muon(muon))
+              
+          event.leadingmuons.sort(key=lambda a: a.pt(), reverse = True)
+          event.highptmuons.sort(key=lambda a: a.pt(), reverse = True)
+
+          if ( (len(event.highptmuons)>1 and not (event.highptmuons[0].pt()<10)) and 
+              self.isMuMCmatched(event.highptmuons[0]) and self.isMuMCmatched(event.highptmuons[1])) :
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+
+          elif ( (len(event.highptelectrons)>1 and not (event.highptelectrons[0].pt()<10)) and
+                self.isEMCmatched(event.highptelectrons[0]) and self.isEMCmatched(event.highptelectrons[1]) ):
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
+          else:
+            return  
             
 
-        if (len(event.preselMuons)>1 and not event.preselMuons[0].pt < 10 and 
-            self.isMuMCmatched(event.preselMuons[0]) and self.isMuMCmatched(event.preselMuons[1])):
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+          # 2 leptons, pt1>10., pt2 > 5 with id
+               #(electron.getSelection("cuts_cutBasedLoose_eidEE") or \
+               # electron.getSelection("cuts_cutBasedLoose_eidEB") ) and \
+          event.leadingelectrons_id = []
+          for electron in event.leadingelectrons:
+            if (electron.getSelection("cuts_kinematics") and 
+                #electron.getSelection("cuts_loosemvaid") and  
+                (electron.sourcePtr().electronID("mvaNonTrigV0")>0.7) and  
+                electron.getSelection("cuts_HLTPatch") ):
+              event.leadingelectrons_id.append(Electron(electron))
+          
+          event.leadingmuons_id = []
+          for muon in event.leadingmuons:
+            if muon.getSelection("cuts_kinematics") and muon.getSelection("cuts_tightPFmuon"):
+              event.leadingmuons_id.append(Muon(muon))
 
-        elif  (len(event.preselElectrons)>1 and not event.preselElectrons[0].pt < 10 and 
-              self.isEMCmatched(event.preselElectrons[0]) and self.isEMCmatched(event.preselElectrons[1])):
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
-        else:
-          return
- 
-        # now dilepton mass requirement
-#        event.dimuons = []
-#        for mu1 in range(len(event.preselMuons)):
-#          for mu2 in range(mu1,len(event.preselMuons)):
-#             dimu = event.preselMuons[mu1].p4() + event.preselMuons[mu2].p4() 
-#             if dimu.mass()>12. and dimu.mass()<75. and event.preselMuons[mu1].pt() > 10.:
-#               event.dimuons.append(dimu)
-#
-#        event.dielectrons = []
-#        for e1 in range(len(event.preselElectrons)):
-#          for e2 in range(e1,len(event.preselElectrons)):
-#             die = event.preselElectrons[e1].p4() + event.preselElectrons[e2].p4()       
-#             if die.mass()>12. and die.mass()<75. and event.preselElectrons[e1].pt() > 10.:
-#               event.dielectrons.append(die)  
+          if (len(event.leadingmuons_id)>1 and not event.leadingmuons_id[0].pt < 10 and
+              self.isMuMCmatched(event.leadingmuons_id[0]) and self.isMuMCmatched(event.leadingmuons_id[1]) ):
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
 
-        #2 jets with pt > 15
-        #event.highptjets = []
-        if not self.handles['jets'].isValid():
+          elif  (len(event.leadingelectrons_id)>1 and not event.leadingelectrons_id[0].pt < 10 and
+                self.isEMCmatched(event.leadingelectrons_id[0]) and self.isEMCmatched(event.leadingelectrons_id[1])):
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
+          else:
             return
-            #print "no valid jet collection"
-        for jet in self.handles['jets'].product():
-          if jet.pt()>15.:
-            event.highptjets.append(Jet(jet))
-            #print "jet pt: ", jet.pt()
-        if len(event.highptjets)>1:
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
-        else:
-          return
+          
+          # 2 leptons, pt1>10., pt2 > 5 with id and iso
+          # N.B. now access muonPresel and electronPresel
+          event.preselElectrons = []
+          for electron in self.handles['electrons'].product():
+            if electron.pt()>10.:
+              event.preselElectrons.append(Electron(electron))
 
-        # 2 jets with id
-        event.highptjets_id = []
-        for jet in event.highptjets:
-          if jet.getSelection("cuts_jetKinematics") and jet.getSelection("cuts_looseJetId"):
-            event.highptjets_id.append(Jet(jet))
-       
-        if len(event.highptjets_id)>1:
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
-        else:
-          return
+          event.preselMuons = []
+          for muon in self.handles['muons'].product():
+            if muon.pt() > 10:
+              event.preselMuons.append(Muon(muon))
+              
 
-        # 2 jets with id and invariant mass
-        event.dijets = []
-        for jet1 in range(len(event.highptjets_id)):
-          for jet2 in range(jet1, len(event.highptjets_id)):
-            dijet = event.highptjets_id[jet1].p4() +event.highptjets_id[jet2].p4()
-            if dijet.mass() > 50 and dijet.mass()<140:
+  #        if (len(event.preselMuons)>1 and not event.preselMuons[0].pt < 10 and 
+  #            self.isMuMCmatched(event.preselMuons[0]) and self.isMuMCmatched(event.preselMuons[1])):
+  #          event.step += 1
+  #          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+  #          self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+  #
+  #        elif  (len(event.preselElectrons)>1 and not event.preselElectrons[0].pt < 10 and 
+  #              self.isEMCmatched(event.preselElectrons[0]) and self.isEMCmatched(event.preselElectrons[1])):
+  #          event.step += 1
+  #          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+  #          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
+  #        else:
+  #          return
+   
+  #        # now dilepton mass requirement
+          for mu1 in range(len(event.leadingmuons_id)):
+            for mu2 in range(mu1+1,len(event.leadingmuons_id)):
+               dimu = event.leadingmuons_id[mu1].p4() + event.leadingmuons_id[mu2].p4() 
+  #             if dimu.mass()>12. and dimu.mass()<75. and event.preselMuons[mu1].pt() > 10.:
+               event.dimuons.append(dimu)
+
+          for e1 in range(len(event.leadingelectrons_id)):
+            for e2 in range(e1+1,len(event.leadingelectrons_id)):
+               die = event.leadingelectrons_id[e1].p4() + event.leadingelectrons_id[e2].p4()       
+  #             if die.mass()>12. and die.mass()<75. and event.preselElectrons[e1].pt() > 10.:
+               event.dielectrons.append(die) 
+
+          #2 jets with pt > 15
+          if not self.handles['jets'].isValid():
+            return
+          for jet in self.handles['jets'].product():
+            if jet.pt()>self.cfg_ana.jetptmin and abs(jet.eta())<2.4:
+              isisolated=True 
+              for mu in event.leadingmuons_id:
+                if deltaR(mu.p4().eta(), mu.p4().phi(), jet.p4().eta(), jet.p4().phi()) < 0.5 :
+                  #print "found matching muon ", mu 
+                  #print "with jet ", jet.pt(), jet.eta(), jet.phi() 
+                  isisolated = False
+                  break
+              if isisolated:
+                for e in event.leadingelectrons_id:
+                  if deltaR(e.p4().eta(), e.p4().phi(), jet.p4().eta(), jet.p4().phi()) < 0.5 :
+                    #print "found matching electron ", e 
+                    #print "with jet ", jet.pt(), jet.eta(), jet.phi()
+                    isisolated = False
+                    break 
+              if isisolated:
+                event.highptjets.append(Jet(jet))
+
+          #if len(event.highptjets)>1:
+          if len(event.highptjets)>=self.cfg_ana.minjets:
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            if (len(event.leadingmuons_id)>1):
+            #if (len(event.preselMuons)>1):
+              self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+            else:
+              self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
+          else:
+            return
+
+          # 2 jets with id
+          event.highptjets_id = []
+          for jet in event.highptjets:
+            if jet.getSelection("cuts_jetKinematics") and jet.getSelection("cuts_looseJetId"):
+              event.highptjets_id.append(Jet(jet))
+         
+          if len(event.highptjets_id)>=self.cfg_ana.minjetsiwithid:
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            #if (len(event.preselMuons)>1):
+            if (len(event.leadingmuons_id)>1):
+              self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+            else:
+              self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
+          else:
+            return
+
+          # 2 jets with id and invariant mass
+          passmass = False
+          for jet1 in range(len(event.highptjets_id)):
+            for jet2 in range(jet1+1, len(event.highptjets_id)):
+              dijet = event.highptjets_id[jet1].p4() +event.highptjets_id[jet2].p4()
+              if dijet.mass() > 50 and dijet.mass()<140:
+                passmass = True
               event.dijets.append(dijet)
 
-        if len(event.dijets):
-          event.step += 1
-          self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
-          self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)
-        else:   
-          return
+          #if len(event.dijets):
+          if passmass:
+            event.step += 1
+            self.fillStandardStep('countall',event.step, event.truezlepmass, event.myweight)
+            #if (len(event.preselMuons)>1):
+            if (len(event.leadingmuons_id)>1):
+              self.fillStandardStep('countmuon',event.step, event.truezlepmass, event.myweight)
+            else:
+              self.fillStandardStep('countelectron',event.step, event.truezlepmass, event.myweight)        
+          else:   
+            return
 ################END SELECTION PART
         
         triggerjets = []
@@ -421,54 +515,61 @@ class hjjllanalyzer( Analyzer ):
           event.deltaeta = triggerjets[0].rapidity() - triggerjets[len(triggerjets)-1].rapidity()
           event.deltaphi = deltaPhi(triggerjets[0].phi(), triggerjets[len(triggerjets)-1].phi())
           event.mjj = ( triggerjets[0].p4() + triggerjets[len(triggerjets)-1].p4() ).mass()
-         
+        
+             
+ 
+        #do MC matching for muons
+        def matchAndSort(inputCollection, outputCollection):
+          for cand in inputCollection:
+            decaymatched = False
+            vbfmatched=False
+            if self.domcmatching:
+              decaymatched = cand.leg2().leg1().getSelection('cuts_genParton') and cand.leg2().leg2().getSelection('cuts_genParton')
+              if cand.vbfptr().isNonnull():
+               if self.cfg_ana.matchvbfgen:  
+                vbfjets = self.handles['genVBF'].product()
+                if (len(vbfjets))>1:
+                  phileg1 = cand.vbfptr().leg1().phi()
+                  etaleg1 = cand.vbfptr().leg1().eta()
+                  phileg2 = cand.vbfptr().leg2().phi()
+                  etaleg2 = cand.vbfptr().leg2().eta()
+
+
+                  phigen1 = vbfjets[0].phi() 
+                  etagen1 = vbfjets[0].eta()
+                  phigen2 = vbfjets[1].phi()
+                  etagen2 = vbfjets[1].eta()
+                  vbfmatched = ((deltaR(phileg1, etaleg1, phigen1, etagen1)<1 or deltaR(phileg1, etaleg1, phigen2, etagen2)<1) or
+                               (deltaR(phileg2, etaleg2, phigen1, etagen1)<1 or deltaR(phileg2, etaleg2, phigen2, etagen2)<1))
+            if ( cand.leg2().leg1().pt()>self.cfg_ana.jetptmin and
+                 cand.leg2().leg2().pt()>self.cfg_ana.jetptmin ):
+              if cand.vbfptr().isNonnull():
+                if ( cand.vbfptr().leg1().pt()>self.cfg_ana.jetptmin and
+                     cand.vbfptr().leg2().pt()>self.cfg_ana.jetptmin ):
+                  varnames = vector("string") ()
+                  varnames.push_back("ZJJMass")
+                  varnames.push_back("J1Pt")
+                  varnames.push_back("J2Pt")
+                  varnames.push_back("abs(HMMJJDeltaPhiZ)")
+                  varnames.push_back("abs(HMMJJSumAbsEtaJ1J2)")
+                  varnames.push_back("ZJJdeltaRDecay")
+                  vars = vector("double") ()
+                  vars.push_back(cand.leg2().mass())
+                  vars.push_back(cand.leg2().leg1().pt())
+                  vars.push_back(cand.leg2().leg2().pt())
+                  vars.push_back(abs(deltaPhi(cand.leg1().phi(), cand.leg2().phi())))
+                  vars.push_back(abs(cand.leg2().leg1().eta())+abs(cand.leg2().leg2().eta()))
+                  vars.push_back(deltaR(cand.leg2().leg1().phi(), cand.leg2().leg1().eta(),
+                           cand.leg2().leg2().phi(), cand.leg2().leg2().eta()))
+                  classifier = ReadBDT(varnames)
+                  value = classifier.GetMvaValue(vars)  
+                  outputCollection.append([cand, decaymatched, vbfmatched,value]) 
+          outputCollection.sort(key=lambda a: a[3], reverse=True)  
+        
 
         if self.handles['hmumujj'].isValid() and len(self.handles['hmumujj'].product()) > 0:
-          hmumujj = self.handles['hmumujj'].product()[0]
-          event.hmumujj.append(hmumujj)
-          event.mumu.append(hmumujj.leg1().leg1())           
-          #event.mumu.append(hmumujj.leg1())
-          event.jj.append(hmumujj.leg2())
+          matchAndSort(self.handles['hmumujj'].product(), event.hmumujj_withmatchinfo)
 
         if self.handles['heejj'].isValid() and len(self.handles['heejj'].product()) > 0:
-          if len(event.hmumujj) != 0:
-            print "WARNING! found and heejj when and hmumujj is already present"
-          heejj = self.handles['heejj'].product()[0]
-          event.heejj.append(heejj)
-          #uncomment to look at electron from Higgs and not dielectron
-          event.ee.append(heejj.leg1().leg1())
-          #event.ee.append(heejj.leg1())
-          event.jj.append(heejj.leg2())
-  
-        if len(event.hmumujj):
-          event.hbest.append(hmumujj)
-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), 
-                                      event.hbest[0].leg2().leg1().phi()) ) )
-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), 
-                                      event.hbest[0].leg2().leg2().phi()) ) )
-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), 
-                                      event.hbest[0].leg2().leg1().phi()) ) )
-          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), 
-                                      event.hbest[0].leg2().leg2().phi()) ) )
-          event.deltaPhiZJ.append( abs( deltaPhi(event.hbest[0].leg1().phi(), 
-                                      event.hbest[0].leg2().leg1().phi()) ) )
-          event.deltaPhiZJ.append( abs( deltaPhi(event.hbest[0].leg1().phi(), 
-                                      event.hbest[0].leg2().leg2().phi()) ) )
-          if event.hbest[0].leg2().leg1().pt() > event.hbest[0].leg2().leg2().pt():
-              event.deltaPhiZJ1 = abs( deltaPhi(event.hbest[0].leg1().phi(), 
-                                      event.hbest[0].leg2().leg1().phi()) )
-              event.deltaPhiZJ2= abs( deltaPhi(event.hbest[0].leg1().phi(), 
-                                      event.hbest[0].leg2().leg2().phi()) )
-          else:
-              event.deltaPhiZJ1= abs( deltaPhi(event.hbest[0].leg1().phi(), 
-                                    event.hbest[0].leg2().leg2().phi()) )
-              event.deltaPhiZJ2= abs( deltaPhi(event.hbest[0].leg1().phi(), 
-                                    event.hbest[0].leg2().leg1().phi()) )
+          matchAndSort(self.handles['heejj'].product(), event.heejj_withmatchinfo)
 
-
-        event.deltaPhiLJ.sort()
-        event.deltaPhiZJ.sort()      
-
-            
-
-        

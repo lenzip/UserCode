@@ -8,7 +8,7 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
 
         def var( varName ):
             self.tree.addVar('float', varName)
-        def boolVar( varName ):
+        def boolVar(varName ):
             self.tree.addVar('int', varName)
 
         def electronVars( pName ):
@@ -27,7 +27,7 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
             var('{pName}IsEE'.format(pName=pName))
             boolVar('{pName}Kinematics'.format(pName=pName))
             boolVar('{pName}Id'.format(pName=pName))
-            var('{pName}mvaId'.format(pName=pName))
+            boolVar('{pName}mvaId'.format(pName=pName))
             boolVar('{pName}Iso'.format(pName=pName))
             boolVar('{pName}GenMatch'.format(pName=pName))
             
@@ -48,9 +48,6 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
             
         muonVars('murec')
         electronVars('erec')
-        muonVars('mu_higgs')
-        electronVars('e_higgs')
-                 
 
         var('weight')
         var('iszee')
@@ -132,8 +129,6 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
             fill('{pName}DeltaPhiSC'.format(pName=pName), particle.deltaPhiSuperClusterTrackAtVtx() )
             fill('{pName}DeltaEtaSC'.format(pName=pName), particle.deltaEtaSuperClusterTrackAtVtx() )
             fill('{pName}HoverE'.format(pName=pName), particle.hadronicOverEm() )
-            fill('{pName}mvaId'.format(pName=pName), particle.sourcePtr().electronID("mvaTrigV0") )
-            
             #fill('{pName}Dxy'.format(pName=pName), particle.dxy() )
             #fill('{pName}Dz'.format(pName=pName), particle.dz() )
             fill('{pName}P'.format(pName=pName), particle.sourcePtr().eSuperClusterOverP() )
@@ -148,12 +143,11 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
               fill('{pName}Id'.format(pName=pName), True)
             else:
               fill('{pName}Id'.format(pName=pName), False)
-           #   if ( ( particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaTrigV0")>0.01 ) ) : #or
-           #(  not particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaNonTrigV0")>0.01)
-           #):
-           #if ( particle.sourcePtr().electronID("mvaTrigV0")>0.01 ) )
-            #else:
-           #   fill('{pName}mvaId'.format(pName=pName), False)
+            if ( ( particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaTrigV0")>0.01 ) ) : #or
+           #    (  not particle.getSelection('cuts_premvaTrig') and particle.sourcePtr().electronID("mvaNonTrigV0")>0.01) ):
+              fill('{pName}mvaId'.format(pName=pName), True)
+            else:
+              fill('{pName}mvaId'.format(pName=pName), False)
 
 
             EAvals = [0.1, 0.12, 0.085, 0.11, 0.12, 0.12, 0.13]
@@ -199,16 +193,3 @@ class hjjlltreeproducerEff( TreeAnalyzer ):
             fill('truezlepmass', subevent.truezlepmass)
             fElectronVars('erec', electron, subevent.rho)
             self.tree.fill()  
-
-        if len(subevent.hmumujj) > 0:
-            #fParticleVars('hmumujj', subevent.hmumujj[0])
-            fMuonVars('mu_higgs', subevent.mumu[0], subevent.rho)
-            #fParticleVars('hjj', subevent.jj[0])
-            
-            
-        if len(subevent.heejj) > 0:
-            #fParticleVars('heejj', subevent.heejj[0])
-            fElectronVars('e_higgs', subevent.ee[0], subevent.rho)
-            #fParticleVars('hjj', subevent.jj[0])
-            
-            

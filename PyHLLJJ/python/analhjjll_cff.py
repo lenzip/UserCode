@@ -17,8 +17,17 @@ import CMGTools.RootTools.fwlite.Config as cfg
 #    )
 
 hjjllAna = cfg.Analyzer('hjjllanalyzer',
+  minjets = 2,
+  minjetsiwithid = 2,
+  jetptmin = 15.,
+  matchgen=True,
+  matchvbfgen=True,
+  replicatepreselection=False
 )
 
+treeProducerConf = {
+  'matchgen': True
+}
 
 def createTreeProducer( ana ):
     tp = cfg.Analyzer( '_'.join( ['hjjlltreeproducer','hjjllanalyzer'] ),
@@ -33,6 +42,7 @@ def createTreeCombinatorial (ana):
 
                        anaName = 'hjjllanalyzer'
                      )
+    tp.matchgen = treeProducerConf['matchgen']
     return tp
 
 def createTreeEff (ana):
@@ -50,8 +60,8 @@ stopper = cfg.Analyzer(
 
 sequence = cfg.Sequence([
     hjjllAna,
-    createTreeProducer( hjjllAna ),
-#    createTreeEff( hjjllAna ),
-    #createTreeCombinatorial ( hjjllAna )
+    #createTreeProducer( hjjllAna ),
+    #createTreeEff( hjjllAna ),
+    createTreeCombinatorial ( hjjllAna )
     ])
 
