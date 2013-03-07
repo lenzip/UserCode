@@ -13,7 +13,8 @@ VBFH125noselection = cfg.MCComponent(
 ## #    'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_5.root',    
 ##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_6.root',    
 ##     'root://eoscms//eos/cms/store/cmst3/user/lenzip/CMG/VBF_HToZZTo2L2Q_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/CMGV2_noselection/cmgTuple_7.root',
-    'file:cmgTuple_numEvent2000.root'
+#    'file:cmgTuple_numEvent2000.root'
+    'file:cmgTupleVBF_etaMod_noVBFcuts__numEvent400.root'
 #  'file:../HLLJJCommon/prod/cmgTuple.root'
     ],
     
