@@ -569,7 +569,15 @@ class hjjllanalyzer( Analyzer ):
 
         if self.handles['hmumujj'].isValid() and len(self.handles['hmumujj'].product()) > 0:
           matchAndSort(self.handles['hmumujj'].product(), event.hmumujj_withmatchinfo)
+          for item in event.hmumujj_withmatchinfo:
+            if item[1] and item[2]:
+              print "Muon match"
+              break
 
         if self.handles['heejj'].isValid() and len(self.handles['heejj'].product()) > 0:
           matchAndSort(self.handles['heejj'].product(), event.heejj_withmatchinfo)
+          for item in event.heejj_withmatchinfo:
+            if item[1] and item[2]:
+              print "Electron match"
+              break
 

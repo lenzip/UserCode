@@ -36,10 +36,13 @@ mclist=[
     #passo il peso direttamente
     #["vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched and event.isVBFMatched", ], 
     ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched and event.isVBFMatched"+def_condition, ], 
-    ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125NoMatch","VBFH125 not matched", "(not event.isDecayMatched or not event.isVBFMatched)"+def_condition], 
-    ["/tmp/lenzip/dy10to50.root",(13124*0.069)*0.0465582665252,"DY10to50", "DY10to50", "True"+def_condition], 
-    ["/tmp/lenzip/dy50.root",(3503.71)*0.0834175089149,"DY50", "DY50", "True"+def_condition], 
+    ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125NoMatch","VBFH125 not matched", "(not event.isDecayMatched or not event.isVBFMatched)"+def_condition, ], 
+    #["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched"+def_condition, ], 
+    #["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125NoMatch","VBFH125 not matched", "(not event.isDecayMatched or not event.isVBFMatched)"+def_condition], 
     ["/tmp/lenzip/ggh125_v5.root",(19.52*0.0264*0.14)*0.143385404875,"GGH125","GGH125", "True"+def_condition], 
+    #["/tmp/lenzip/ggh125_v5.root",(19.52*0.0264*0.14)*0.143385404875,"GGH125","GGH125", "event.isDecayMatched"+def_condition], 
+    ["/tmp/lenzip/dy50.root",(3503.71)*0.0834175089149,"DY50", "DY50", "True"+def_condition], 
+    ["/tmp/lenzip/dy10to50.root",(13124*0.069)*0.0465582665252,"DY10to50", "DY10to50", "True"+def_condition], 
     ]
 treename="hjjllcombinatorial_hjjllanalyzer"
 
@@ -84,16 +87,18 @@ h1_list=[
     ["HEEJJDeltaPhiZ" ,"abs(event.HEEJJDeltaPhiZ)" ,40,0,4,def_plot, "", "", "#Delta#phi Z(e+e-)Z(jj)", ""],
     ["HMMJJDeltaPhiZJ1" ,"abs(event.HMMJJDeltaPhiZJ1)" ,40,0,4,def_plot, "", "", "#Delta#phiZ(#mu+#mu-)J1", ""],
     ["HEEJJDeltaPhiZJ1" ,"abs(event.HEEJJDeltaPhiZJ1)" ,40,0,4,def_plot, "", "", "#Delta#phiZ(e+e-)J1", ""],
-    ["HMMJJhelcosthetaZl1" ,"event.HMMJJhelcosthetaZl1" ,30,-1.5,1.5,def_plot, "", "", "", ""],
-    ["HMMJJhelcosthetaZl2" ,"event.HMMJJhelcosthetaZl2" ,20,-0.5,1.5, def_plot, "", "", "", ""],
-    ["HEEJJhelcosthetaZl1" ,"event.HEEJJhelcosthetaZl1" ,30,-1.5,1.5,def_plot, "", "", "", ""],
-    ["HEEJJhelcosthetaZl2" ,"event.HEEJJhelcosthetaZl2" ,20,-0.5,1.5, def_plot, "", "", "", ""],
-    ["HMMJJSumAbsEtaJ1J2" ,"event.HMMJJSumAbsEtaJ1J2" ,20,0,5., def_plot, "", "", "", ""],
-    ["HEEJJSumAbsEtaJ1J2" ,"event.HEEJJSumAbsEtaJ1J2" ,20,0,5, def_plot, "", "", "", ""],
+    ["HMMJJhelcosthetaZl1" ,"event.HMMJJhelcosthetaZl1" ,30,-1.5,1.5,def_plot, "", "", "helcosthetaZl1 H(#mu+#mu-jj)", ""],
+    ["HMMJJhelcosthetaZl2" ,"event.HMMJJhelcosthetaZl2" ,20,-0.5,1.5, def_plot, "", "", "helcosthetaZl2 H(#mu+#mu-jj)", ""],
+    ["HEEJJhelcosthetaZl1" ,"event.HEEJJhelcosthetaZl1" ,30,-1.5,1.5,def_plot, "", "", "helcosthetaZl1 H(e+e-jj)", ""],
+    ["HEEJJhelcosthetaZl2" ,"event.HEEJJhelcosthetaZl2" ,20,-0.5,1.5, def_plot, "", "", "helcosthetaZl2 H(e+e-jj)", ""],
+    ["HMMJJSumAbsEtaJ1J2" ,"event.HMMJJSumAbsEtaJ1J2" ,20,0,5., def_plot, "", "|#eta(J1)|+|#eta(J2)|, H(e+e-jj)", "", ""],
+    ["HEEJJSumAbsEtaJ1J2" ,"event.HEEJJSumAbsEtaJ1J2" ,20,0,5., def_plot, "", "|#eta(J1)|+|#eta(J2)|, H(#mu+#mu-jj)", "", ""],
+    ["HEEJJClassifier" ,"event.HEEJJClassifier" ,50,-0.8, 0.2, def_plot, "", "", "BDT classifier, H(e+e-jj)", ""],
+    ["HMMJJClassifier" ,"event.HMMJJClassifier", 50,-0.8, 0.2, def_plot, "", "", "BDT classifier, H(#mu+#mu-jj)", ""],
 ]
     
     
-linecolors=[2, 1, 3, 4, 5]
+linecolors=[2, 6, 3, 4, 5]
 fillcolors=[0, 4, 4, 4, 4]
 fillstyles=[0, 3013, 3013, 3013, 3013]
 smooth=[False, False, False, False, False]
@@ -130,7 +135,9 @@ nhtt=0
 nhtt_sel=0
 nhbbtt=0
 nhbbtt_sel=0
-
+gROOT.ProcessLine(".L ~/tdrStyle.C");
+setTDRStyle()
+#gROOT.ProcessLine(".L ~/tdrStyle.C");
 for index,mc in enumerate(mclist):
     rootfile=mc[0]
     xsec=mc[1]
@@ -149,6 +156,9 @@ for index,mc in enumerate(mclist):
     
     h1loc=h1glob[index]
     read=0
+    #nevents passing default selection
+    npass = 0
+    passpresel = False
     for event  in tree:
         if read>=nevents:
             break
@@ -158,6 +168,9 @@ for index,mc in enumerate(mclist):
         if (event.eventNumber != lastevent):
           lastevent = event.eventNumber
           neventsprocessed += 1
+          if passpresel:
+            npass+=1
+          passpresel = False
 
         addcut = eval(mc[4]) 
             
@@ -170,6 +183,7 @@ for index,mc in enumerate(mclist):
                 
         #if event.step>=stepplot and addcut:
         if addcut:
+            passpresel = True
             # here we can put all plots after selection
             for i,h1 in enumerate(h1loc):
                 param=h1_list[i]
@@ -177,7 +191,7 @@ for index,mc in enumerate(mclist):
                 #h1.Fill(eval(param[1]),weight)
                 h1.Fill(eval(param[1]))
     weight = xsec/neventsprocessed * lumi
-    print xsec, weight, neventsprocessed
+    print xsec, weight, neventsprocessed, npass
     for i,h1 in enumerate(h1loc):
       h1.Scale(weight)
     treefile.Close()
@@ -190,18 +204,20 @@ for index,mc in enumerate(mclist):
 
 # first prepare legenda
 #yheaderstart=.95-.023*len(mclist)
-leg_hist = TLegend(0.60,0.65,0.98,0.98);
+leg_hist = TLegend(0.30,0.85,0.98,0.98);
 leg_hist.SetFillColor(0)# Have a white background
 leg_hist.SetTextSize(0.03)
+leg_hist.SetNColumns(2)
 
-leg_hist2 = TLegend(0.60,0.75,0.98,0.98);
+leg_hist2 = TLegend(0.30,0.85,0.98,0.98);
 leg_hist2.SetFillColor(0)# Have a white background
 leg_hist2.SetTextSize(0.03)
+leg_hist2.SetNColumns(2)
 #text_lumi = TText(60,320,"L = 500 fb-1");
 
 c1=TCanvas("step","step")
-c1.SetFillColor(kWhite)
-c1.SetFillStyle(1001)
+#c1.SetFillColor(kWhite)
+#c1.SetFillStyle(1001)
 #gStyle.SetOptStat(0)
  
 first=True
@@ -225,7 +241,7 @@ for index in range(0,len(mclist)):
 
 
 canv=[]
-gStyle.SetOptStat(11111111)
+#gStyle.SetOptStat(11111111)
 for i,h1 in enumerate(h1_list):
     plot=h1[5]
     if not plot:
@@ -236,7 +252,6 @@ for i,h1 in enumerate(h1_list):
     #canv[len(canv)-1].SetLogy()
     #canv[len(canv)-1].
     canv[len(canv)-1].cd(1)  
-    gPad.SetLogy()
     stackbyhand = TH1F(tag,tag,h1[2],h1[3],h1[4])
     if h1[6] != "":
       stackh_h = THStack(h1[6], h1[7])
@@ -251,14 +266,21 @@ for i,h1 in enumerate(h1_list):
           h1loc[i].Smooth(1, "R")
         stackbyhand.Add(h1loc[i])  
         stackh_h.Add(h1loc[i])
+    themax = max(stackbyhand.GetMaximum(), (h1glob[0])[i].GetMaximum()) 
+    #stackbyhand.GetYaxis().SetRangeUser(0.02, 1.3*themax)
     stackh_h.Draw()
     if h1[8] != "":
       stackh_h.GetXaxis().SetTitle(h1[8])
     if h1[9] != "":
       stackh_h.GetYaxis().SetTitle(h1[9])
     (h1glob[0])[i].Scale(5000)
+    #(h1glob[0])[i].GetYaxis().SetRangeUser(0.02, 1.3*themax)
+    stackh_h.SetMaximum(20*themax)
+    stackh_h.SetMinimum(0.1)
     (h1glob[0])[i].Draw("sames")
     leg_hist.Draw("sames")
+    gPad.SetLogy()
+    gPad.Update()
     #text_lumi.Draw()
     canv[len(canv)-1].cd(2)
     #if h1[6] != "":
@@ -278,8 +300,17 @@ for i,h1 in enumerate(h1_list):
 
     stackbyhand.GetXaxis().SetTitle(h1[8])
     stackbyhand.GetYaxis().SetTitle(h1[9])
-    stackbyhand.DrawNormalized()
-    (h1glob[0])[i].Clone().DrawNormalized("sames")
+    stackbyhand.SetLineColor(fillcolors[2])
+    stackbyhand.SetLineWidth(2)
+    #stackbyhand.DrawNormalized()
+    stackbyhand.Scale(1/stackbyhand.Integral())
+    h1clone = (h1glob[0])[i].Clone()
+    h1clone.Scale(1/h1clone.Integral())
+    themax = max(stackbyhand.GetMaximum(), h1clone.GetMaximum())
+    stackbyhand.GetYaxis().SetRangeUser(0, 1.3*themax)
+    stackbyhand.Draw()
+    h1clone.Draw("sames")
+    #(h1glob[0])[i].Clone().DrawNormalized("sames")
     leg_hist2.Draw("sames")
     #if h1[8] != "":
     #  normstackh_h.GetXaxis().SetTitle(h1[8])

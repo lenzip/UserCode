@@ -1,0 +1,9 @@
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -p 0 -f &> log1.txt& 
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 300001 -p 0 -f &> log2.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 600001 -p 0 -f &> log3.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 900001 -p 0 -f &> log4.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 1200001 -p 0 -f &> log5.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 1500001 -p 0 -f &> log6.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 1800001 -p 0 -f &> log7.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 2100001 -p 0 -f &> log8.txt&
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY50V5presel2_15_cfg.py -N 300000 -i 2400001 -p 0 -f &> log9.txt&
