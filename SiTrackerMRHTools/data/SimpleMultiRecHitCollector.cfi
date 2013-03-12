@@ -1,8 +1,0 @@
-es_module simpleMultiRecHitCollector = MultiRecHitCollectorESProducer{
-	string ComponentName = "simpleMultiRecHitCollector"	
-	string Mode = "Simple"
-	string MultiRecHitUpdator     = "SiTrackerMultiRecHitUpdator"
-	string propagatorAlong        = "PropagatorWithMaterial"
-	string estimator              = "RelaxedChi2Simple"
-	string MeasurementTrackerName = ""
-}
