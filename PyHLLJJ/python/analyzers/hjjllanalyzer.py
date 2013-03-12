@@ -515,7 +515,7 @@ class hjjllanalyzer( Analyzer ):
           event.deltaeta = triggerjets[0].rapidity() - triggerjets[len(triggerjets)-1].rapidity()
           event.deltaphi = deltaPhi(triggerjets[0].phi(), triggerjets[len(triggerjets)-1].phi())
           event.mjj = ( triggerjets[0].p4() + triggerjets[len(triggerjets)-1].p4() ).mass()
-<<<<<<< hjjllanalyzer.py
+
         
              
  
@@ -571,59 +571,6 @@ class hjjllanalyzer( Analyzer ):
                   outputCollection.append([cand, decaymatched, vbfmatched,value]) 
           outputCollection.sort(key=lambda a: a[3], reverse=True)  
         
-=======
-        
-             
- 
-        #do MC matching for muons
-        def matchAndSort(inputCollection, outputCollection):
-          for cand in inputCollection:
-            decaymatched = False
-            vbfmatched=False
-            if self.domcmatching:
-              decaymatched = cand.leg2().leg1().getSelection('cuts_genParton') and cand.leg2().leg2().getSelection('cuts_genParton')
-              if cand.vbfptr().isNonnull():
-               if self.cfg_ana.matchvbfgen:  
-                vbfjets = self.handles['genVBF'].product()
-                if (len(vbfjets))>1:
-                  phileg1 = cand.vbfptr().leg1().phi()
-                  etaleg1 = cand.vbfptr().leg1().eta()
-                  phileg2 = cand.vbfptr().leg2().phi()
-                  etaleg2 = cand.vbfptr().leg2().eta()
-
-
-                  phigen1 = vbfjets[0].phi() 
-                  etagen1 = vbfjets[0].eta()
-                  phigen2 = vbfjets[1].phi()
-                  etagen2 = vbfjets[1].eta()
-                  vbfmatched = ((deltaR(phileg1, etaleg1, phigen1, etagen1)<1 or deltaR(phileg1, etaleg1, phigen2, etagen2)<1) or
-                               (deltaR(phileg2, etaleg2, phigen1, etagen1)<1 or deltaR(phileg2, etaleg2, phigen2, etagen2)<1))
-            if ( cand.leg2().leg1().pt()>self.cfg_ana.jetptmin and
-                 cand.leg2().leg2().pt()>self.cfg_ana.jetptmin ):
-              if cand.vbfptr().isNonnull():
-                if ( cand.vbfptr().leg1().pt()>self.cfg_ana.jetptmin and
-                     cand.vbfptr().leg2().pt()>self.cfg_ana.jetptmin ):
-                  varnames = vector("string") ()
-                  varnames.push_back("ZJJMass")
-                  varnames.push_back("J1Pt")
-                  varnames.push_back("J2Pt")
-                  varnames.push_back("abs(HMMJJDeltaPhiZ)")
-                  varnames.push_back("abs(HMMJJSumAbsEtaJ1J2)")
-                  varnames.push_back("ZJJdeltaRDecay")
-                  vars = vector("double") ()
-                  vars.push_back(cand.leg2().mass())
-                  vars.push_back(cand.leg2().leg1().pt())
-                  vars.push_back(cand.leg2().leg2().pt())
-                  vars.push_back(abs(deltaPhi(cand.leg1().phi(), cand.leg2().phi())))
-                  vars.push_back(abs(cand.leg2().leg1().eta())+abs(cand.leg2().leg2().eta()))
-                  vars.push_back(deltaR(cand.leg2().leg1().phi(), cand.leg2().leg1().eta(),
-                           cand.leg2().leg2().phi(), cand.leg2().leg2().eta()))
-                  classifier = ReadBDT(varnames)
-                  value = classifier.GetMvaValue(vars)  
-                  outputCollection.append([cand, decaymatched, vbfmatched,value]) 
-          outputCollection.sort(key=lambda a: a[3], reverse=True)  
-        
->>>>>>> 1.10
 
         if self.handles['hmumujj'].isValid() and len(self.handles['hmumujj'].product()) > 0:
           matchAndSort(self.handles['hmumujj'].product(), event.hmumujj_withmatchinfo)
@@ -633,17 +580,9 @@ class hjjllanalyzer( Analyzer ):
           #    break
 
         if self.handles['heejj'].isValid() and len(self.handles['heejj'].product()) > 0:
-<<<<<<< hjjllanalyzer.py
-          matchAndSort(self.handles['heejj'].product(), event.heejj_withmatchinfo)
-          #for item in event.heejj_withmatchinfo:
-          #  if item[1] and item[2]:
-          #    print "Electron match"
-          #    break
-=======
-          matchAndSort(self.handles['heejj'].product(), event.heejj_withmatchinfo)
-          #for item in event.heejj_withmatchinfo:
-          #  if item[1] and item[2]:
-          #    print "Electron match"
-          #    break
 
->>>>>>> 1.10
+          matchAndSort(self.handles['heejj'].product(), event.heejj_withmatchinfo)
+          #for item in event.heejj_withmatchinfo:
+          #  if item[1] and item[2]:
+          #    print "Electron match"
+          #    break
