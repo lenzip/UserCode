@@ -4,7 +4,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.19
 diff -u -r1.19 DiObject.h
 --- AnalysisDataFormats/CMGTools/interface/DiObject.h	17 Jan 2012 12:51:07 -0000	1.19
-+++ AnalysisDataFormats/CMGTools/interface/DiObject.h	13 Feb 2013 17:17:29 -0000
++++ AnalysisDataFormats/CMGTools/interface/DiObject.h	19 Mar 2013 15:43:17 -0000
 @@ -11,6 +11,7 @@
  
  template <typename T, typename U> class DiObject;
@@ -13,7 +13,18 @@ diff -u -r1.19 DiObject.h
  
  template< typename T, typename U >
  class DiObject : public AbstractPhysicsObject{
-@@ -38,7 +39,8 @@
+@@ -25,8 +26,8 @@
+     }
+ 
+     /// constructs from leg1 and leg2  
+-    DiObject(const T& leg1, const U& leg2):
+-        AbstractPhysicsObject(reco::LeafCandidate(leg1.charge()+leg2.charge(),leg1.p4()+leg2.p4())),
++    DiObject(const edm::Ptr<T>& leg1, const edm::Ptr<U>& leg2):
++        AbstractPhysicsObject(reco::LeafCandidate(leg1->charge()+leg2->charge(),leg1->p4()+leg2->p4())),
+       leg1_(leg1),
+       leg2_(leg2),
+       mT_(UnSet(Double_t)),
+@@ -38,15 +39,16 @@
        pZetaVis_(UnSet(Double_t)),
        mTLeg1_(UnSet(Double_t)),
        mTLeg2_(UnSet(Double_t)),
@@ -23,7 +34,17 @@ diff -u -r1.19 DiObject.h
  	{
      }
      
-@@ -57,7 +59,8 @@
+     /// copy constructor
+     DiObject(const DiObject<T,U>& other):
+       AbstractPhysicsObject(other),
+-      leg1_(other.leg1()),
+-      leg2_(other.leg2()),
++      leg1_(other.leg1_),
++      leg2_(other.leg2_),
+       met_(other.met()),
+       mT_(other.mT_),
+       alphaT_(other.alphaT_),
+@@ -57,14 +59,15 @@
        pZetaVis_(other.pZetaVis_), 
        mTLeg1_(other.mTLeg1_), 
        mTLeg2_(other.mTLeg2_),
@@ -33,7 +54,16 @@ diff -u -r1.19 DiObject.h
      }
  
      virtual ~DiObject(){}
-@@ -109,8 +112,14 @@
+ 
+-    const T& leg1() const{ return leg1_; }
++    const T& leg1() const{ return *(leg1_.get()); }
+ 
+-    const U& leg2() const{ return leg2_; }
++    const U& leg2() const{ return *(leg2_.get()); }
+ 
+     const reco::LeafCandidate& met() const { return met_;}
+ 
+@@ -109,13 +112,19 @@
      ///mass from SVFit
      double massSVFit() const { return massSVFit_; }
  
@@ -48,7 +78,41 @@ diff -u -r1.19 DiObject.h
      
      virtual void accept(AbstractPhysicsObjectVisitor* v) const{
        v->visit(this);
-@@ -191,7 +200,11 @@
+-      v->visit(&leg1_);
+-      v->visit(&leg2_);
++      v->visit(leg1_.get());
++      v->visit(leg2_.get());
+     }
+ 
+    ///Overides the methods reco::Candidate so that it can be used with the TopProjector
+@@ -144,10 +153,10 @@
+         const reco::Candidate* result = 0;
+         switch(i){
+          case 0:
+-            result = &leg1_;
++            result = leg1_.get();
+             break;
+          case 1:
+-            result = &leg2_;
++            result = leg2_.get();
+             break;
+          default:
+             result = 0;
+@@ -157,8 +166,11 @@
+ 
+   private:
+ 
+-    T leg1_;
+-    U leg2_;
++    edm::Ptr<T> leg1_;
++    edm::Ptr<U> leg2_;
++  
++    //T leg1_;
++    //U leg2_;
+     reco::LeafCandidate met_;
+     
+     /// M_T between the two legs (one of them can be the MET)
+@@ -191,7 +203,11 @@
      /// SVFit mass
      double   massSVFit_;
  
@@ -66,7 +130,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/interface/
 retrieving revision 1.11
 diff -u -r1.11 Muon.h
 --- AnalysisDataFormats/CMGTools/interface/Muon.h	28 Aug 2012 16:07:40 -0000	1.11
-+++ AnalysisDataFormats/CMGTools/interface/Muon.h	13 Feb 2013 17:17:29 -0000
++++ AnalysisDataFormats/CMGTools/interface/Muon.h	19 Mar 2013 15:43:17 -0000
 @@ -55,7 +55,8 @@
      }
      bool isPF() const{
@@ -77,14 +141,73 @@ diff -u -r1.11 Muon.h
        return (*(this->sourcePtr()))->userFloat("isPFMuon"); 
      }
      
+Index: AnalysisDataFormats/CMGTools/src/classes.h
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/src/classes.h,v
+retrieving revision 1.35
+diff -u -r1.35 classes.h
+--- AnalysisDataFormats/CMGTools/src/classes.h	1 Oct 2012 12:01:53 -0000	1.35
++++ AnalysisDataFormats/CMGTools/src/classes.h	19 Mar 2013 15:43:17 -0000
+@@ -310,7 +310,19 @@
+     edm::ValueMap<reco::VertexRefVector> vtxvmap2_;
+     edm::Wrapper<edm::ValueMap<reco::VertexRefVector> > vtxvmapw2_;
+ 
+-  };
+   
+ 
++  edm::Ptr<cmg::DiObject<cmg::Electron,cmg::Electron> > ciao;
++
++  edm::Ptr<cmg::DiObject<cmg::Muon,cmg::Muon> > ciao1;
++
++  edm::Ptr<cmg::DiObject<cmg::PhysicsObjectWithPtr<edm::Ptr<reco::GenParticle> >,cmg::PhysicsObjectWithPtr<edm::Ptr<reco::GenParticle> > > > ciao2;
++
++  edm::Ptr<cmg::Electron> ciao3;
++
++  edm::Ptr<cmg::PFJet> ciao4;
++
++  edm::Ptr<cmg::PhysicsObjectWithPtr<edm::Ptr<reco::GenParticle> > > ciao5;
++
++  };
+ }
+Index: AnalysisDataFormats/CMGTools/src/classes_def.xml
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/AnalysisDataFormats/CMGTools/src/classes_def.xml,v
+retrieving revision 1.40
+diff -u -r1.40 classes_def.xml
+--- AnalysisDataFormats/CMGTools/src/classes_def.xml	1 Oct 2012 12:01:53 -0000	1.40
++++ AnalysisDataFormats/CMGTools/src/classes_def.xml	19 Mar 2013 15:43:20 -0000
+@@ -278,5 +278,18 @@
+   <class name="edm::ValueMap<reco::VertexRefVector>"/>
+   <class name="edm::Wrapper<edm::ValueMap<reco::VertexRefVector> >"/>;
+ 
++  <class name="edm::Ptr<cmg::DiObject<cmg::Electron,cmg::Electron> >"/>;
++
++  <class name="edm::Ptr<cmg::DiObject<cmg::Muon,cmg::Muon> >"/>;
++
++  <class name="edm::Ptr<cmg::DiObject<cmg::PhysicsObjectWithPtr<edm::Ptr<reco::GenParticle> >,cmg::PhysicsObjectWithPtr<edm::Ptr<reco::GenParticle> > > >"/>;
++
++  <class name="edm::Ptr<cmg::Electron>"/>;
++
++  <class name="edm::Ptr<cmg::PFJet>"/>;
++
++  <class name="edm::Ptr<cmg::PhysicsObjectWithPtr<edm::Ptr<reco::GenParticle> > >"/>;
++
++
+ 
+ </lcgdict>
 Index: CMGTools/Common/interface/DiObjectFactory.h
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/interface/DiObjectFactory.h,v
 retrieving revision 1.14
 diff -u -r1.14 DiObjectFactory.h
 --- CMGTools/Common/interface/DiObjectFactory.h	28 Feb 2012 15:45:19 -0000	1.14
-+++ CMGTools/Common/interface/DiObjectFactory.h	13 Feb 2013 17:17:29 -0000
-@@ -60,6 +60,7 @@
++++ CMGTools/Common/interface/DiObjectFactory.h	19 Mar 2013 15:43:21 -0000
+@@ -56,10 +56,11 @@
+ 
+ ///Make when the types are different
+ template< typename T, typename U >
+-cmg::DiObject<T,U> make(const T& l1, const U& l2){
++cmg::DiObject<T,U> make(const edm::Ptr<T>& l1, const edm::Ptr<U>& l2){
      return cmg::DiObject<T,U>(l1,l2);
  }
  ///Make when the types are the same - sorts the legs
@@ -100,13 +223,32 @@ diff -u -r1.14 DiObjectFactory.h
  
  }
  
+@@ -102,12 +104,17 @@
+     }
+     const bool sameCollection = (leg1Cands.id () == leg2Cands.id());
+     for(typename collection1::const_iterator it = leg1Cands->begin(); it != leg1Cands->end(); ++it){
++        unsigned int i1 = std::distance(leg1Cands->begin(), it);
++        edm::Ptr<T> i1ptr(leg1Cands, i1); 
+         for(typename collection2::const_iterator jt = leg2Cands->begin(); jt != leg2Cands->end(); ++jt){
++            unsigned int i2 = std::distance(leg2Cands->begin(), jt);
++            edm::Ptr<U> i2ptr(leg2Cands, i2); 
+             //we skip if its the same object
+             if( sameCollection && (*it == *jt) ) continue;
+             
+             //enable sorting only if we are using the same collection - see Savannah #20217
+-            cmg::DiObject<T, U> cmgTmp = sameCollection ? cmg::make(*it,*jt) : cmg::DiObject<T,U>(*it,*jt); 
++            //cmg::DiObject<T, U> cmgTmp = sameCollection ? cmg::make(*it,*jt) : cmg::DiObject<T,U>(*it,*jt); 
++            cmg::DiObject<T, U> cmgTmp = sameCollection ? cmg::make(i1ptr, i2ptr) : cmg::DiObject<T,U>(i1ptr,i2ptr); 
+             
+             cmg::DiObjectFactory<T, U>::set(std::make_pair(cmgTmp.leg1(),cmgTmp.leg2()),&cmgTmp);
+ 	    /*             if(metAvailable && metCands->size()){ */
 Index: CMGTools/Common/python/PAT/addFilterPaths_cff.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/python/PAT/addFilterPaths_cff.py,v
 retrieving revision 1.7
 diff -u -r1.7 addFilterPaths_cff.py
 --- CMGTools/Common/python/PAT/addFilterPaths_cff.py	2 Oct 2012 09:02:09 -0000	1.7
-+++ CMGTools/Common/python/PAT/addFilterPaths_cff.py	13 Feb 2013 17:17:29 -0000
++++ CMGTools/Common/python/PAT/addFilterPaths_cff.py	19 Mar 2013 15:43:24 -0000
 @@ -15,7 +15,7 @@
      cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
      filter = cms.bool(True)
@@ -189,7 +331,7 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Common/python/PAT/patCMGSchedu
 retrieving revision 1.8
 diff -u -r1.8 patCMGSchedule_cff.py
 --- CMGTools/Common/python/PAT/patCMGSchedule_cff.py	2 Oct 2012 09:02:09 -0000	1.8
-+++ CMGTools/Common/python/PAT/patCMGSchedule_cff.py	13 Feb 2013 17:17:29 -0000
++++ CMGTools/Common/python/PAT/patCMGSchedule_cff.py	19 Mar 2013 15:43:24 -0000
 @@ -6,21 +6,21 @@
  
      result = cms.Schedule(
@@ -222,13 +364,30 @@ diff -u -r1.8 patCMGSchedule_cff.py
      else:
          process.metNoiseCleaningPath.remove(process.CSCTightHaloFilter)
          process.metNoiseCleaningPath.remove(process.HBHENoiseFilter)
+Index: CMGTools/Production/python/castorBaseDir.py
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Production/python/castorBaseDir.py,v
+retrieving revision 1.10
+diff -u -r1.10 castorBaseDir.py
+--- CMGTools/Production/python/castorBaseDir.py	7 Jun 2012 08:20:56 -0000	1.10
++++ CMGTools/Production/python/castorBaseDir.py	19 Mar 2013 15:43:53 -0000
+@@ -19,7 +19,8 @@
+     if area is None:
+         user, area = getUserAndArea(user)
+     
+-    d = '/store/cmst3/%s/%s/CMG' % (area,user)
++    #d = '/store/cmst3/%s/%s/CMG' % (area,user)
++    d = '/store/%s/%s/CMG' % (area,user)
+     exists = castortools.isDirectory( castortools.lfnToCastor(d) )
+     if exists:
+         return d
 Index: CMGTools/Production/scripts/cmsBatch.py
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/Production/scripts/cmsBatch.py,v
 retrieving revision 1.15
 diff -u -r1.15 cmsBatch.py
 --- CMGTools/Production/scripts/cmsBatch.py	18 Sep 2012 14:43:34 -0000	1.15
-+++ CMGTools/Production/scripts/cmsBatch.py	13 Feb 2013 17:17:29 -0000
++++ CMGTools/Production/scripts/cmsBatch.py	19 Mar 2013 15:43:57 -0000
 @@ -81,6 +81,7 @@
     '''prepare the LSF version of the batch script, to run on LSF'''
     script = """#!/bin/bash
@@ -243,8 +402,44 @@ RCS file: /local/reps/CMSSW/UserCode/CMG/CMGTools/RootTools/python/fwlite/MultiL
 retrieving revision 1.10
 diff -u -r1.10 MultiLoop.py
 --- CMGTools/RootTools/python/fwlite/MultiLoop.py	14 Nov 2012 16:44:52 -0000	1.10
-+++ CMGTools/RootTools/python/fwlite/MultiLoop.py	13 Feb 2013 17:17:29 -0000
-@@ -123,6 +123,10 @@
++++ CMGTools/RootTools/python/fwlite/MultiLoop.py	19 Mar 2013 15:44:04 -0000
+@@ -24,18 +24,26 @@
+ def runLoop( comp, outDir, config, options):
+     fullName = '/'.join( [outDir, comp.name ] )
+     # import pdb; pdb.set_trace()
++    if options.iEvent is None:
++      firstEvent = 0
++    else:
++      firstEvent = int(options.iEvent)
+     loop = Looper( fullName, comp, config.sequence,
+-                   options.nevents, 0, 
++                   #options.nevents, 0, 
++                   options.nevents, firstEvent, 
+                    nPrint = options.nprint)
+     print loop
+-    if options.iEvent is None:
+-        loop.loop()
+-        loop.write()
+-        print loop
+-    else:
+-        # loop.InitOutput()
+-        iEvent = int(options.iEvent)
+-        loop.process( iEvent )
++#    if options.iEvent is None:
++#        loop.loop()
++#        loop.write()
++#        print loop
++#    else:
++#        # loop.InitOutput()
++#        iEvent = int(options.iEvent)
++#        loop.process( iEvent )
++    loop.loop()
++    loop.write()
++    print loop
+     return loop
+ 
+ 
+@@ -123,6 +131,10 @@
                                   'src/CMGTools/WMass/python/analyzers'] ))
      sys.path.append( '/'.join( [ os.environ['CMSSW_BASE'],
                                   'src/CMGTools/ZJetsTutorial/python/analyzers'] ))
@@ -261,7 +456,7 @@ RCS file: /local/reps/CMSSW/CMSSW/DataFormats/Candidate/interface/LeafCandidate.
 retrieving revision 1.24
 diff -u -r1.24 LeafCandidate.h
 --- DataFormats/Candidate/interface/LeafCandidate.h	27 Oct 2011 16:29:58 -0000	1.24
-+++ DataFormats/Candidate/interface/LeafCandidate.h	13 Feb 2013 17:17:29 -0000
++++ DataFormats/Candidate/interface/LeafCandidate.h	19 Mar 2013 15:44:26 -0000
 @@ -39,7 +39,7 @@
        cachePolarFixed_( false ), cacheCartesianFixed_( false ) { }
      // constructor from candidate                                                         
@@ -277,7 +472,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/BuildFile.xml,v
 retrieving revision 1.1
 diff -u -r1.1 BuildFile.xml
 --- Francesco/KinFitter/src/BuildFile.xml	7 May 2011 13:51:55 -0000	1.1
-+++ Francesco/KinFitter/src/BuildFile.xml	13 Feb 2013 17:17:30 -0000
++++ Francesco/KinFitter/src/BuildFile.xml	19 Mar 2013 15:44:35 -0000
 @@ -1,7 +1,4 @@
 -<flags CXXFLAGS="-I$(CMSSW_RELEASE_BASE)/src/PhysicsTools/KinFitter/interface/"/>
 -
@@ -294,7 +489,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.cc,v
 retrieving revision 1.3
 diff -u -r1.3 DiJetKinFitter.cc
 --- Francesco/KinFitter/src/DiJetKinFitter.cc	21 May 2011 15:35:53 -0000	1.3
-+++ Francesco/KinFitter/src/DiJetKinFitter.cc	13 Feb 2013 17:17:30 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.cc	19 Mar 2013 15:44:35 -0000
 @@ -1,11 +1,11 @@
  #include "DiJetKinFitter.h"
  
@@ -373,7 +568,81 @@ diff -u -r1.3 DiJetKinFitter.cc
    jetpair.first  = jet1_kinfit;
    jetpair.second = jet2_kinfit;
  
-@@ -231,7 +239,13 @@
+@@ -165,8 +173,32 @@
+     c = 2.6831e-7;
+     d = -2.93791;
+     e = -0.259687;
++  } else if( fabs(Eta) < 3.5 ) {
++    a = 201.72;
++    b = 0.027783;
++    c = 0.20805;
++    d = -200.378;
++    e = -2.49299;
++  } else if( fabs(Eta) < 4. ) {
++    a = 285.824;
++    b = 0.0039595;
++    c = 0.259876;
++    d = -284.99;
++    e = -0.852086;
++  } else if( fabs(Eta) < 4.5 ) {
++    a = 0.013065;
++    b = 0.0843742;
++    c = 4.4255e-6;
++    d = 0.38954;
++    e = -0.576654;
++  } else if( fabs(Eta) < 5. ) {
++    a = 3.8509e-6;
++    b = 0.181891;
++    c = 1.7246e-8;
++    d = -0.0129155;
++    e = 0.;
+   } else {
+-    std::cout << "Not implemented Eta Err for eta > 3. Exiting." << std::endl;
++    std::cout << "Not implemented Eta Err for eta > 5. Exiting." << std::endl;
+     exit(1123);
+   }
+   
+@@ -219,8 +251,38 @@
+     c = 0.0071142;
+     d = -10.7613;
+     e = 0.280927;
++  } else if( fabs(Eta) < 3. ) {
++    a = 11.1957;
++    b = 0.643236;
++    c = 0.0071142;
++    d = -10.7613;
++    e = 0.280927;
++  } else if( fabs(Eta) < 3.5 ) {
++    a = 1.9027;
++    b = 4.5698e-6;
++    c = 0.0304793;
++    d = -1.09124;
++    e = -0.136402;
++  } else if( fabs(Eta) < 4. ) {
++    a = 2.11446;
++    b = 0.203329;
++    c = 0.0175832;
++    d = -1.67946;
++    e = -0.0085347;
++  } else if( fabs(Eta) < 4.5 ) {
++    a = 0.765787;
++    b = 3.9063e-6;
++    c = 4.7022e-8;
++    d = 0.11831;
++    e = -1.4675;
++  } else if( fabs(Eta) < 5. ) {
++    a = 259.189;
++    b = 0.0013279;
++    c = 0.311411;
++    d = -258.647;
++    e = 0.;
+   } else {
+-    std::cout << "Not implemented Phi Err for eta > 3. Exiting." << std::endl;
++    std::cout << "Not implemented Phi Err for eta > 5. Exiting." << std::endl;
+     exit(1123);
+   }
+   
+@@ -231,7 +293,13 @@
  
  }
  
@@ -394,7 +663,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/DiJetKinFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 DiJetKinFitter.h
 --- Francesco/KinFitter/src/DiJetKinFitter.h	5 Apr 2011 15:42:53 -0000	1.1
-+++ Francesco/KinFitter/src/DiJetKinFitter.h	13 Feb 2013 17:17:30 -0000
++++ Francesco/KinFitter/src/DiJetKinFitter.h	19 Mar 2013 15:44:35 -0000
 @@ -8,7 +8,8 @@
  #ifndef DiJetKinFitter_h
  #define DiJetKinFitter_h
@@ -443,7 +712,7 @@ RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.cc,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.cc
 --- Francesco/KinFitter/src/GlobalFitter.cc	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.cc	13 Feb 2013 17:17:30 -0000
++++ Francesco/KinFitter/src/GlobalFitter.cc	19 Mar 2013 15:44:37 -0000
 @@ -1,10 +1,9 @@
  #include "GlobalFitter.h"
  
@@ -459,13 +728,81 @@ diff -u -r1.1 GlobalFitter.cc
  
  #include <iostream>
  
+@@ -256,8 +255,32 @@
+     c = 2.6831e-7;
+     d = -2.93791;
+     e = -0.259687;
++  } else if( fabs(Eta) < 3.5 ) {
++    a = 201.72;
++    b = 0.027783;
++    c = 0.20805;
++    d = -200.378;
++    e = -2.49299;
++  } else if( fabs(Eta) < 4. ) {
++    a = 285.824;
++    b = 0.0039595;
++    c = 0.259876;
++    d = -284.99;
++    e = -0.852086;
++  } else if( fabs(Eta) < 4.5 ) {
++    a = 0.013065;
++    b = 0.0843742;
++    c = 4.4255e-6;
++    d = 0.38954;
++    e = -0.576654;
++  } else if( fabs(Eta) < 5. ) {
++    a = 3.8509e-6;
++    b = 0.181891;
++    c = 1.7246e-8;
++    d = -0.0129155;
++    e = 0.;
+   } else {
+-    std::cout << "Not implemented Eta Err for eta > 3. Exiting." << std::endl;
++    std::cout << "Not implemented Eta Err for eta > 5. Exiting." << std::endl;
+     exit(1123);
+   }
+ 
+@@ -310,8 +333,32 @@
+     c = 0.0071142;
+     d = -10.7613;
+     e = 0.280927;
++  } else if( fabs(Eta) < 3.5 ) {
++    a = 1.9027;
++    b = 4.5698e-6;
++    c = 0.0304793;
++    d = -1.09124;
++    e = -0.136402;
++  } else if( fabs(Eta) < 4. ) {
++    a = 2.11446;
++    b = 0.203329;
++    c = 0.0175832;
++    d = -1.67946;
++    e = -0.0085347;
++  } else if( fabs(Eta) < 4.5 ) {
++    a = 0.765787;
++    b = 3.9063e-6;
++    c = 4.7022e-8;
++    d = 0.11831;
++    e = -1.4675;
++  } else if( fabs(Eta) < 5. ) {
++    a = 259.189;
++    b = 0.0013279;
++    c = 0.311411;
++    d = -258.647;
++    e = 0.;
+   } else {
+-    std::cout << "Not implemented Phi Err for eta > 3. Exiting." << std::endl;
++    std::cout << "Not implemented Phi Err for eta > 5. Exiting." << std::endl;
+     exit(1123);
+   }
+ 
 Index: Francesco/KinFitter/src/GlobalFitter.h
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/pandolf/KinematicFit/GlobalFitter.h,v
 retrieving revision 1.1
 diff -u -r1.1 GlobalFitter.h
 --- Francesco/KinFitter/src/GlobalFitter.h	25 Sep 2011 15:00:53 -0000	1.1
-+++ Francesco/KinFitter/src/GlobalFitter.h	13 Feb 2013 17:17:30 -0000
++++ Francesco/KinFitter/src/GlobalFitter.h	19 Mar 2013 15:44:37 -0000
 @@ -6,7 +6,7 @@
  #ifndef GlobalFitter_h
  #define GlobalFitter_h
@@ -481,7 +818,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/diElectron_c
 retrieving revision 1.3
 diff -u -r1.3 diElectron_cff.py
 --- HiggsAna/HEEJJ/python/diElectron_cff.py	12 May 2012 21:59:30 -0000	1.3
-+++ HiggsAna/HEEJJ/python/diElectron_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/diElectron_cff.py	19 Mar 2013 15:44:37 -0000
 @@ -11,7 +11,7 @@
  cmgDiElectronHistograms.inputCollection=cms.InputTag("cmgDiElectronSel2L2Q")
  
@@ -497,7 +834,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/electron_cff
 retrieving revision 1.14
 diff -u -r1.14 electron_cff.py
 --- HiggsAna/HEEJJ/python/electron_cff.py	3 Jun 2012 19:34:40 -0000	1.14
-+++ HiggsAna/HEEJJ/python/electron_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/electron_cff.py	19 Mar 2013 15:44:39 -0000
 @@ -8,7 +8,7 @@
      cut = cms.string(' (abs(pdgId)==11 )&& abs(mother.pdgId)==23 ')
  )
@@ -564,7 +901,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/cmgDiE
 retrieving revision 1.3
 diff -u -r1.3 cmgDiElectronSel_cfi.py
 --- HiggsAna/HEEJJ/python/skims/cmgDiElectronSel_cfi.py	24 Apr 2012 09:32:31 -0000	1.3
-+++ HiggsAna/HEEJJ/python/skims/cmgDiElectronSel_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/skims/cmgDiElectronSel_cfi.py	19 Mar 2013 15:44:39 -0000
 @@ -6,6 +6,7 @@
  
  cmgDiElectronSel2L2Q = cms.EDFilter(
@@ -579,7 +916,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/cmgHig
 retrieving revision 1.2
 diff -u -r1.2 cmgHiggsSel_cff.py
 --- HiggsAna/HEEJJ/python/skims/cmgHiggsSel_cff.py	22 Sep 2011 14:36:56 -0000	1.2
-+++ HiggsAna/HEEJJ/python/skims/cmgHiggsSel_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/skims/cmgHiggsSel_cff.py	19 Mar 2013 15:44:39 -0000
 @@ -3,11 +3,13 @@
  
  cmgHiggsSel = cms.EDFilter(
@@ -600,7 +937,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.13
 diff -u -r1.13 selEventsElectron_cfi.py
 --- HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	5 Jun 2012 10:11:48 -0000	1.13
-+++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsElectron_cfi.py	19 Mar 2013 15:44:39 -0000
 @@ -2,7 +2,7 @@
  
  electronPreselNoIso = cms.EDFilter(
@@ -622,7 +959,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.1
 diff -u -r1.1 selEventsHiggs_cfi.py
 --- HiggsAna/HEEJJ/python/skims/selEventsHiggs_cfi.py	11 May 2011 10:41:59 -0000	1.1
-+++ HiggsAna/HEEJJ/python/skims/selEventsHiggs_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsHiggs_cfi.py	19 Mar 2013 15:44:39 -0000
 @@ -3,6 +3,6 @@
  
  selectedHiggsCandFilter = cms.EDFilter("CandViewCountFilter",
@@ -637,7 +974,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HEEJJ/python/skims/selEve
 retrieving revision 1.6
 diff -u -r1.6 selEventsZ_cff.py
 --- HiggsAna/HEEJJ/python/skims/selEventsZ_cff.py	24 Apr 2012 09:32:31 -0000	1.6
-+++ HiggsAna/HEEJJ/python/skims/selEventsZ_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HEEJJ/python/skims/selEventsZ_cff.py	19 Mar 2013 15:44:39 -0000
 @@ -2,6 +2,7 @@
  
  ZeeCand = cms.EDFilter(
@@ -652,7 +989,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/DiO
 retrieving revision 1.5
 diff -u -r1.5 DiObjectKinFitFactory.h
 --- HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	23 Apr 2012 13:35:22 -0000	1.5
-+++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/interface/DiObjectKinFitFactory.h	19 Mar 2013 15:44:39 -0000
 @@ -66,21 +66,31 @@
  void cmg::DiObjectKinFitFactory<T, U>::set(const cmg::DiObject<T,U>& pair, cmg::DiObject<T,U>* const obj) const{
  
@@ -703,7 +1040,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/Hig
 retrieving revision 1.7
 diff -u -r1.7 HiggsCandidateFactory.h
 --- HiggsAna/HLLJJCommon/interface/HiggsCandidateFactory.h	30 Jul 2012 16:13:41 -0000	1.7
-+++ HiggsAna/HLLJJCommon/interface/HiggsCandidateFactory.h	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/interface/HiggsCandidateFactory.h	19 Mar 2013 15:44:40 -0000
 @@ -147,15 +147,18 @@
    for(size_t dau=0;dau<2;dau++){     //ZjjboostedZjj->numberOfDaughters();dau++){ //careful! there 4 daughters!
      if(ZjjboostedZjj->daughter(dau)->phi()>=0)posphiZjjdau=dau; // changed >0 to >=0 to avoid problems with non-converging kinematic fit
@@ -769,7 +1106,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/interface/Jet
 retrieving revision 1.4
 diff -u -r1.4 JetKinFitterConst.h
 --- HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	23 Apr 2012 13:35:22 -0000	1.4
-+++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h	19 Mar 2013 15:44:40 -0000
 @@ -3,6 +3,7 @@
  #include "TLorentzVector.h"
  #include "TMatrixD.h"
@@ -787,13 +1124,31 @@ diff -u -r1.4 JetKinFitterConst.h
    //int Refit();
  
  private:
+Index: HiggsAna/HLLJJCommon/plugins/CMGTools.cc
+===================================================================
+RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/CMGTools.cc,v
+retrieving revision 1.6
+diff -u -r1.6 CMGTools.cc
+--- HiggsAna/HLLJJCommon/plugins/CMGTools.cc	7 Jun 2011 09:21:30 -0000	1.6
++++ HiggsAna/HLLJJCommon/plugins/CMGTools.cc	19 Mar 2013 15:44:40 -0000
+@@ -10,8 +10,8 @@
+ DEFINE_FWK_MODULE(DiGenParticleDiGenParticlePOProducer);
+ DEFINE_FWK_MODULE(DiMuonDiJetPOProducer);
+ DEFINE_FWK_MODULE(DiElectronDiJetPOProducer);
+-DEFINE_FWK_MODULE(DiPFJetKinFitPOProducer);
+-DEFINE_FWK_MODULE(DiJetKinFitPOProducer);
++//DEFINE_FWK_MODULE(DiPFJetKinFitPOProducer);
++//DEFINE_FWK_MODULE(DiJetKinFitPOProducer);
+ 
+ DEFINE_FWK_MODULE(DiGenParticleDiGenParticleHiggsPOProducer);
+ DEFINE_FWK_MODULE(DiMuonDiJetHiggsPOProducer);
 Index: HiggsAna/HLLJJCommon/plugins/Plugins.cc
 ===================================================================
 RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/plugins/Plugins.cc,v
 retrieving revision 1.17
 diff -u -r1.17 Plugins.cc
 --- HiggsAna/HLLJJCommon/plugins/Plugins.cc	18 Oct 2012 08:46:43 -0000	1.17
-+++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/plugins/Plugins.cc	19 Mar 2013 15:44:40 -0000
 @@ -4,7 +4,7 @@
  #include "HiggsAna/HLLJJCommon/plugins/HLTWeightProducer.h" 
  #include "HiggsAna/HLLJJCommon/plugins/PTWeightAnalyzer.h" 
@@ -833,7 +1188,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/FinalS
 retrieving revision 1.14
 diff -u -r1.14 FinalSelection_cff.py
 --- HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	18 Oct 2012 08:46:43 -0000	1.14
-+++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/FinalSelection_cff.py	19 Mar 2013 15:44:41 -0000
 @@ -28,45 +28,82 @@
                                    cut = cms.string("getSelection(\"cuts_btags_btag2\")")
                                    )
@@ -1033,7 +1388,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/jet_cf
 retrieving revision 1.31
 diff -u -r1.31 jet_cff.py
 --- HiggsAna/HLLJJCommon/python/jet_cff.py	21 Aug 2012 12:46:52 -0000	1.31
-+++ HiggsAna/HLLJJCommon/python/jet_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/jet_cff.py	19 Mar 2013 15:44:42 -0000
 @@ -10,7 +10,7 @@
  
  jetCountFilter = cms.EDFilter("CandViewCountFilter",
@@ -1075,7 +1430,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/factor
 retrieving revision 1.14
 diff -u -r1.14 cmgDiJet_cfi.py
 --- HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py	14 Sep 2012 15:34:15 -0000	1.14
-+++ HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/factories/cmgDiJet_cfi.py	19 Mar 2013 15:44:44 -0000
 @@ -9,7 +9,7 @@
  
  #from CMGTools.Common.selections.kinematics_cfi import dijetKinematics
@@ -1098,7 +1453,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/factor
 retrieving revision 1.18
 diff -u -r1.18 cmgJet_cfi.py
 --- HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py	21 Aug 2012 12:46:53 -0000	1.18
-+++ HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/factories/cmgJet_cfi.py	19 Mar 2013 15:44:44 -0000
 @@ -24,7 +24,7 @@
  from HiggsAna.HLLJJCommon.selections.jetKinematics_cfi import jetKinematics
  from HiggsAna.HLLJJCommon.selections.jetid_cfi import *
@@ -1114,7 +1469,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/select
 retrieving revision 1.5
 diff -u -r1.5 jetKinematics_cfi.py
 --- HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	13 May 2012 11:58:49 -0000	1.5
-+++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/selections/jetKinematics_cfi.py	19 Mar 2013 15:44:46 -0000
 @@ -2,19 +2,29 @@
  
  
@@ -1155,7 +1510,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/skims/
 retrieving revision 1.9
 diff -u -r1.9 selEventsPFJet_cff.py
 --- HiggsAna/HLLJJCommon/python/skims/selEventsPFJet_cff.py	27 Apr 2012 13:46:54 -0000	1.9
-+++ HiggsAna/HLLJJCommon/python/skims/selEventsPFJet_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/skims/selEventsPFJet_cff.py	19 Mar 2013 15:44:46 -0000
 @@ -3,17 +3,18 @@
  jetIDJet = cms.EDFilter(
  #    "CmgBaseJetSelector",
@@ -1184,7 +1539,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/python/skims/
 retrieving revision 1.2
 diff -u -r1.2 selEventsZjj_cff.py
 --- HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py	28 Apr 2011 11:40:27 -0000	1.2
-+++ HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/python/skims/selEventsZjj_cff.py	19 Mar 2013 15:44:46 -0000
 @@ -2,13 +2,13 @@
  
  ZjjCand = cms.EDFilter(
@@ -1207,7 +1562,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HLLJJCommon/src/JetKinFit
 retrieving revision 1.3
 diff -u -r1.3 JetKinFitterConst.cc
 --- HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	7 May 2011 14:37:17 -0000	1.3
-+++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HLLJJCommon/src/JetKinFitterConst.cc	19 Mar 2013 15:44:46 -0000
 @@ -1,17 +1,19 @@
  #include "HiggsAna/HLLJJCommon/interface/JetKinFitterConst.h"
  #include "Francesco/KinFitter/src/DiJetKinFitter.h"
@@ -1237,7 +1592,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/diMuon_cff.p
 retrieving revision 1.2
 diff -u -r1.2 diMuon_cff.py
 --- HiggsAna/HMMJJ/python/diMuon_cff.py	27 May 2011 12:15:04 -0000	1.2
-+++ HiggsAna/HMMJJ/python/diMuon_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/diMuon_cff.py	19 Mar 2013 15:44:50 -0000
 @@ -6,9 +6,9 @@
  from CMGTools.Common.skims.cmgDiMuonCount_cfi import *
  from CMGTools.Common.histograms.cmgDiMuonHistograms_cfi import *
@@ -1257,7 +1612,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/muon_cff.py,
 retrieving revision 1.5
 diff -u -r1.5 muon_cff.py
 --- HiggsAna/HMMJJ/python/muon_cff.py	22 May 2012 16:50:11 -0000	1.5
-+++ HiggsAna/HMMJJ/python/muon_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/muon_cff.py	19 Mar 2013 15:44:50 -0000
 @@ -5,7 +5,7 @@
      src = cms.InputTag("genParticles"),
      cut = cms.string(' (abs(pdgId)==13 )&& abs(mother.pdgId)==23 ')
@@ -1281,7 +1636,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cm
 retrieving revision 1.5
 diff -u -r1.5 cmgDiMuon_cfi.py
 --- HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	27 Sep 2011 15:16:22 -0000	1.5
-+++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/factories/cmgDiMuon_cfi.py	19 Mar 2013 15:44:50 -0000
 @@ -8,7 +8,7 @@
  )
  from HiggsAna.HMMJJ.selections.zmumu_cfi import zmumu
@@ -1297,7 +1652,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/factories/cm
 retrieving revision 1.5
 diff -u -r1.5 cmgMuon_cfi.py
 --- HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	13 May 2012 16:42:56 -0000	1.5
-+++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/factories/cmgMuon_cfi.py	19 Mar 2013 15:44:50 -0000
 @@ -2,7 +2,7 @@
  
  from CMGTools.Common.factories.cmgLepton_cfi import leptonFactory
@@ -1322,7 +1677,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgDiM
 retrieving revision 1.1
 diff -u -r1.1 cmgDiMuonSel_cfi.py
 --- HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/skims/cmgDiMuonSel_cfi.py	19 Mar 2013 15:44:51 -0000
 @@ -4,9 +4,10 @@
  # as they are subject to change. 
  # you should override these cuts in your analysis.
@@ -1342,7 +1697,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/cmgMuo
 retrieving revision 1.1
 diff -u -r1.1 cmgMuonSel_cfi.py
 --- HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	28 Mar 2011 14:12:52 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/skims/cmgMuonSel_cfi.py	19 Mar 2013 15:44:51 -0000
 @@ -4,9 +4,9 @@
  # as they are subject to change. 
  # you should override these cuts in your analysis.
@@ -1361,7 +1716,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEve
 retrieving revision 1.1
 diff -u -r1.1 selEventsHiggs_cfi.py
 --- HiggsAna/HMMJJ/python/skims/selEventsHiggs_cfi.py	27 May 2011 12:16:41 -0000	1.1
-+++ HiggsAna/HMMJJ/python/skims/selEventsHiggs_cfi.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsHiggs_cfi.py	19 Mar 2013 15:44:51 -0000
 @@ -3,6 +3,6 @@
  
  selectedHiggsCandFilter = cms.EDFilter("CandViewCountFilter",
@@ -1376,7 +1731,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEve
 retrieving revision 1.7
 diff -u -r1.7 selEventsMuon_cff.py
 --- HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	4 Jun 2012 15:59:00 -0000	1.7
-+++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsMuon_cff.py	19 Mar 2013 15:44:51 -0000
 @@ -2,7 +2,7 @@
  
  muonPreselNoIso = cms.EDFilter(
@@ -1398,7 +1753,7 @@ RCS file: /local/reps/CMSSW/UserCode/sbologne/HiggsAna/HMMJJ/python/skims/selEve
 retrieving revision 1.5
 diff -u -r1.5 selEventsZ_cff.py
 --- HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	27 Sep 2011 15:16:23 -0000	1.5
-+++ HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	13 Feb 2013 17:17:30 -0000
++++ HiggsAna/HMMJJ/python/skims/selEventsZ_cff.py	19 Mar 2013 15:44:51 -0000
 @@ -2,7 +2,8 @@
  
  ZmmCand = cms.EDFilter(

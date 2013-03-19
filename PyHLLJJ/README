@@ -38,3 +38,5 @@ patch -p0 < HiggsAna/PyHLLJJ/giulioCMSSW_5_3_3_patch3.patch
 ##CROSSED FINGERS
 scram b
 
+
+#latest config file for CMGV6 production: HLLJJTemplateBoth_lowMass_prod_eta47_vbf_noKinFit_cff.py
