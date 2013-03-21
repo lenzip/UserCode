@@ -47,6 +47,9 @@ class hjjlltreeproducer( TreeAnalyzer ):
             var('{pName}costhetastar'.format(pName=pName))
             var('{pName}DeltaPtZ'.format(pName=pName))
             var('{pName}DeltaPhiZ'.format(pName=pName))
+            var('{pName}DeltaPhiZJ1'.format(pName=pName))
+            var('{pName}DeltaPhiZJ2'.format(pName=pName))
+            var('{pName}SumAbsEtaJ1J2'.format(pName=pName))
             var('{pName}helphi'.format(pName=pName))
             var('{pName}helphiZl1'.format(pName=pName))
             var('{pName}helphiZl2'.format(pName=pName))
@@ -57,7 +60,8 @@ class hjjlltreeproducer( TreeAnalyzer ):
             var('{pName}detaVBF'.format(pName=pName))
             var('{pName}dphiVBF'.format(pName=pName))
             var('{pName}massVBF'.format(pName=pName))     
-        
+            var('{pName}Classifier'.format(pName=pName))
+                        
             
         #jetVars('j1rec')
         #jetVars('j2rec')
@@ -66,7 +70,7 @@ class hjjlltreeproducer( TreeAnalyzer ):
         jetVars('J1')
         jetVars('J2')
         jetVars('VBFJ1')
-        jetVars('VBFJ1')
+        jetVars('VBFJ2')
         
         particleVars('M1')
         particleVars('M2')
@@ -157,7 +161,7 @@ class hjjlltreeproducer( TreeAnalyzer ):
             fill('g_{pName}Energy'.format(pName=pName), particle.energy() )
             fill('g_{pName}Eta'.format(pName=pName), particle.eta() )
 
-        def fHiggsVars( pName, particle ):
+        def fHiggsVars( pName, particle, classifierValue ):
             fill('{pName}Mass'.format(pName=pName),particle.mass())
             fill('{pName}Pt'.format(pName=pName),particle.pt())
             fill('{pName}Energy'.format(pName=pName),particle.energy())
@@ -180,7 +184,9 @@ class hjjlltreeproducer( TreeAnalyzer ):
               fill('{pName}detaVBF'.format(pName=pName), abs(particle.vbfptr().leg1().eta()-particle.vbfptr().leg2().eta()))
               fill('{pName}dphiVBF'.format(pName=pName), deltaPhi(particle.vbfptr().leg1().phi(), particle.vbfptr().leg2().phi()))
               fill('{pName}massVBF'.format(pName=pName), particle.vbfptr().mass())     
-#
+              #
+            fill('{pName}Classifier'.format(pName=pName), classifierValue)
+                       
         subevent = getattr( event, self.cfg_ana.anaName )
         fill('step',subevent.step)
         #fill('iszee',subevent.iszee)
@@ -271,11 +277,32 @@ class hjjlltreeproducer( TreeAnalyzer ):
 #        if len(subevent.hbest) > 0:
 #          fParticleVars('hmumujjrefit', subevent.hbest[0])
 #          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
-        
-          
         if (len(subevent.hmumujj_withmatchinfo)>0):
-          goldenCandidate = subevent.hmumujj_withmatchinfo[0]
-          fHiggsVars('HMMJJ', goldenCandidate[0])
+          vbfmaxdeta = 0.   
+          vbfmaxmass = 0.                   
+          for cand in subevent.hmumujj_withmatchinfo:
+            #if(abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) ) > vbfmaxdeta:
+            if(cand[0].vbfptr().mass()) > vbfmaxmass:  
+              #vbfmaxdeta = abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta())   
+              vbfmaxmass = cand[0].vbfptr().mass()
+              goldenCandidate = cand
+          #print "Mu candidate. VBF max deltaEta: ", vbfmaxdeta
+          #print "Mu candidate. VBF max mass: ", vbfmaxmass
+          
+        elif (len(subevent.heejj_withmatchinfo)>0):
+          vbfmaxdeta = 0.
+          vbfmaxmass = 0.
+          for cand in subevent.heejj_withmatchinfo:
+            if(cand[0].vbfptr().mass()) > vbfmaxmass:
+#            if(abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) ) > vbfmaxdeta:
+#              vbfmaxdeta = abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) 
+              vbfmaxmass = cand[0].vbfptr().mass()
+              goldenCandidate= cand
+          #print "Ele candidate. VBF max mass: ", vbfmaxmass
+       
+        if (len(subevent.hmumujj_withmatchinfo)>0):
+          #goldenCandidate = subevent.hmumujj_withmatchinfo[0]
+          fHiggsVars('HMMJJ', goldenCandidate[0], goldenCandidate[3])
           fill('isDecayMatched',goldenCandidate[1])
           fill('isVBFMatched',goldenCandidate[2])
           fParticleVars('ZMM', goldenCandidate[0].leg1())
@@ -284,9 +311,11 @@ class hjjlltreeproducer( TreeAnalyzer ):
           fParticleVars('M2', goldenCandidate[0].leg1().leg2())
           fParticleVars('J1', goldenCandidate[0].leg2().leg1())
           fParticleVars('J2', goldenCandidate[0].leg2().leg2())
+          fJetVars('VBFJ1',goldenCandidate[0].vbfptr().leg1())
+          fJetVars('VBFJ2',goldenCandidate[0].vbfptr().leg2())
         elif (len(subevent.heejj_withmatchinfo)>0):
-          goldenCandidate = subevent.heejj_withmatchinfo[0]
-          fHiggsVars('HEEJJ', goldenCandidate[0])
+          #goldenCandidate = subevent.heejj_withmatchinfo[0]
+          fHiggsVars('HEEJJ', goldenCandidate[0], goldenCandidate[3])
           fill('isDecayMatched',goldenCandidate[1])
           fill('isVBFMatched',goldenCandidate[2])
           fParticleVars('ZEE', goldenCandidate[0].leg1())
@@ -295,5 +324,7 @@ class hjjlltreeproducer( TreeAnalyzer ):
           fParticleVars('E2', goldenCandidate[0].leg1().leg2())
           fParticleVars('J1', goldenCandidate[0].leg2().leg1())
           fParticleVars('J2', goldenCandidate[0].leg2().leg2()) 
-
+          fJetVars('VBFJ1',goldenCandidate[0].vbfptr().leg1())
+          fJetVars('VBFJ2',goldenCandidate[0].vbfptr().leg2())                  
+                    
         self.tree.fill()
