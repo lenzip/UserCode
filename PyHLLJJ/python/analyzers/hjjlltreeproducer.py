@@ -278,26 +278,26 @@ class hjjlltreeproducer( TreeAnalyzer ):
 #          fParticleVars('hmumujjrefit', subevent.hbest[0])
 #          fill('minDeltaPhiLJ', subevent.deltaPhiLJ[0])
         if (len(subevent.hmumujj_withmatchinfo)>0):
-          vbfmaxdeta = 0.   
-          vbfmaxmass = 0.                   
-          for cand in subevent.hmumujj_withmatchinfo:
-            #if(abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) ) > vbfmaxdeta:
-            if(cand[0].vbfptr().mass()) > vbfmaxmass:  
-              #vbfmaxdeta = abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta())   
-              vbfmaxmass = cand[0].vbfptr().mass()
-              goldenCandidate = cand
+          #vbfmaxdeta = 0.   
+          #vbfmaxmass = 0.                   
+          #for cand in subevent.hmumujj_withmatchinfo:
+          #  #if(abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) ) > vbfmaxdeta:
+          #  if(cand[0].vbfptr().mass()) > vbfmaxmass:  
+          #    #vbfmaxdeta = abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta())   
+          #    vbfmaxmass = cand[0].vbfptr().mass()
+          goldenCandidate = subevent.hmumujj_withmatchinfo[0] #cand
           #print "Mu candidate. VBF max deltaEta: ", vbfmaxdeta
           #print "Mu candidate. VBF max mass: ", vbfmaxmass
           
         elif (len(subevent.heejj_withmatchinfo)>0):
-          vbfmaxdeta = 0.
-          vbfmaxmass = 0.
-          for cand in subevent.heejj_withmatchinfo:
-            if(cand[0].vbfptr().mass()) > vbfmaxmass:
-#            if(abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) ) > vbfmaxdeta:
-#              vbfmaxdeta = abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) 
-              vbfmaxmass = cand[0].vbfptr().mass()
-              goldenCandidate= cand
+          #vbfmaxdeta = 0.
+          #vbfmaxmass = 0.
+          #for cand in subevent.heejj_withmatchinfo:
+          #  if(cand[0].vbfptr().mass()) > vbfmaxmass:
+#         #   if(abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) ) > vbfmaxdeta:
+#         #     vbfmaxdeta = abs(cand[0].vbfptr().leg1().eta() - cand[0].vbfptr().leg2().eta()) 
+          #    vbfmaxmass = cand[0].vbfptr().mass()
+          goldenCandidate = subevent.heejj_withmatchinfo[0]
           #print "Ele candidate. VBF max mass: ", vbfmaxmass
        
         if (len(subevent.hmumujj_withmatchinfo)>0):

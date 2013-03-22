@@ -4,8 +4,8 @@ import copy
 from HiggsAna.HLLJJCommon.cmdLine import options
 options.parseArguments()
 options.selection = 'presel'
-options.maxEvents = 400
-options.output = "cmgTupleVBF_etaMod_noVBFcuts_.root" 
+#options.maxEvents = 400
+#options.output = "cmgTupleVBF_etaMod_noVBFcuts_.root" 
 print options.selection 
 
 runOnMC      = True
@@ -439,7 +439,7 @@ process.cmgJetR2.checkOverlaps.genParton.algorithm = cms.string('byDeltaR')
 process.VBFPairsAll.cuts.genVBF = cms.PSet( genVBF = cms.string('leg1.sourcePtr().get().hasOverlaps(\'genVBF\') && leg2.sourcePtr().get().hasOverlaps(\'genVBF\')'))
 
 print process.cmgJetR2.checkOverlaps
-process.VBFPairsAll.cuts.vbf.deta="abs(leg1.eta - leg2.eta) > 0"
+process.VBFPairsAll.cuts.vbf.deta="abs(leg1.eta - leg2.eta) > 1.5"
 process.VBFPairsAll.cuts.vbf.mass="mass > 20"
 
 process.analysisSequenceJets = cms.Sequence(
@@ -447,8 +447,8 @@ process.analysisSequenceJets = cms.Sequence(
     process.jetSequence +
     process.selectedJetSequence +
     process.diJetSequence +
-    process.selectedZjjSequence+
-    process.cmgDiJetKinFit
+    process.selectedZjjSequence #+
+    #process.cmgDiJetKinFit
     )
 
 ########################################

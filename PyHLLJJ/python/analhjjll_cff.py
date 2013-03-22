@@ -22,7 +22,8 @@ hjjllAna = cfg.Analyzer('hjjllanalyzer',
   jetptmin = 15.,
   matchgen=True,
   matchvbfgen=True,
-  replicatepreselection=False
+  replicatepreselection=False,
+  computeClassifier = True
 )
 
 treeProducerConf = {
@@ -60,8 +61,8 @@ stopper = cfg.Analyzer(
 
 sequence = cfg.Sequence([
     hjjllAna,
-    #createTreeProducer( hjjllAna ),
+    createTreeProducer( hjjllAna ),
     #createTreeEff( hjjllAna ),
-    createTreeCombinatorial ( hjjllAna )
+    #createTreeCombinatorial ( hjjllAna )
     ])
 

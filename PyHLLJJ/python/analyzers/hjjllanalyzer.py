@@ -15,7 +15,8 @@ from CMGTools.RootTools.utils.DeltaR import deltaR, deltaPhi
 from math import pi, sqrt, acos
 from sets import Set
 import numpy
-gSystem.CompileMacro("TMVAClassification_BDT.class.C")
+#gSystem.CompileMacro("TMVAClassification_BDT.class.C")
+gSystem.Load("TMVAClassification_BDT.class_C.so")
 from ROOT import ReadBDT,vector
 #from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
 
@@ -555,22 +556,49 @@ class hjjllanalyzer( Analyzer ):
                   varnames.push_back("ZJJMass")
                   varnames.push_back("J1Pt")
                   varnames.push_back("J2Pt")
-                  varnames.push_back("abs(HMMJJDeltaPhiZ)")
-                  varnames.push_back("abs(HMMJJSumAbsEtaJ1J2)")
-                  varnames.push_back("ZJJdeltaRDecay")
+                  varnames.push_back("ZJJdeltaEtaDecay")
+                  varnames.push_back("HMMJJMass>0?abs(HMMJJDeltaPhiZ):abs(HEEJJDeltaPhiZ)")
+                  varnames.push_back("HMMJJMass>0?abs(HMMJJSumAbsEtaJ1J2):abs(HEEJJSumAbsEtaJ1J2)")
+                  varnames.push_back("HMMJJMass>0?HMMJJcosthetastar:HEEJJcosthetastar")
+                  varnames.push_back("HMMJJMass>0?HMMJJhelphi:HEEJJhelphi")
+                  varnames.push_back("HMMJJMass>0?HMMJJhelphiZl1:HEEJJhelphiZl1")
+                  varnames.push_back("HMMJJMass>0?HMMJJhelphiZl2:HEEJJhelphiZl2")
+                  varnames.push_back("HMMJJMass>0?HMMJJphistarZl1:HEEJJphistarZl1")
+                  varnames.push_back("HMMJJMass>0?HMMJJphistarZl2:HEEJJphistarZl2")
+                  varnames.push_back("HMMJJMass>0?HMMJJhelcosthetaZl1:HEEJJhelcosthetaZl1")
+                  varnames.push_back("HMMJJMass>0?HMMJJhelcosthetaZl2:HEEJJhelcosthetaZl2")
                   vars = vector("double") ()
                   vars.push_back(cand.leg2().mass())
                   vars.push_back(cand.leg2().leg1().pt())
                   vars.push_back(cand.leg2().leg2().pt())
-                  vars.push_back(abs(deltaPhi(cand.leg1().phi(), cand.leg2().phi())))
+                  vars.push_back(abs(cand.leg2().leg1().eta() - cand.leg2().leg2().eta()))
+                  vars.push_back(abs(deltaPhi(cand.leg1().eta(), cand.leg2().eta())))
                   vars.push_back(abs(cand.leg2().leg1().eta())+abs(cand.leg2().leg2().eta()))
-                  vars.push_back(deltaR(cand.leg2().leg1().phi(), cand.leg2().leg1().eta(),
-                           cand.leg2().leg2().phi(), cand.leg2().leg2().eta()))
-                  classifier = ReadBDT(varnames)
-                  value = classifier.GetMvaValue(vars)  
-                  outputCollection.append([cand, decaymatched, vbfmatched,value]) 
-          outputCollection.sort(key=lambda a: a[3], reverse=True)  
-        
+                  vars.push_back(cand.costhetastar())
+                  vars.push_back(cand.helphi())
+                  vars.push_back(cand.helphiZl1())
+                  vars.push_back(cand.helphiZl2())
+                  vars.push_back(cand.phistarZl1())
+                  vars.push_back(cand.phistarZl2())
+                  vars.push_back(cand.helcosthetaZl1())
+                  vars.push_back(cand.helcosthetaZl2())
+                  if self.cfg_ana.computeClassifier:         
+                    classifier = ReadBDT(varnames)
+                    value = classifier.GetMvaValue(vars)  
+                  else: 
+                    value = -1.
+                  outputCollection.append([cand, decaymatched, vbfmatched,value])
+          outputCollection.sort(key=lambda a: a[0].vbfptr().mass(), reverse=True)       
+          if self.cfg_ana.computeClassifier:
+            outputCollection.sort(key=lambda a: a[3], reverse=True)  
+          #print "initial size", len(outputCollection)  
+          leadingmass = outputCollection[0][0].vbfptr().mass()  
+          #print "maxvbfmass is ",leadingmass  
+          outputCollection = [x for x in outputCollection if x[0].vbfptr().mass() >= leadingmass]
+          #print "final size",len(outputCollection)
+
+
+
 
         if self.handles['hmumujj'].isValid() and len(self.handles['hmumujj'].product()) > 0:
           matchAndSort(self.handles['hmumujj'].product(), event.hmumujj_withmatchinfo)

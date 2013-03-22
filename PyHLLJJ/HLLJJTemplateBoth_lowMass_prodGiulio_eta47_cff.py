@@ -30,8 +30,8 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
 process.genSelectorVBF = cms.EDFilter("GenParticleSelector",
   src = cms.InputTag("genParticles"),
   cut = cms.string(' (abs(pdgId) <= 6 ) '+
-                   ' && (status==3) ')# +
-                   #' && abs(mother.pdgId) <= 6 '+
+                   ' && (status==3) ' +
+                   ' && abs(mother.pdgId) <= 6 ')
                    #' && mother.numberOfDaughters()==2 '+
                    #' && ( abs(mother.daughter(0).pdgId)==25 || abs(mother.daughter(1).pdgId)==25) ')
                    #' && (daughter(0).status()==2) '+

@@ -1,1 +1,7 @@
-python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py V5_3 DY10To50V5presel2_15_cfg.py -N 100000000 -p 0 -f 
+#!/bin/bash
+
+for i  in `seq 0 500`; do
+  startinit=$(( $i*30000 ))
+  echo $startinit
+  bsub -q cmscaf1nd "batch.sh V6/DY10to50_$startinit DY10To50V6presel2_15_cfg.py $i $startinit"
+done  
