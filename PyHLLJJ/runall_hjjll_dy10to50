@@ -3,5 +3,5 @@
 for i  in `seq 0 500`; do
   startinit=$(( $i*30000 ))
   echo $startinit
-  bsub -q cmscaf1nd "batch.sh V6/DY10to50_$startinit DY10To50V6presel2_15_cfg.py $i $startinit"
+  bsub -q cmscaf1nd "batch.sh V6/DY10to50_$startinit DY10To50V6presel2_15_cfg.py $startinit"
 done  

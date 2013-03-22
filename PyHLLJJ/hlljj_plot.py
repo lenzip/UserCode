@@ -30,21 +30,34 @@ os.system("mkdir -p "+plot_dire)
 
 
 lumi=20000
-def_condition = " and (event.J1Pt > 15 and event.J2Pt > 15. and event.VBFJ1Pt > 15. and event.VBFJ2Pt > 15.)"
+#def_condition = " and (event.J1Pt > 15 and event.J2Pt > 15. and event.VBFJ1Pt > 15. and event.VBFJ2Pt > 15.)"
+def_condition = " and (event.J1Pt > 20 and event.J2Pt > 20. and event.VBFJ1Pt > 35. and event.VBFJ2Pt > 35.)"
+def_condition += " and (event.J1EFraction < 0.9 and event.J2EFraction < 0.9 and event.VBFJ1EFraction <0.9 and event.VBFJ2EFraction < 0.9)"
 def_condition += " and ((event.M1Pt > 15 and event.M2Pt > 10.) or (event.E1Pt > 20 and event.E2Pt > 10.))"
+def_condition += " and max(event.HEEJJClassifier, event.HMMJJClassifier) > -0.2"
+def_condition += " and max(event.ZEEMass, event.ZMMMass) < 75. "
+def_condition += " and max(event.HEEJJdetaVBF,event.HMMJJdetaVBF) > 4."
+def_condition += " and max(event.HEEJJmassVBF,event.HMMJJmassVBF) > 350."
+
+
 mclist=[
-    #passo il peso direttamente
     #["vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched and event.isVBFMatched", ], 
-    ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched and event.isVBFMatched"+def_condition, ], 
-    ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125NoMatch","VBFH125 not matched", "(not event.isDecayMatched or not event.isVBFMatched)"+def_condition, ], 
+#    ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched and event.isVBFMatched"+def_condition, ], 
+#    ["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125NoMatch","VBFH125 not matched", "(not event.isDecayMatched or not event.isVBFMatched)"+def_condition, ], 
     #["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125Match","VBFH125 matched", "event.isDecayMatched"+def_condition, ], 
     #["/tmp/lenzip/vbfh125_v5_4.root",(1.578*0.0264*0.14)*0.19,"VBFH125NoMatch","VBFH125 not matched", "(not event.isDecayMatched or not event.isVBFMatched)"+def_condition], 
-    ["/tmp/lenzip/ggh125_v5.root",(19.52*0.0264*0.14)*0.143385404875,"GGH125","GGH125", "True"+def_condition], 
+#    ["/tmp/lenzip/ggh125_v5.root",(19.52*0.0264*0.14)*0.143385404875,"GGH125","GGH125", "True"+def_condition], 
     #["/tmp/lenzip/ggh125_v5.root",(19.52*0.0264*0.14)*0.143385404875,"GGH125","GGH125", "event.isDecayMatched"+def_condition], 
-    ["/tmp/lenzip/dy50.root",(3503.71)*0.0834175089149,"DY50", "DY50", "True"+def_condition], 
-    ["/tmp/lenzip/dy10to50.root",(13124*0.069)*0.0465582665252,"DY10to50", "DY10to50", "True"+def_condition], 
+#    ["/tmp/lenzip/dy50.root",(3503.71)*0.0834175089149,"DY50", "DY50", "True"+def_condition], 
+#    ["/tmp/lenzip/dy10to50.root",(13124*0.069)*0.0465582665252,"DY10to50", "DY10to50", "True"+def_condition], 
+
+#V6
+    ["/tmp/lenzip/vbfv6_treeproducer.root",(1.578*0.0264*0.14)*0.172597472816,"VBFH125","VBFH125", "True"+def_condition],
+    ["/tmp/lenzip/dy50v6_treeproducer.root", (3503.71)*0.0627984012868, "DY50", "DY50", "True"+def_condition],
+    ["/tmp/lenzip/dy10to50v6_treeproducer.root", (13124*0.069)*0.0343213512163, "DY10to50", "DY10to50", "True"+def_condition],
+
     ]
-treename="hjjllcombinatorial_hjjllanalyzer"
+treename="hjjlltreeproducer_hjjllanalyzer"
 
 # luminosity to normalize (in pb-1)
 
@@ -165,12 +178,12 @@ for index,mc in enumerate(mclist):
         read+=1
         if read % 10000 ==1:
             print "Reading event:",read,'/',nevents
-        if (event.eventNumber != lastevent):
-          lastevent = event.eventNumber
-          neventsprocessed += 1
-          if passpresel:
-            npass+=1
-          passpresel = False
+        #if (event.eventNumber != lastevent):
+        #lastevent = event.eventNumber
+        neventsprocessed += 1
+        if passpresel:
+          npass+=1
+        passpresel = False
 
         addcut = eval(mc[4]) 
             
