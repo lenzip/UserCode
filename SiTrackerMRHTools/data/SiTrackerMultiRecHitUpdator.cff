@@ -1,4 +1,0 @@
-include "RecoTracker/TransientTrackingRecHit/data/TransientTrackingRecHitBuilder.cfi" 
-include "TrackingTools/KalmanUpdators/data/TrackingRecHitPropagatorESProducer.cff"
-
-include "RecoTracker/SiTrackerMRHTools/data/SiTrackerMultiRecHitUpdator.cfi"

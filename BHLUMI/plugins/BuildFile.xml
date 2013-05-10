@@ -1,7 +1,0 @@
-<use name="GeneratorInterface/BHLUMI"/>
-<use name="GeneratorInterface/Pythia6Interface"/>
-<use   name="GeneratorInterface/ExternalDecays"/>
-<library   file="*.cc" name="GeneratorInterfaceBHLUMIFilter">
-  <Flags CppDefines="DEBUG=1"/>
-  <flags   EDM_PLUGIN="1"/>
-</library>
