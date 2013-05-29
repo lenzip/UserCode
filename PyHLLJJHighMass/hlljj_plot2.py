@@ -9,24 +9,27 @@ import getopt
 from optparse import OptionParser, Option
 from systematics import *
 from fit import *
+import math
 
 #sources of xsection info
 xsecgg="http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HiggsAnalysis/CombinedLimit/data/lhc-hxswg/sm/xs/8TeV/8TeV-ggH.txt?revision=1.4&view=markup"
 xsecvbf="http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HiggsAnalysis/CombinedLimit/data/lhc-hxswg/sm/xs/8TeV/8TeV-vbfH.txt?revision=1.7&view=markup"
 effvbf="http://lenzip.web.cern.ch/lenzip/H2l2q/Efficiencies/effVBF.txt"
 effgg="http://lenzip.web.cern.ch/lenzip/H2l2q/Efficiencies/effGG.txt"
+mvatraining="/afs/cern.ch/work/v/vagori/public/MVA_weights/"
 
 #default selection
 def_condition = " and (event.J1Pt > 30 and event.J2Pt > 30. and event.VBFJ1Pt > 50. and event.VBFJ2Pt > 30.)"
 def_condition += " and ((event.M1Pt > 40 and event.M2Pt > 20.) or (event.E1Pt > 40 and event.E2Pt > 20.))"
-#def_condition += " and ((event.ZEEMass > 76. and event.ZEEMass < 106.) or (event.ZMMMass > 76. and event.ZMMMass < 106.))"
-def_condition += " and ((event.ZEEMass > 50.) or (event.ZMMMass > 50.))"
-#def_condition += " and (event.ZJJMass > 71. and event.ZJJMass < 111.)"
-def_condition += " and (event.ZJJMass > 50. )"
+def_condition += " and ((event.ZEEMass > 76. and event.ZEEMass < 106.) or (event.ZMMMass > 76. and event.ZMMMass < 106.))"
+#def_condition += " and ((event.ZEEMass > 50.) or (event.ZMMMass > 50.))"
+def_condition += " and (event.ZJJMass > 71. and event.ZJJMass < 111.)"
+#def_condition += " and (event.ZJJMass > 50. )"
 def_condition += " and max(event.HEEJJmassVBF, event.HMMJJmassVBF)> 400"
 def_condition += " and max(event.HEEJJdetaVBF, event.HMMJJdetaVBF)> 4"
 def_condition += " and event.ZJJPt > 80."
-#def_condition += " and (abs(event.HEEJJcosthetastar) < 0.8 or abs(event.HMMJJcosthetastar) < 0.8)"
+def_condition += " and (abs(event.HEEJJcosthetastar) < 0.8 or abs(event.HMMJJcosthetastar) < 0.8)"
+#def_condition += " and max(event.HEEJJMass, event.HMMJJMass)>282 and max(event.HEEJJMass, event.HMMJJMass) < 330"
 
 #default list of plots
 def_plot=True
@@ -86,6 +89,8 @@ h1_list=[
     ["ZLLJJPtSum" ,"max(event.ZEEPt, event.ZMMPt)+event.ZJJPt" , 200, 0. , 2000, def_plot, "", "", "ZLLPt+ZJJPt", ""],
     ["HEEJJEta" ,"event.HEEJJEta", 50, -5. , 5, def_plot, "", "", "HEEJJEta", ""],
     ["HMMJJEta" ,"event.HMMJJEta", 50, -5. , 5, def_plot, "", "", "HMMJJEta", ""],
+    ["HMMclassifier_value", "HMMclassifier_value", 100, -0.8, 0.8, def_plot, "", "", "bdt", ""],
+    ["HEEclassifier_value", "HEEclassifier_value", 100, -0.8, 0.8, def_plot, "", "", "bdt", ""]
 ]
 #name of the tree you want to look for in the files
 treename="hjjlltreeproducerhm_hjjllanalyzerhm"
@@ -108,8 +113,8 @@ def defineSamples(massmin, massmax, step, sigonly, bkgonly):
     br = getBr(mass)
     print "br", br
 
-    signals.append(["~vagori/public/VBFH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(vbfxsec[0]*br[0]*0.14)*vbfeff,"VBFH"+str(mass),"VBFH"+str(mass), "True"+def_condition]),
-    signals.append(["/afs/cern.ch/user/l/lenzip/public/FromAntonio/V6_gg/GGH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(ggxsec[0]*br[0]*0.14)*ggeff,"GGH"+str(mass),"GGH"+str(mass), "True"+def_condition]),
+    signals.append(["~vagori/public/VBFH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(vbfxsec[0]*br[0]*0.14)*vbfeff,"VBFH"+str(mass),"VBFH"+str(mass), "True"+def_condition, mass]),
+    signals.append(["/afs/cern.ch/user/l/lenzip/public/FromAntonio/V6_gg/GGH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(ggxsec[0]*br[0]*0.14)*ggeff,"GGH"+str(mass),"GGH"+str(mass), "True"+def_condition, mass]),
 
   backgrounds=[
     #["V6/dy50_treeproducerhm.root", (3503.71)*0.0627984012868, "DY50", "DY50", "True"+def_condition], 
@@ -185,6 +190,7 @@ def getEff(mass, sample):
 def bookHistograms(signals, backgrounds, mclist, indexcontent):
   linecolors=[]
   linestyle=[]
+  linewidth=[]
   fillcolors=[]
   fillstyles=[]
   smooth=[]
@@ -197,6 +203,7 @@ def bookHistograms(signals, backgrounds, mclist, indexcontent):
     linecolors.append(color)
     fillcolors.append(0)
     fillstyles.append(0)
+    linewidth.append(2)
     if i%2 == 0:
       linestyle.append(1)
     else:
@@ -205,10 +212,15 @@ def bookHistograms(signals, backgrounds, mclist, indexcontent):
     lastcolor=color
  
   for i in range(len(backgrounds)):
-    linecolors.append(lastcolor+i)
+    #linecolors.append(lastcolor+i)
+    linecolors.append(4)
     fillcolors.append(4)
     fillstyles.append(3013)
     smooth.append(False)
+    if i < len(backgrounds)-1:
+      linewidth.append(-1)
+    else:
+      linewidth.append(2)
     linestyle.append(1)
 
   h1glob=[]
@@ -221,12 +233,13 @@ def bookHistograms(signals, backgrounds, mclist, indexcontent):
         param=h1_list[h1]
         h1loc.append(TH1F(param[0]+tag,param[0]+tag,param[2],param[3],param[4]))
         h1loc[len(h1loc)-1].SetLineColor(linecolors[index])
-        h1loc[len(h1loc)-1].SetLineWidth(2)
+        #h1loc[len(h1loc)-1].SetLineWidth(2)
         h1loc[len(h1loc)-1].SetMarkerColor(linecolors[index])
         h1loc[len(h1loc)-1].SetLineStyle(linestyle[index])
         #if index != 0:
         h1loc[len(h1loc)-1].SetFillStyle(fillstyles[index]);
         h1loc[len(h1loc)-1].SetFillColor(fillcolors[index])
+        h1loc[len(h1loc)-1].SetLineWidth(linewidth[index])
         h1loc[len(h1loc)-1].Sumw2()
         #indexcontent+="<IMG SRC=\""+param[0]+".png\">\n"
     if (len(h1loc)):
@@ -239,14 +252,14 @@ def bookHistograms(signals, backgrounds, mclist, indexcontent):
   setTDRStyle()
   return h1glob, indexcontent
 
-def draw(h1glob, plot_dire, indexcontent):
+def draw(h1glob, plot_dire, indexcontent, v_neventsprocessed, v_neventspassed, v_lumiweight):
   # first prepare legenda
   #yheaderstart=.95-.023*len(mclist)
   leg_hist = TLegend(0.30,0.85,0.98,0.98);
   leg_hist.SetFillColor(0)# Have a white background
   leg_hist.SetTextSize(0.03)
   leg_hist.SetNColumns(2)
-  leg_hist.SetHeader( "L = %s fb#^-1" %str(float(lumi/1000.)))
+  leg_hist.SetHeader( "L = %s/fb" %str(float(lumi/1000.)))
 
   leg_hist2 = TLegend(0.30,0.85,0.98,0.98);
   leg_hist2.SetFillColor(0)# Have a white background
@@ -269,10 +282,11 @@ def draw(h1glob, plot_dire, indexcontent):
         opt=""
     if index<len(signals):
       leg_hist2.AddEntry((h1glob[index])[0],mc[3],"l")
+      leg_hist.AddEntry((h1glob[index])[0],mc[3],"l")
     if index == len(h1glob)-1:
       leg_hist.AddEntry( (h1glob[index])[0], "All backgrounds", "lf");
       leg_hist2.AddEntry( (h1glob[index])[0], "All backgrounds", "lf");
-    leg_hist.AddEntry((h1glob[index])[0],mc[3],"l")
+    #leg_hist.AddEntry((h1glob[index])[0],mc[3],"l")
 
   canv=[]
   #gStyle.SetOptStat(11111111)
@@ -301,14 +315,19 @@ def draw(h1glob, plot_dire, indexcontent):
         stackh_h.Add(h1loc[i])
     themax = max(stackbyhand.GetMaximum(), (h1glob[0])[i].GetMaximum())
     if not options.sigonly:
-      stackh_h.Draw("HIST")
+      #stackh_h.Draw("HIST")
+      stackbyhand.Draw("HIST")
       if h1[8] != "":
-        stackh_h.GetXaxis().SetTitle(h1[8])
+        #stackh_h.GetXaxis().SetTitle(h1[8])
+        stackbyhand.GetXaxis().SetTitle(h1[8])
       if h1[9] != "":
-        stackh_h.GetYaxis().SetTitle(h1[9])
+        #stackh_h.GetYaxis().SetTitle(h1[9])
+        stackbyhand.GetYaxis().SetTitle(h1[9])
       (h1glob[0])[i].Scale(scalesig)
-      stackh_h.SetMaximum(20*themax)
-      stackh_h.SetMinimum(0.1)
+      #stackh_h.SetMaximum(20*themax)
+      stackbyhand.SetMaximum(20*themax)
+      #stackh_h.SetMinimum(0.1)
+      stackbyhand.SetMinimum(0.1)
       for isig in range(len(signals)):
         (h1glob[isig])[i].Draw("HISTsames")
     else:
@@ -336,12 +355,19 @@ def draw(h1glob, plot_dire, indexcontent):
       stackbyhand.SetLineWidth(2)
       #stackbyhand.DrawNormalized()
       stackbyhandclone = stackbyhand.Clone()
-      stackbyhandclone.Scale(1/stackbyhandclone.Integral())
+      integral = stackbyhandclone.Integral()
+      if integral == 0.:
+        integral = 1.
+      stackbyhandclone.Scale(1/integral)
     clonemax=0
     h1clones=[]
     for isig in range(len(signals)):
       h1clone = (h1glob[isig])[i].Clone()
-      h1clone.Scale(1/h1clone.Integral())
+      #integral = max(1., h1clone.Integral())
+      integral = h1clone.Integral()
+      if integral == 0.:
+        integral = 1.
+      h1clone.Scale(1/integral)
       h1clones.append(h1clone)
       if h1clone.GetMaximum() > clonemax:
         clonemax = h1clone.GetMaximum()
@@ -376,18 +402,56 @@ def draw(h1glob, plot_dire, indexcontent):
         (h1glob[index])[i].GetStats(statssig)
         stackbyhand.GetXaxis().SetRangeUser(minmass, maxmass)
         stackbyhand.GetStats(statsback)
+        nsel = v_neventspassed[index] #(h1glob[index])[i].GetEntries()
         print statssig[0],statssig[1]
         type = "VBF"
         if index%2 != 0:
           type = "GG"
         print type
         type=type+str(mass)
+        area = (h1glob[index])[i].Integral()/scalesig
+        eff_plus = ((nsel/v_neventsprocessed[index]+0.5/v_neventsprocessed[index])+\
+                     math.sqrt(math.pow((nsel/v_neventsprocessed[index]+0.5/v_neventsprocessed[index]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[index],2)*(1.+1./v_neventsprocessed[index]) ))/(1.+1./v_neventsprocessed[index])
+        eff_minus = ((nsel/v_neventsprocessed[index]+0.5/v_neventsprocessed[index])-\
+                     math.sqrt(math.pow((nsel/v_neventsprocessed[index]+0.5/v_neventsprocessed[index]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[index],2)*(1.+1./v_neventsprocessed[index]) ))/(1.+1./v_neventsprocessed[index])
+        print "effplus, effminus, eff ", eff_plus, eff_minus, float(nsel/v_neventsprocessed[index])            
+        error_plus = (v_neventsprocessed[index]*eff_plus - nsel)*v_lumiweight[index]
+        error_minus = (nsel - v_neventsprocessed[index]*eff_minus)*v_lumiweight[index]
+        #protection for numeric accuracy
+        if nsel==0:
+          error_minus = 0.
+        #TODO CAREFUL! I'm assuming, for the rerrors that half is electrons half is muons  
         indexcontent+="<CENTER>#events in signal "+type+" in ("+str(minmass)+","+str(maxmass)+") for "+h1[0]+": "+str((h1glob[index])[i].Integral()/scalesig)+ \
-                    "+/-" + str(sqrt(statssig[1])/scalesig)+'</CENTER>\n'
-        indexcontent+="<CENTER>#events in background "+str(mass)+" in ("+str(minmass)+","+str(maxmass)+") for "+h1[0]+": "+str(stackbyhand.Integral()) + \
-                  "+/-" + str(sqrt(statsback[1]))+'</CENTER>\n'
+                    "+" + str(error_plus)+"-"+str(error_minus)+' estimated from '+str(float(nsel)/2.)+" events with lumi weight "+str(v_lumiweight[index])+'</CENTER>\n'
+        for index2 in range(len(backgrounds)):
+          imc = len(signals)+index2
+          nsel = v_neventspassed[imc] #(h1glob[index])[i].GetEntries()
+          (h1glob[imc])[i].GetXaxis().SetRangeUser(minmass, maxmass)
+          area = (h1glob[imc])[i].Integral()
+          eff_plus = ((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc])+\
+                     math.sqrt(math.pow((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[imc],2)*(1.+1./v_neventsprocessed[imc]) ))/(1.+1./v_neventsprocessed[imc])
+          eff_minus = ((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc])-\
+                     math.sqrt(math.pow((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[imc],2)*(1.+1./v_neventsprocessed[imc]) ))/(1.+1./v_neventsprocessed[imc])
+          print "nsel, eff_plus, eff_minus", nsel, eff_plus, eff_minus           
+          error_plus = (v_neventsprocessed[imc]*eff_plus - float(nsel))*v_lumiweight[imc]
+          error_minus = (-v_neventsprocessed[imc]*eff_minus + float(nsel))*v_lumiweight[imc]
+          #protection for numeric accuracy
+          if nsel==0:
+            error_minus = 0.
+          #TODO CAREFUL! I'm assuming, for the rerrors that half is electrons half is muons  
+          indexcontent+="<CENTER>#events in background "+(backgrounds[index2])[2]+" "+str(mass)+" in ("+str(minmass)+","+str(maxmass)+") for "+h1[0]+": "+str(h1glob[imc][i].Integral()) + \
+                      "+" + str(error_plus)+"-"+str(error_minus)+" estimated from "+str(float(nsel)/2.)+" events with lumi weight "+str(v_lumiweight[imc])+'</CENTER>\n'
+                      
+        #toterrp = 0.
+        #toterrn = 0.
+        #for i in range(len(errpos)):
+        #  toterrp += math.pow(errpos[i], 2)
+        #  toterrn += math.pow(errneg[i], 2)
+        #toterrp = math.sqrt(toterrp)
+        #toterrm = math.sqrt(toterrn)
         indexcontent+="<CENTER>-----------------------------------</CENTER>\n"
-  
+          
+ 
   indexcontent+="<HR WIDTH=\"100%\">\n"
   indexcontent+="</HTML>\n"
   out_file = open(plot_dire+"/index.html","w")
@@ -422,6 +486,8 @@ if __name__=="__main__":
   parser.add_option('--sigonly',  action="store_true", help="process signals only (default=False)", default=False)
   parser.add_option('--bkgonly',  action="store_true", help="process backgrounds only (default=False)", default=False)
   parser.add_option('--scalesignals',  action="store", help="multiply all signals by a factor (default=1.)", default=1.)
+  parser.add_option('--mva',  action="store_true", help="for the moment only one mass point st a tme can be done when evaluating mva", default=False)
+  parser.add_option('--mvacut', action='store', help="cut to apply on mva (default=no cut)", default=-9999999999.)
   parser.add_option('--syst', action="store", help = "perform syst evaluation (default=None), available: JESUP, JESDOWN  ", default=None)
 
   (options, args) = parser.parse_args()
@@ -446,6 +512,10 @@ if __name__=="__main__":
     print 'directory '+plot_dire+' exists already, doing nothing.'
     print 'You can overwrite with the --force option'
     sys.exit(1)
+  
+  if options.mva and massmin != massmax:
+    print "You can only do 1 mass point at a time when doing mva evaluation"
+    sys.exit(1)
 
   os.system("mkdir -p "+plot_dire)
 
@@ -455,12 +525,30 @@ if __name__=="__main__":
 
   #define samples
   signals, backgrounds, mclist = defineSamples(massmin, massmax, step, options.sigonly, options.bkgonly) 
+  if options.mva:
+    gSystem.CompileMacro(mvatraining+str(massmin)+"GeV_fullDY/TMVAClassification_BDT.class.C")
+    from ROOT import ReadBDT
+    varnames = vector("string") ()
+    varnames.push_back("J1Pt")
+    varnames.push_back("J2Pt")
+    varnames.push_back("VBFJ1Pt")
+    varnames.push_back("VBFJ1Eta")
+    varnames.push_back("max(HEEJJdetaVBF,HMMJJdetaVBF)")
+    varnames.push_back("min(fabs(HEEJJDeltaPhiZ),fabs(HMMJJDeltaPhiZ))")
+    varnames.push_back("max(HEEJJhelcosthetaZl2,HMMJJhelcosthetaZl2)")
+    varnames.push_back("max(HMMJJcosthetastar,HEEJJcosthetastar)")
+    varnames.push_back("ZJJMass")
+    varnames.push_back("max(ZEEPt,ZMMPt)+ZJJPt")
+    classifier = ReadBDT(varnames)
 
   #book all histograms
   h1glob, indexcontent = bookHistograms(signals, backgrounds, mclist, indexcontent)
 
   # do sample loop
-  fitmu = MLFit(plot_dire, "event.ZMMMass>0")
+  #fitmu = MLFit(plot_dire, "event.ZMMMass>0")
+  v_neventsprocessed = []
+  v_neventspassed = []
+  v_lumiweight = []
   for index,mc in enumerate(mclist):
     rootfile=mc[0]
     xsec=mc[1]
@@ -500,28 +588,53 @@ if __name__=="__main__":
         if read % 10000 ==1:
             print "Reading event:",read,'/',nevents
         neventsprocessed += 1
-        if passpresel:
-          npass+=1
         passpresel = False
 
-        addcut = eval(mc[4]) 
+        addcut = eval(mc[4])
         theweight = event.weight*lumiweight
-            
+        #for binomial error calculation
+        #sumofinitialweights+=theweight
+        HEEclassifier_value = -99.
+        HMMclassifier_value = -99.
+        if options.mva and addcut:
+          vars = vector("double") ()
+          vars.push_back(event.J1Pt)
+          vars.push_back(event.J2Pt)
+          vars.push_back(event.VBFJ1Pt)
+          vars.push_back(event.VBFJ1Eta)
+          vars.push_back(max(event.HEEJJdetaVBF, event.HMMJJdetaVBF))
+          vars.push_back(min(abs(event.HEEJJDeltaPhiZ), abs(event.HMMJJDeltaPhiZ)))
+          vars.push_back(max(event.HEEJJhelcosthetaZl2, event.HMMJJhelcosthetaZl2))
+          vars.push_back(max(event.HMMJJcosthetastar, event.HEEJJcosthetastar))
+          vars.push_back(event.ZJJMass)
+          vars.push_back(max(event.ZEEPt,event.ZMMPt)+event.ZJJPt)
+          classifier_value = classifier.GetMvaValue(vars)
+          #print classifier_value;
+          addcut = addcut and (classifier_value>float(options.mvacut))
+          if event.HMMJJMass > 0.:
+            HMMclassifier_value = classifier_value
+          if event.HEEJJMass > 0.:  
+            HEEclassifier_value = classifier_value
+          
                 
         if addcut:
             passpresel = True
-            fitmu.addToDataset(event, index<len(signals))
+            npass+=event.weight
+            #fitmu.addToDataset(event, index<len(signals))
             # here we can put all plots after selection
             for i,h1 in enumerate(h1loc):
                 param=h1_list[i]
                 h1.Fill(eval(param[1]), theweight)
     print xsec, lumiweight, neventsprocessed, npass
+    v_neventsprocessed.append(neventsprocessed)
+    v_neventspassed.append(npass)
+    v_lumiweight.append(lumiweight)
     #for i,h1 in enumerate(h1loc):
     #  h1.Scale(weight)
     treefile.Close()
 
 
   #finally draw histograms
-  draw(h1glob, plot_dire, indexcontent)
-  fitmu.fit()
+  draw(h1glob, plot_dire, indexcontent, v_neventsprocessed, v_neventspassed, v_lumiweight)
+  #fitmu.fit()
   
