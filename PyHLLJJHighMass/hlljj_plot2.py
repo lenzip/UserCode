@@ -29,7 +29,7 @@ def_condition += " and max(event.HEEJJmassVBF, event.HMMJJmassVBF)> 400"
 def_condition += " and max(event.HEEJJdetaVBF, event.HMMJJdetaVBF)> 4"
 def_condition += " and event.ZJJPt > 80."
 def_condition += " and (abs(event.HEEJJcosthetastar) < 0.8 or abs(event.HMMJJcosthetastar) < 0.8)"
-#def_condition += " and max(event.HEEJJMass, event.HMMJJMass)>282 and max(event.HEEJJMass, event.HMMJJMass) < 330"
+#def_condition += " and max(event.HEEJJMass, event.HMMJJMass)>564 and max(event.HEEJJMass, event.HMMJJMass) < 660"
 
 #default list of plots
 def_plot=True
@@ -90,7 +90,9 @@ h1_list=[
     ["HEEJJEta" ,"event.HEEJJEta", 50, -5. , 5, def_plot, "", "", "HEEJJEta", ""],
     ["HMMJJEta" ,"event.HMMJJEta", 50, -5. , 5, def_plot, "", "", "HMMJJEta", ""],
     ["HMMclassifier_value", "HMMclassifier_value", 100, -0.8, 0.8, def_plot, "", "", "bdt", ""],
-    ["HEEclassifier_value", "HEEclassifier_value", 100, -0.8, 0.8, def_plot, "", "", "bdt", ""]
+    ["HEEclassifier_value", "HEEclassifier_value", 100, -0.8, 0.8, def_plot, "", "", "bdt", ""],
+    ["HEEJJLD", "event.HEEJJLD", 50, 0, 1, def_plot, "", "", "LD HEEJJ", ""],
+    ["HMMJJLD", "event.HMMJJLD", 50, 0, 1, def_plot, "", "", "LD HMMJJ", ""],
 ]
 #name of the tree you want to look for in the files
 treename="hjjlltreeproducerhm_hjjllanalyzerhm"
@@ -113,15 +115,21 @@ def defineSamples(massmin, massmax, step, sigonly, bkgonly):
     br = getBr(mass)
     print "br", br
 
-    signals.append(["~vagori/public/VBFH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(vbfxsec[0]*br[0]*0.14)*vbfeff,"VBFH"+str(mass),"VBFH"+str(mass), "True"+def_condition, mass]),
-    signals.append(["/afs/cern.ch/user/l/lenzip/public/FromAntonio/V6_gg/GGH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(ggxsec[0]*br[0]*0.14)*ggeff,"GGH"+str(mass),"GGH"+str(mass), "True"+def_condition, mass]),
+    signals.append(["V7/VBFH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(vbfxsec[0]*br[0]*0.14)*0.376148809643,"VBFH"+str(mass),"VBFH"+str(mass), "True"+def_condition, mass])
+    #signals.append(["~vagori/public/VBFH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(vbfxsec[0]*br[0]*0.14)*vbfeff,"VBFH"+str(mass),"VBFH"+str(mass), "True"+def_condition, mass]),
+    #signals.append(["~vagori/public/VBFH"+str(mass)+"/hjjlltreeproducerhm_hjjllanalyzerhm/hjjlltreeproducerhm_hjjllanalyzerhm_tree.root",(vbfxsec[0]*br[0]*0.14)*vbfeff,"VBFH"+str(mass),"VBFH"+str(mass), "True"+def_condition, mass]),
 
   backgrounds=[
+    ["V7/DY2Jet_treeproducerhm.root", (666.30)*0.029571432944, "DY50J2", "DY50J2", "True"+def_condition], 
+    ["V7/DY3Jet_treeproducerhm.root", (214.97)*0.0610400939618, "DY50J3", "DY50J3", "True"+def_condition], 
+    ["V7/DY4Jet_treeproducerhm.root", (60.69)*0.08356401767, "DY50J4", "DY50J4", "True"+def_condition], 
+    ["V7/DY200To400_treeproducerhm.root", (23.43)*0.147013266797, "DY50HT200To400", "DY50HT200To400", "True"+def_condition], 
+    ["V7/DY400ToInf_treeproducerhm.root", (3.365)*0.211445990669, "DY50HT400ToInf", "DY50HT400ToInf", "True"+def_condition], 
     #["V6/dy50_treeproducerhm.root", (3503.71)*0.0627984012868, "DY50", "DY50", "True"+def_condition], 
-    ["V6/dy1_treeproducerhm.root", (667.6)*0.083927, "DY50_1", "DY50_1", "True"+def_condition],
-    ["V6/dy2_treeproducerhm.root", (215.4)*0.137033556, "DY50_2", "DY50_2", "True"+def_condition],
-    ["V6/dy3_treeproducerhm.root", (60.7)*0.20019701, "DY50_3", "DY50_3", "True"+def_condition],
-    ["V6/dy4_treeproducerhm.root", (27.4)*0.26028636, "DY50_4", "DY50_4", "True"+def_condition],
+    #["V6/dy1_treeproducerhm.root", (667.6)*0.083927, "DY50_1", "DY50_1", "True"+def_condition],
+    #["V6/dy2_treeproducerhm.root", (215.4)*0.137033556, "DY50_2", "DY50_2", "True"+def_condition],
+    #["V6/dy3_treeproducerhm.root", (60.7)*0.20019701, "DY50_3", "DY50_3", "True"+def_condition],
+    #["V6/dy4_treeproducerhm.root", (27.4)*0.26028636, "DY50_4", "DY50_4", "True"+def_condition],
 
   ]
     
@@ -423,24 +431,25 @@ def draw(h1glob, plot_dire, indexcontent, v_neventsprocessed, v_neventspassed, v
         #TODO CAREFUL! I'm assuming, for the rerrors that half is electrons half is muons  
         indexcontent+="<CENTER>#events in signal "+type+" in ("+str(minmass)+","+str(maxmass)+") for "+h1[0]+": "+str((h1glob[index])[i].Integral()/scalesig)+ \
                     "+" + str(error_plus)+"-"+str(error_minus)+' estimated from '+str(float(nsel)/2.)+" events with lumi weight "+str(v_lumiweight[index])+'</CENTER>\n'
-        for index2 in range(len(backgrounds)):
-          imc = len(signals)+index2
-          nsel = v_neventspassed[imc] #(h1glob[index])[i].GetEntries()
-          (h1glob[imc])[i].GetXaxis().SetRangeUser(minmass, maxmass)
-          area = (h1glob[imc])[i].Integral()
-          eff_plus = ((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc])+\
-                     math.sqrt(math.pow((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[imc],2)*(1.+1./v_neventsprocessed[imc]) ))/(1.+1./v_neventsprocessed[imc])
-          eff_minus = ((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc])-\
-                     math.sqrt(math.pow((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[imc],2)*(1.+1./v_neventsprocessed[imc]) ))/(1.+1./v_neventsprocessed[imc])
-          print "nsel, eff_plus, eff_minus", nsel, eff_plus, eff_minus           
-          error_plus = (v_neventsprocessed[imc]*eff_plus - float(nsel))*v_lumiweight[imc]
-          error_minus = (-v_neventsprocessed[imc]*eff_minus + float(nsel))*v_lumiweight[imc]
-          #protection for numeric accuracy
-          if nsel==0:
-            error_minus = 0.
-          #TODO CAREFUL! I'm assuming, for the rerrors that half is electrons half is muons  
-          indexcontent+="<CENTER>#events in background "+(backgrounds[index2])[2]+" "+str(mass)+" in ("+str(minmass)+","+str(maxmass)+") for "+h1[0]+": "+str(h1glob[imc][i].Integral()) + \
-                      "+" + str(error_plus)+"-"+str(error_minus)+" estimated from "+str(float(nsel)/2.)+" events with lumi weight "+str(v_lumiweight[imc])+'</CENTER>\n'
+        if not options.sigonly:            
+          for index2 in range(len(backgrounds)):
+            imc = len(signals)+index2
+            nsel = v_neventspassed[imc] #(h1glob[index])[i].GetEntries()
+            (h1glob[imc])[i].GetXaxis().SetRangeUser(minmass, maxmass)
+            area = (h1glob[imc])[i].Integral()
+            eff_plus = ((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc])+\
+                       math.sqrt(math.pow((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[imc],2)*(1.+1./v_neventsprocessed[imc]) ))/(1.+1./v_neventsprocessed[imc])
+            eff_minus = ((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc])-\
+                       math.sqrt(math.pow((nsel/v_neventsprocessed[imc]+0.5/v_neventsprocessed[imc]),2)-math.pow(nsel,2)/math.pow(v_neventsprocessed[imc],2)*(1.+1./v_neventsprocessed[imc]) ))/(1.+1./v_neventsprocessed[imc])
+            print "nsel, eff_plus, eff_minus", nsel, eff_plus, eff_minus           
+            error_plus = (v_neventsprocessed[imc]*eff_plus - float(nsel))*v_lumiweight[imc]
+            error_minus = (-v_neventsprocessed[imc]*eff_minus + float(nsel))*v_lumiweight[imc]
+            #protection for numeric accuracy
+            if nsel==0:
+              error_minus = 0.
+            #TODO CAREFUL! I'm assuming, for the rerrors that half is electrons half is muons  
+            indexcontent+="<CENTER>#events in background "+(backgrounds[index2])[2]+" "+str(mass)+" in ("+str(minmass)+","+str(maxmass)+") for "+h1[0]+": "+str(h1glob[imc][i].Integral()) + \
+                        "+" + str(error_plus)+"-"+str(error_minus)+" estimated from "+str(float(nsel)/2.)+" events with lumi weight "+str(v_lumiweight[imc])+'</CENTER>\n'
                       
         #toterrp = 0.
         #toterrn = 0.
@@ -591,7 +600,8 @@ if __name__=="__main__":
         passpresel = False
 
         addcut = eval(mc[4])
-        theweight = event.weight*lumiweight
+        #theweight = event.weight*lumiweight
+        theweight = lumiweight
         #for binomial error calculation
         #sumofinitialweights+=theweight
         HEEclassifier_value = -99.
@@ -611,9 +621,9 @@ if __name__=="__main__":
           classifier_value = classifier.GetMvaValue(vars)
           #print classifier_value;
           addcut = addcut and (classifier_value>float(options.mvacut))
-          if event.HMMJJMass > 0.:
+          if event.HMMJJMass > event.HEEJJMass:
             HMMclassifier_value = classifier_value
-          if event.HEEJJMass > 0.:  
+          else:  
             HEEclassifier_value = classifier_value
           
                 
