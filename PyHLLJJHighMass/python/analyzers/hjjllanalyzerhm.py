@@ -30,9 +30,9 @@ standardsteps = ['All events',
                  '50<mjj<140']
 
 class hjjllanalyzerhm( Analyzer ):
-
     def declareHandles(self):
         super(hjjllanalyzerhm, self).declareHandles()
+        self.lastevent = -1
         if self.cfg_ana.replicatepreselection:
           self.handles['jets'] = AutoHandle ('cmgJet2L2Q',
                                            'std::vector<cmg::PFJet>')
@@ -50,7 +50,11 @@ class hjjllanalyzerhm( Analyzer ):
         self.handles['heejj'] = AutoHandle('cmgHiggsSelEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
         #self.handles['heejjnofit'] = AutoHandle('cmgHiggsSelEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
 
-        self.handles['PUweight'] = AutoHandle('vertexWeightSummer12MC53XHCPData', 'double')
+        #self.handles['PUweight'] = AutoHandle('vertexWeightSummer12MC53XHCPData', 'double')
+        self.handles['PUweight'] = AutoHandle('vertexWeightSummer12MC53X2012ABCDData', 'double')
+
+        self.handles['LDe'] = AutoHandle(("LDe", "LD", "CMG"), 'edm::ValueMap<float>') 
+        self.handles['LDmu'] = AutoHandle(("LDmu", "LD", "CMG"), 'edm::ValueMap<float>') 
 
         self.handles['vertices'] = AutoHandle('goodOfflinePrimaryVertices', "vector<reco::Vertex>" )
         if self.cfg_ana.matchgen:
@@ -202,6 +206,9 @@ class hjjllanalyzerhm( Analyzer ):
         #  print "invalid vbfpairs"
 
         eventNumber = iEvent.eventAuxiliary().id().event()
+        if eventNumber == self.lastevent:
+          return False
+        self.lastevent = eventNumber  
         myEvent = Event(event.iEv)
         setattr(event, self.name, myEvent)
         event = myEvent
@@ -519,12 +526,14 @@ class hjjllanalyzerhm( Analyzer ):
           event.mjj = ( triggerjets[0].p4() + triggerjets[len(triggerjets)-1].p4() ).mass()
 
         
-             
+               
  
         #do MC matching for muons
-        def matchAndSort(inputCollection,outputCollection):
+        def matchAndSort(inputCollection,inputLD, outputCollection):
           for i in range(len(inputCollection)):
-            outputCollection.append(inputCollection[i])
+            cand = inputCollection[i]
+            cand.LD = inputLD.get(i)
+            outputCollection.append( cand )
           #sort according to the VBF mass
           outputCollection.sort(key=lambda a: a.vbfptr().mass(), reverse=True)      
           #remove the non leading vbf mass
@@ -547,15 +556,21 @@ class hjjllanalyzerhm( Analyzer ):
 
 
         if self.handles['hmumujj'].isValid() and len(self.handles['hmumujj'].product()) > 0:
-          matchAndSort(self.handles['hmumujj'].product(), event.hmumujj_withmatchinfo)
+          matchAndSort(self.handles['hmumujj'].product(), self.handles['LDmu'].product(), event.hmumujj_withmatchinfo)
           #for item in event.hmumujj_withmatchinfo:
           #  if item[1] and item[2]:
           #    print "Muon match"
           #    break
+          return True
 
         if self.handles['heejj'].isValid() and len(self.handles['heejj'].product()) > 0:
-          matchAndSort(self.handles['heejj'].product(), event.heejj_withmatchinfo)
+          matchAndSort(self.handles['heejj'].product(), self.handles['LDe'].product(), event.heejj_withmatchinfo)
           #for item in event.heejj_withmatchinfo:
           #  if item[1] and item[2]:
           #    print "Electron match"
           #    break
+          return True
+
+          print "No valid candidate found" 
+
+        return False  
